@@ -1,10 +1,9 @@
 import numpy as np
 from parapy.core import *
 from parapy.geom import *
-#from parapy.core import *
-#from parapy.geom import *
 import Import_Input as I
 from airfoil import Airfoil
+
 
 # this file makes use of the afollowing files:
 # airfoil.py
@@ -120,7 +119,6 @@ class Wing(GeomBase):
 
 
 
-
     @Part
     def root_airfoil(self):  # root airfoil will receive self.position as default
         return Airfoil(airfoil_name=self.airfoil_root,
@@ -143,14 +141,13 @@ class Wing(GeomBase):
                        mesh_deflection=0.0001)
 
     @Part
-    def right_wing(self):
+    def right_wing_surface(self):
         return LoftedSurface(profiles=self.profiles,
-                             hidden=not (__name__ == '__main__'),
                              mesh_deflection=0.0001)
 
     @Part
-    def left_wing(self):
-        return MirroredShape(shape_in=self.right_wing,
+    def left_wing_surface(self):
+        return MirroredShape(shape_in=self.right_wing_surface,
                              reference_point=self.position,
                              # Two vectors to define the mirror plane
                              vector1=self.position.Vz,
