@@ -19,9 +19,11 @@ from airfoil import Airfoil
 
 class Wing(GeomBase):
 
+    # airfoil profiles
     airfoil_root = Input("whitcomb")
     airfoil_tip = Input("simm_airfoil")
 
+    # imported parameters from input file
     mach_cruise = Input(I.Mach_cruise)
     altitude_cruise = Input(I.Altitude_cruise)
     weight_TO = Input(I.Weight_TO)
@@ -29,13 +31,10 @@ class Wing(GeomBase):
     aspect_ratio = Input(I.Aspect_ratio)
     wing_highlow = Input("low")
 
+    # some other parameters
     twist = Input(-5)
     is_mirrored = Input(True)
 
-    # Controls
-    control_name = Input(None)
-    control_hinge_loc = Input(None)
-    dupplicate_sign = Input(1)
 
     @Attribute
     def pressure(self):
@@ -98,8 +97,10 @@ class Wing(GeomBase):
         cos_halfsweep = np.cos(np.deg2rad(self.sweep_mid_chord))
         option_one = (cos_halfsweep**3 * (0.935 - self.mach_drag_divergence * cos_halfsweep) - 0.115 *self.lift_coefficient**1.5)/(cos_halfsweep**2)
 
-        if option_one < 0.18:
+        if option_one > 0.18:
             toverc = 0.18
+        elif option_one < 0.1:
+            toverc = 0.1
         else:
             toverc =option_one
 
@@ -132,7 +133,8 @@ class Wing(GeomBase):
     def tip_airfoil(self):
         return Airfoil(airfoil_name=self.airfoil_tip,
                        chord=self.chord_tip,
-                       thickness_factor=self.thickness_to_chord,factor=0.24,
+                       thickness_factor=self.thickness_to_chord,
+                       factor=0.24,
                        position=translate(
                            rotate(self.position, "y", np.deg2rad(self.twist)),  # apply twist angle
                            "y", self.span/2,
@@ -141,12 +143,19 @@ class Wing(GeomBase):
                        mesh_deflection=0.0001)
 
     @Part
-    def lofted_surf(self):
+    def right_wing(self):
         return LoftedSurface(profiles=self.profiles,
                              hidden=not (__name__ == '__main__'),
                              mesh_deflection=0.0001)
 
-
+    @Part
+    def left_wing(self):
+        return MirroredShape(shape_in=self.right_wing,
+                             reference_point=self.position,
+                             # Two vectors to define the mirror plane
+                             vector1=self.position.Vz,
+                             vector2=self.position.Vx,
+                             mesh_deflection=0.0001)
 
 if __name__ == '__main__':
     from parapy.gui import display
