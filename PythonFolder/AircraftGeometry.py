@@ -11,9 +11,11 @@ import aircraft.Import_Input as I
 class AircraftGeometry(GeomBase):
 
 
+
+
     @Part
     def fuselage(self):
-        return Fuselage(color="green")
+        return Fuselage(color="blue")
 
     @Part
     def main_wing(self):
