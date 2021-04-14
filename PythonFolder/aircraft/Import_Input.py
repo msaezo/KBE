@@ -42,7 +42,7 @@ for i in range(52,55):
     exec(Name + "=Value")
 
 #Empenage parameters
-for i in range(57,59):
+for i in range(57,67):
     Name = worksheet.cell(i,1).value
     Value = worksheet.cell(i,2).value
     exec(Name + "=Value")
