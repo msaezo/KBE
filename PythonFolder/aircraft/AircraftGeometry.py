@@ -10,18 +10,14 @@ from ref_frame import Frame
 
 class AircraftGeometry(GeomBase):
 
+
     @Part
     def fuselage(self):
-        return Fuselage(color="Green")
+        return Fuselage(color="green")
 
     @Part
     def main_wing(self):
-        return Wing(color="yellow",
-                    position=translate(
-                        self.position,
-                        "x", 15,
-                        "Z",-2.4)
-                    )
+        return Wing(color="yellow")
 
 
 

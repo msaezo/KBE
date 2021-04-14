@@ -2,8 +2,9 @@ import numpy as np
 from parapy.core import *
 from parapy.geom import *
 import Import_Input as I
-from airfoil import Airfoil
 
+from airfoil import Airfoil
+from fuselage import Fuselage
 
 # this file makes use of the afollowing files:
 # airfoil.py
@@ -29,6 +30,19 @@ class Wing(GeomBase):
     area_wing = Input(I.Wing_area)
     aspect_ratio = Input(I.Aspect_ratio)
     wing_highlow = Input("low")
+
+
+    fuselage_mass_fraction = Input(I.Fuselage_mass_fraction)
+    empennage_mass_fraction = Input(I.Empennage_mass_fraction)
+    fixed_equipment_mass_fraction = Input(I.Fixed_equipment_mass_fraction)
+    fuselage_cg_loc = Input(I.Fuselage_cg_loc)
+    empennage_cg_loc = Input(I.Empennage_cg_loc)
+    fixed_equipment_cg_loc = Input(I.Fixed_equipment_cg_loc)
+    wing_mass_fraction = Input(I.Wing_mass_fraction)
+    propulsion_mass_fraction = Input(I.Propulsion_system_mass_fraction)
+    wing_cg_loc = Input(I.Wing_cg_loc)
+    propulsion_cg_loc = Input(I.Propulsion_system_cg_loc)
+    oew_cg_loc = Input(I.OEW_cg_loc)
 
     # some other parameters
     twist = Input(-5)
@@ -117,13 +131,48 @@ class Wing(GeomBase):
     def profiles(self):
         return [self.root_airfoil, self.tip_airfoil]
 
+    @Attribute
+    def x_fuselage_cg(self):
+        fuselage_sum = self.fuselage_cg_loc * self.fuselage_mass_fraction
+        empennage_sum = self.empennage_cg_loc * self.empennage_mass_fraction
+        fixed_equip_sum = self.fixed_equipment_cg_loc * self.fixed_equipment_mass_fraction
+        mass_sum = self.fuselage_mass_fraction + self.empennage_mass_fraction + self.fixed_equipment_mass_fraction
+        return 52.28 * (fuselage_sum + empennage_sum + fixed_equip_sum) / (mass_sum) # this fixed value should be adaptable and equal length fuselage
 
+    @Attribute
+    def x_wing_cg(self):
+        wing_sum = self.wing_cg_loc * self.wing_mass_fraction
+        propulsion_sum = self.propulsion_cg_loc * self.propulsion_mass_fraction
+        return self.mean_aerodynamic_chord * (wing_sum + propulsion_sum) / (
+                    self.wing_mass_fraction + self.propulsion_mass_fraction)
+
+    @Attribute
+    def x_le_mac(self):
+        mass_fuselage = self.fuselage_mass_fraction + self.empennage_mass_fraction + self.fixed_equipment_mass_fraction
+        mass_wing = self.wing_mass_fraction + self.propulsion_mass_fraction
+        mass_wing_over_mass_fuse = mass_wing / mass_fuselage
+        return self.x_fuselage_cg + self.mean_aerodynamic_chord * ((self.x_wing_cg / self.mean_aerodynamic_chord) * mass_wing_over_mass_fuse - self.oew_cg_loc * (1 + mass_wing_over_mass_fuse))
+
+    @Attribute
+    def wing_x_shift(self):
+        return self.x_le_mac - self.y_mean_aerodynamic_chord * np.tan(np.deg2rad(self.sweep_leading_edge))
+
+    @Attribute
+    def wing_z_shift(self):
+        if self.wing_highlow == "high":
+            pos = 2
+        elif self.wing_highlow == "low":
+            pos = -2.4
+        return pos
 
     @Part
     def root_airfoil(self):  # root airfoil will receive self.position as default
         return Airfoil(airfoil_name=self.airfoil_root,
                        chord=self.chord_root,
                        thickness_factor=self.thickness_to_chord,
+                       position=translate(self.position,
+                                          "x", self.wing_x_shift,
+                                          "Z", self.wing_z_shift),
                        factor=0.14,
                        mesh_deflection=0.0001)
 
@@ -136,13 +185,14 @@ class Wing(GeomBase):
                        position=translate(
                            rotate(self.position, "y", np.deg2rad(self.twist)),  # apply twist angle
                            "y", self.span/2,
-                           "x", self.span/2 * np.tan(np.deg2rad(self.sweep_leading_edge)),
-                           "Z", self.span/2 * np.tan(np.deg2rad(self.dihedral))),  # apply sweep
+                           "x", self.wing_x_shift + self.span/2 * np.tan(np.deg2rad(self.sweep_leading_edge)),
+                           "Z", self.wing_z_shift + self.span/2 * np.tan(np.deg2rad(self.dihedral))),
                        mesh_deflection=0.0001)
 
     @Part
     def right_wing_surface(self):
         return LoftedSurface(profiles=self.profiles,
+
                              mesh_deflection=0.0001)
 
     @Part
