@@ -1,6 +1,6 @@
 import xlrd
 
-workbook = xlrd.open_workbook('KBE_Input.xls')
+workbook = xlrd.open_workbook('aircraft\KBE_Input.xls')
 worksheet = workbook.sheet_by_name('Input')
 
 #Fuselage parameters

@@ -14,7 +14,7 @@
 
 from parapy.geom import *
 from parapy.core import *
-from ref_frame import Frame
+from aircraft.ref_frame import Frame
 
 
 class Airfoil(FittedCurve):  # note the use of FittedCurve as superclass

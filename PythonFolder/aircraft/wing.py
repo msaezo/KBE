@@ -1,10 +1,15 @@
 import numpy as np
+
+
+
+import aircraft.Import_Input as I
+
 from parapy.core import *
 from parapy.geom import *
-import Import_Input as I
 
-from airfoil import Airfoil
-from fuselage import Fuselage
+
+from aircraft.airfoil import Airfoil
+from aircraft.fuselage import Fuselage
 
 # this file makes use of the afollowing files:
 # airfoil.py
@@ -20,8 +25,8 @@ from fuselage import Fuselage
 class Wing(GeomBase):
 
     # airfoil profiles
-    airfoil_root = Input("whitcomb")
-    airfoil_tip = Input("simm_airfoil")
+    airfoil_root = Input("aircraft\whitcomb")
+    airfoil_tip = Input("aircraft\simm_airfoil")
 
     # imported parameters from input file
     mach_cruise = Input(I.Mach_cruise)
@@ -44,10 +49,14 @@ class Wing(GeomBase):
     propulsion_cg_loc = Input(I.Propulsion_system_cg_loc)
     oew_cg_loc = Input(I.OEW_cg_loc)
 
+
     # some other parameters
     twist = Input(-5)
     is_mirrored = Input(True)
 
+    @Attribute
+    def test(self):
+        return Fuselage().length_fuselage
 
     @Attribute
     def pressure(self):
@@ -137,7 +146,7 @@ class Wing(GeomBase):
         empennage_sum = self.empennage_cg_loc * self.empennage_mass_fraction
         fixed_equip_sum = self.fixed_equipment_cg_loc * self.fixed_equipment_mass_fraction
         mass_sum = self.fuselage_mass_fraction + self.empennage_mass_fraction + self.fixed_equipment_mass_fraction
-        return 52.28 * (fuselage_sum + empennage_sum + fixed_equip_sum) / (mass_sum) # this fixed value should be adaptable and equal length fuselage
+        return Fuselage().length_fuselage * (fuselage_sum + empennage_sum + fixed_equip_sum) / (mass_sum) # this fixed value should be adaptable and equal length fuselage
 
     @Attribute
     def x_wing_cg(self):
