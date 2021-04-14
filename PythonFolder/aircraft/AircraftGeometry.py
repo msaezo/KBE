@@ -6,6 +6,8 @@ from airfoil import Airfoil
 from wing import Wing
 from fuselage import Fuselage
 from ref_frame import Frame
+from empennage import Horizontal_Tail
+from empennage import Vertical_Tail
 
 
 class AircraftGeometry(GeomBase):
@@ -18,6 +20,14 @@ class AircraftGeometry(GeomBase):
     @Part
     def main_wing(self):
         return Wing(color="yellow")
+
+    @Part
+    def vertical_Tail(self):
+        return Vertical_Tail(color="purple")
+
+    @Part
+    def horizontal_Tail(self):
+        return Horizontal_Tail(color="purple")
 
 
 
