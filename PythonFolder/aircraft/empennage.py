@@ -9,7 +9,7 @@ from airfoil import Airfoil
 class Horizontal_Tail(GeomBase):
 
     # airfoil profiles
-    airfoil_root = Input("whitcomb")
+    airfoil_root = Input("simm_airfoil")
     airfoil_tip = Input("simm_airfoil")
 
     volume_HT = Input(I.Tail_volume_horizontal)
@@ -118,10 +118,12 @@ class Horizontal_Tail(GeomBase):
                              vector2=self.position.Vx,
                              mesh_deflection=0.0001)
 
+
+
 class Vertical_Tail(GeomBase):
 
     # airfoil profiles
-    airfoil_root = Input("whitcomb")
+    airfoil_root = Input("simm_airfoil")
     airfoil_tip = Input("simm_airfoil")
 
     volume_VT = Input(I.Tail_volume_vertical)
@@ -133,7 +135,7 @@ class Vertical_Tail(GeomBase):
     cg_arm_vertical = Input(I.cg_arm_vertical)
     twist_VT = Input(0)  # Hard Coded
     dihedral_VT = Input(0)  # Hard Coded
-    mach_drag_divergence = Input(I.Mach_cruise)
+    mach_cruise = Input(I.Mach_cruise)
     lift_coefficient = Input(0.3) #Hard Coded
     X_aft_cg = Input(20) #Hard Coded
 
@@ -167,7 +169,7 @@ class Vertical_Tail(GeomBase):
 
     @Attribute
     def sweepMidChordVerticalTail(self):  #
-        return atan(tan(self.sweep_three_quarter_horizontal * pi / 180) - 4 / self.aspect_Ratio_vertical) * (
+        return atan(tan(self.sweep_leading_edge_vertical * pi / 180) - 4 / self.aspect_Ratio_vertical) * (
                     1 / 2) * (1 - self.taper_Ratio_vertical) / (1 + self.taper_Ratio_vertical)
 
     @Attribute
@@ -193,7 +195,8 @@ class Vertical_Tail(GeomBase):
         return Airfoil(airfoil_name=self.airfoil_root,
                        chord=self.rootChordVerticalTail,
                        thickness_factor=self.thickness_to_chord,
-                       position=translate(self.position,
+                       position=translate(
+                           rotate(self.position, "x", np.deg2rad(90)),
                                           "x", self.VT_x_shift,
                                           "Z", self.VT_z_shift),
                        factor=0.14,
@@ -206,10 +209,10 @@ class Vertical_Tail(GeomBase):
                        thickness_factor=self.thickness_to_chord,
                        factor=0.24,
                        position=translate(
-                           rotate(self.position, "y", np.deg2rad(self.twist_VT)),  # apply twist angle
-                           "y", self.spanVerticalTail,
+                           rotate(self.position, "x", np.deg2rad(90)),  # apply twist angle
+                        
                            "x", self.VT_x_shift + self.spanVerticalTail * np.tan(np.deg2rad(self.sweep_leading_edge_vertical)),
-                           "Z", self.VT_z_shift + self.spanVerticalTail * np.tan(np.deg2rad(self.dihedral_VT))),
+                           "y", self.VT_z_shift + self.spanVerticalTail * np.tan(np.deg2rad(self.dihedral_VT))),
                        mesh_deflection=0.0001)
 
     @Part
