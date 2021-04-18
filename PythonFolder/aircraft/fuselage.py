@@ -22,6 +22,13 @@ class Fuselage(GeomBase):
     weight_cargo = Input(I.Cargo)
     kcc = Input(I.Kcc) #cargo compartment factor
 
+    fuselage_mass_fraction = Input(I.Fuselage_mass_fraction)
+    empennage_mass_fraction = Input(I.Empennage_mass_fraction)
+    fixed_equipment_mass_fraction = Input(I.Fixed_equipment_mass_fraction)
+    fuselage_cg_loc = Input(I.Fuselage_cg_loc)
+    empennage_cg_loc = Input(I.Empennage_cg_loc)
+    fixed_equipment_cg_loc = Input(I.Fixed_equipment_cg_loc)
+
     density_luggage = Input(170)
     density_cargo = Input(160)
     kos = Input(0.74) # overhead storage factor
@@ -165,6 +172,15 @@ class Fuselage(GeomBase):
     def profiles(self):
         return self.profile_set  # collect the elements of the sequence profile_set
 
+    @Attribute
+    def x_fuselage_cg(self):
+        fuselage_sum = self.fuselage_cg_loc * self.fuselage_mass_fraction
+        empennage_sum = self.empennage_cg_loc * self.empennage_mass_fraction
+        fixed_equip_sum = self.fixed_equipment_cg_loc * self.fixed_equipment_mass_fraction
+        mass_sum = self.fuselage_mass_fraction + self.empennage_mass_fraction + self.fixed_equipment_mass_fraction
+        return self.length_fuselage * (fuselage_sum + empennage_sum + fixed_equip_sum) / (
+            mass_sum)
+
     @Part
     def outer_profile_set(self):
         return Circle(quantify=len(self.fuselage_sections), color="Black",
@@ -188,14 +204,14 @@ class Fuselage(GeomBase):
     @Part  # This part is redundant as far as LoftedSolid is a Fuselage's superclass.
     def fuselage_lofted_shell_outer(self):
         return LoftedShell(profiles=self.outer_profile_set,
-                           color="red",
+                           color="orange",
                            mesh_deflection=0.00001,
                            hidden=False)
 
     @Part  # This part is redundant as far as LoftedSolid is a Fuselage's superclass.
     def fuselage_lofted_shell_inner(self):
         return LoftedShell(profiles=self.inner_profile_set,
-                           color="green",
+                           color="red",
                            mesh_deflection=0.00001,
                            hidden=False)
 

@@ -1,29 +1,39 @@
 import numpy as np
 from parapy.core import *
 from parapy.geom import *
-import Import_Input as I
 from math import *
 
-from airfoil import Airfoil
+import aircraft.Import_Input as I
+from aircraft.airfoil import Airfoil
+from aircraft.fuselage import Fuselage
+from aircraft.wing import Wing
+from aircraft.cg_calculations import CG_calculations
 
 class Horizontal_Tail(GeomBase):
 
     # airfoil profiles
-    airfoil_root = Input("simm_airfoil")
-    airfoil_tip = Input("simm_airfoil")
+    airfoil_root = Input("aircraft\simm_airfoil")
+    airfoil_tip = Input("aircraft\simm_airfoil")
 
     volume_HT = Input(I.Tail_volume_horizontal)
     Surface_Area = Input(I.Wing_area)
-    MAC = Input(2.39)
+    MAC = Input(Wing().mean_aerodynamic_chord)
     aspect_Ratio_horizontal = Input(I.aspect_Ratio_horizontal)
     taper_Ratio_horizontal = Input(I.taper_Ratio_horizontal)
     sweep_three_quarter_horizontal = Input(I.sweep_three_quarter_horizontal)
-    cg_arm_horizontal = Input(I.cg_arm_horizontal)
+    mach_cruise = Input(I.Mach_cruise)
+
     twist = Input(0) #Hard Coded
     dihedral = Input(0) #Hard Coded
-    mach_cruise = Input(I.Mach_cruise)
     lift_coefficient = Input(0.3) #Hard Coded
-    X_aft_cg = Input(20) #Hard Coded
+
+    @Attribute
+    def x_tail_horizontal(self):
+        return 0.85 * Fuselage().length_fuselage
+
+    @Attribute
+    def cg_arm_horizontal(self):
+        return self.x_tail_horizontal - CG_calculations().cg_aft
 
     @Attribute
     def surfaceHorizontalTail(self):
@@ -35,7 +45,7 @@ class Horizontal_Tail(GeomBase):
 
     @Attribute
     def rootChordHorizontalTail(self):
-        return 2*self.surfaceHorizontalTail / (1+self.taper_Ratio_horizontal) * self.spanHorizontalTail
+        return 2*self.surfaceHorizontalTail / ((1+self.taper_Ratio_horizontal) * self.spanHorizontalTail)
 
     @Attribute
     def tipChordHorizontalTail(self):
@@ -43,15 +53,16 @@ class Horizontal_Tail(GeomBase):
 
     @Attribute
     def sweepLeadingEdgeHorizontalTail(self): #self.sweep_three_quarter_horizontal
-        return atan(tan(self.sweep_three_quarter_horizontal * pi / 180) - 4/self.aspect_Ratio_horizontal) * (-3/4)*(1-self.taper_Ratio_horizontal)/(1+self.taper_Ratio_horizontal)
+        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_three_quarter_horizontal)) - 4 / self.aspect_Ratio_horizontal * (-3 / 4) * (1 - self.taper_Ratio_horizontal) / (1 + self.taper_Ratio_horizontal)))
+
 
     @Attribute
     def sweepMidChordHorizontalTail(self):  # self.sweep_three_quarter_horizontal
-        return atan(tan(self.sweep_three_quarter_horizontal * pi / 180) - 4 / self.aspect_Ratio_horizontal) * (-1 / 4) * (1 - self.taper_Ratio_horizontal) / (1 + self.taper_Ratio_horizontal)
+        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_three_quarter_horizontal)) - 4 / self.aspect_Ratio_horizontal * (-1 / 4) * (1 - self.taper_Ratio_horizontal) / (1 + self.taper_Ratio_horizontal)))
 
     @Attribute #Hard Coded, relate it to the Xcg
     def HT_x_shift(self):
-        return self.X_aft_cg + self.cg_arm_horizontal
+        return CG_calculations().cg_aft + self.cg_arm_horizontal
 
     @Attribute #Hard Coded, maybe set same hight as wing?
     def HT_z_shift(self):
@@ -123,25 +134,32 @@ class Horizontal_Tail(GeomBase):
 class Vertical_Tail(GeomBase):
 
     # airfoil profiles
-    airfoil_root = Input("simm_airfoil")
-    airfoil_tip = Input("simm_airfoil")
+    airfoil_root = Input("aircraft\simm_airfoil")
+    airfoil_tip = Input("aircraft\simm_airfoil")
 
     volume_VT = Input(I.Tail_volume_vertical)
     Surface_Area = Input(I.Wing_area)
-    MAC = Input(2.39)
+    Span = Input(Wing().span)
     aspect_Ratio_vertical = Input(I.aspect_Ratio_vertical)
     taper_Ratio_vertical = Input(I.taper_Ratio_vertical)
     sweep_leading_edge_vertical = Input(I.sweep_leading_edge_vertical)
-    cg_arm_vertical = Input(I.cg_arm_vertical)
+    mach_cruise = Input(I.Mach_cruise)
+
     twist_VT = Input(0)  # Hard Coded
     dihedral_VT = Input(0)  # Hard Coded
-    mach_cruise = Input(I.Mach_cruise)
     lift_coefficient = Input(0.3) #Hard Coded
-    X_aft_cg = Input(20) #Hard Coded
+
+    @Attribute
+    def x_tail_vertical(self):
+        return 0.8 * Fuselage().length_fuselage
+
+    @Attribute
+    def cg_arm_vertical(self):
+        return self.x_tail_vertical - CG_calculations().cg_aft
 
     @Attribute
     def surfaceVerticalTail(self):
-        return self.volume_VT * self.Surface_Area * self.MAC / self.cg_arm_vertical
+        return self.volume_VT * self.Surface_Area * self.Span / self.cg_arm_vertical
 
     @Attribute
     def spanVerticalTail(self):
@@ -149,7 +167,7 @@ class Vertical_Tail(GeomBase):
 
     @Attribute
     def rootChordVerticalTail(self):
-        return 2 * self.surfaceVerticalTail / (1 + self.taper_Ratio_vertical) * self.spanVerticalTail
+        return 2 * self.surfaceVerticalTail / ((1 + self.taper_Ratio_vertical) * self.spanVerticalTail)
 
     @Attribute
     def tipChordVerticalTail(self):
@@ -161,16 +179,15 @@ class Vertical_Tail(GeomBase):
 
     @Attribute #Hard Coded, relate it to the Xcg
     def VT_x_shift(self):
-        return self.X_aft_cg + self.cg_arm_vertical
+        return CG_calculations().cg_aft + self.cg_arm_vertical
 
     @Attribute #Hard Coded, maybe a bit higher?
     def VT_z_shift(self):
         return 2
 
     @Attribute
-    def sweepMidChordVerticalTail(self):  #
-        return atan(tan(self.sweep_leading_edge_vertical * pi / 180) - 4 / self.aspect_Ratio_vertical) * (
-                    1 / 2) * (1 - self.taper_Ratio_vertical) / (1 + self.taper_Ratio_vertical)
+    def sweepMidChordVerticalTail(self):
+        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_leading_edge_vertical)) - 4 / self.aspect_Ratio_vertical * (1 / 2) * (1 - self.taper_Ratio_vertical) / (1 + self.taper_Ratio_vertical)))
 
     @Attribute
     def mach_drag_divergence(self):
@@ -178,17 +195,7 @@ class Vertical_Tail(GeomBase):
 
     @Attribute
     def thickness_to_chord(self):
-        cos_halfsweep = np.cos(np.deg2rad(self.sweepMidChordVerticalTail))
-        option_one = (cos_halfsweep**3 * (0.935 - self.mach_drag_divergence * cos_halfsweep) - 0.115 *self.lift_coefficient**1.5)/(cos_halfsweep**2)
-
-        if option_one > 0.18:
-            toverc = 0.18
-        elif option_one < 0.1:
-            toverc = 0.1
-        else:
-            toverc =option_one
-
-        return toverc
+        return 0.1
 
     @Part
     def root_airfoil_VT(self):  # root airfoil will receive self.position as default
@@ -212,7 +219,7 @@ class Vertical_Tail(GeomBase):
                            rotate(self.position, "x", np.deg2rad(90)),  # apply twist angle
                         
                            "x", self.VT_x_shift + self.spanVerticalTail * np.tan(np.deg2rad(self.sweep_leading_edge_vertical)),
-                           "y", self.VT_z_shift + self.spanVerticalTail * np.tan(np.deg2rad(self.dihedral_VT))),
+                           "y", self.VT_z_shift + self.spanVerticalTail ),
                        mesh_deflection=0.0001)
 
     @Part
@@ -221,7 +228,3 @@ class Vertical_Tail(GeomBase):
 
                              mesh_deflection=0.0001)
 
-if __name__ == '__main__':
-    from parapy.gui import display
-    obj = Empennage()
-    display(obj)
