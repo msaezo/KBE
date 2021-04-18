@@ -10,6 +10,7 @@ from aircraft import Horizontal_Tail
 from aircraft import CG_calculations
 from aircraft import Propeller_engine
 from aircraft import Fan_engine
+from aircraft import Seat
 
 import aircraft.Import_Input as I
 
@@ -54,6 +55,10 @@ class AircraftGeometry(GeomBase):
     @Part
     def cg_range(self):
         return CG_calculations()
+
+    @Part
+    def seatt(self):
+        return Seat()
 
 
 

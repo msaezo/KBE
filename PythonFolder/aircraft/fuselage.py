@@ -152,7 +152,7 @@ class Fuselage(GeomBase):
         return radius_0, radius_1, radius_2, radius_3, radius_4, radius_5, radius_6, radius_7, radius_8, radius_9, radius_10
 
     @Attribute
-    def section_length(self):
+    def section_length_outer(self):
         section_0 = 0
         section_1 = 0.001
         section_2 = self.length_cockpit/self.length_fuselage
@@ -165,6 +165,22 @@ class Fuselage(GeomBase):
         section_8 = (self.length_fuselage-self.length_tail)/self.length_fuselage
         section_9 = 0.996
         section_10 = 1
+        return section_0, section_1, section_2, section_3, section_4, section_5, section_6, section_7, section_8, section_9, section_10
+
+    @Attribute
+    def section_length_inner(self):
+        section_0 = 0.0005
+        section_1 = 0.001
+        section_2 = self.length_cockpit / self.length_fuselage
+        section_3 = self.length_nosecone / self.length_fuselage
+        cylindrical_part = self.length_fuselage - self.length_nosecone - self.length_tailcone
+        section_4 = (self.length_nosecone + 1 / 4 * cylindrical_part) / self.length_fuselage
+        section_5 = (self.length_nosecone + 2 / 4 * cylindrical_part) / self.length_fuselage
+        section_6 = (self.length_nosecone + 3 / 4 * cylindrical_part) / self.length_fuselage
+        section_7 = (self.length_nosecone + 4 / 4 * cylindrical_part) / self.length_fuselage
+        section_8 = (self.length_fuselage - self.length_tail) / self.length_fuselage
+        section_9 = 0.996
+        section_10 = 0.999
         return section_0, section_1, section_2, section_3, section_4, section_5, section_6, section_7, section_8, section_9, section_10
 
     @Attribute  # used by the superclass LoftedSolid. It could be removed if the @Part profile_set /
@@ -188,7 +204,7 @@ class Fuselage(GeomBase):
                       # fuselage along the X axis, nose in XOY
                       position=translate(
                           rotate(self.position, "y", np.deg2rad(90)),
-                          "z", self.section_length[child.index]*self.length_fuselage,
+                          "z", self.section_length_outer[child.index]*self.length_fuselage,
                           "-x", self.fuselage_sections_z[child.index] * self.diameter_fuselage_outer/2))
 
     @Part
@@ -198,22 +214,122 @@ class Fuselage(GeomBase):
                       # fuselage along the X axis, nose in XOY
                       position=translate(
                           rotate(self.position, "y", np.deg2rad(90)),
-                          "z", self.section_length[child.index] * self.length_fuselage,
+                          "z", self.section_length_inner[child.index] * self.length_fuselage,
                           "-x",self.fuselage_sections_z[child.index] * self.diameter_fuselage_outer / 2 ))
 
-    @Part  # This part is redundant as far as LoftedSolid is a Fuselage's superclass.
-    def fuselage_lofted_shell_outer(self):
-        return LoftedShell(profiles=self.outer_profile_set,
-                           color="orange",
+    @Part
+    def fuselage_lofted_solid_outer(self):
+        return LoftedSolid(profiles=self.outer_profile_set,
+                           color="yellow",
                            mesh_deflection=0.00001,
-                           hidden=False)
+                           hidden=True)
 
-    @Part  # This part is redundant as far as LoftedSolid is a Fuselage's superclass.
-    def fuselage_lofted_shell_inner(self):
-        return LoftedShell(profiles=self.inner_profile_set,
+    @Part
+    def fuselage_lofted_solid_inner(self):
+        return LoftedSolid(profiles=self.inner_profile_set,
                            color="red",
                            mesh_deflection=0.00001,
-                           hidden=False)
+                           hidden=True)
+
+    @Part
+    def fuselage_subtracted(self):
+        return SubtractedSolid(shape_in=self.fuselage_lofted_solid_outer,
+                               tool=self.fuselage_lofted_solid_inner,
+                               color="orange",
+                               mesh_deflection=0.00005,
+                               transparency=0.5)
+
+    @Part
+    def floor(self):
+        return Box(length=self.diameter_fuselage_outer,
+                   width=self.length_fuselage,
+                   height=self.height_floor,
+                   centered=True,
+                   position=translate(self.position,
+                                      "z", -self.height_shoulder-self.height_floor/2,
+                                      "x", self.length_fuselage/2-0.1),
+                   hidden=True)
+
+    @Part
+    def floor_cut(self):
+        return CommonSolid(shape_in=self.floor,
+                           tool=self.fuselage_lofted_solid_inner,
+                           hidden = False,
+                           mesh_deflection=0.00001)
+
+
+class Seat(Fuselage, GeomBase):
+
+    @Attribute
+    def k_cabin(self):
+        if Fuselage().n_aisles ==1:
+            k_cabin1 = 1.08
+        elif Fuselage().n_aisles ==2:
+            k_cabin1 = 1.17
+        return k_cabin1
+
+    @Attribute
+    def l_feet(self):
+        if Fuselage().n_aisles == 1:
+            l_feet1 = 0.48
+        elif Fuselage().n_aisles == 2:
+            l_feet1 = 0.57
+        return l_feet1
+
+    @Attribute
+    def l_seat(self):
+        if Fuselage().n_aisles == 1:
+            l_seat1 = 0.98
+        elif Fuselage().n_aisles == 2:
+            l_seat1 = 1.07
+        return l_seat1
+
+
+    @Part
+    def seatbox(self):
+        return Box(length=Fuselage().width_seat,
+                   width=self.k_cabin,
+                   height=1.3,
+                   centered=True,
+                   position=translate(self.position,
+                                      "z", 0.65,
+                                      "x",self.k_cabin/2)
+                   )
+
+    @Part
+    def feetspace(self):
+        return Box(length=Fuselage().width_seat,
+                   width=self.l_feet,
+                   height=0.5,
+                   centered=True,
+                   position=translate(self.position,
+                                      "z", 0.25,
+                                      "x", self.l_feet / 2)
+                   )
+
+    @Part
+    def seatspace(self):
+        return Box(length=Fuselage().width_seat,
+                   width=self.l_seat,
+                   height=0.8,
+                   centered=True,
+                   position=translate(self.position,
+                                      "z", 0.5+0.4,
+                                      "x",self.l_seat/2))
+
+    @Part
+    def seatfeetspace(self):
+        return SubtractedSolid(shape_in=self.seatbox,
+                               tool=self.feetspace,
+                               mesh_deflection=0.00005)
+
+    @Part
+    def seat(self):
+        return SubtractedSolid(shape_in=self.seatfeetspace,
+                               tool=self.seatspace,
+                               mesh_deflection=0.00005)
+
+
 
 if __name__ == '__main__':
     from parapy.gui import display

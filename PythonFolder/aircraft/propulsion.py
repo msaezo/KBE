@@ -217,7 +217,7 @@ class Fan_engine(GeomBase):
 
     @Part
     def bypass(self):
-        return SubtractedSolid(shape_in=self.fused_bypass_outer, tool=self.fused_bypass_inner,color="yellow")
+        return SubtractedSolid(shape_in=self.fused_bypass_outer, tool=self.fused_bypass_inner,color="yellow", transparency = 0.5)
 
 
 
