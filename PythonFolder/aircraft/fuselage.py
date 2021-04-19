@@ -36,13 +36,16 @@ class Fuselage(GeomBase):
     area_os_centre = Input(0.24)  # overhead storage area centre
     n_compartments_lat = Input(2)
 
-    fuselage_sections = Input([1,10, 80, 100, 100, 100, 100, 100, 80, 10,1])
-    fuselage_sections_z = Input([-0.3,-0.3, -0.10, 0, 0, 0, 0, 0, 0.21, 0.62, 0.65])
+    fuselage_sections = Input([1,10, 90, 100, 100, 100, 100, 100, 80, 10,1])
+    fuselage_sections_z = Input([-0.3,-0.3, -0.08, 0, 0, 0, 0, 0, 0.2, 0.62, 0.65])
 
     @Attribute
     def seats_abreast(self):
         seats = 0.45*np.sqrt(self.n_pax)
-        return np.ceil(seats)
+        seatsmax = 9
+        return min(np.ceil(seats),seatsmax)
+
+
 
     @Attribute
     def n_aisles(self):
@@ -51,6 +54,10 @@ class Fuselage(GeomBase):
         else:
             n_aisle = 2
         return n_aisle
+
+    @Attribute
+    def n_rows(self):
+        return np.ceil(self.n_pax/self.seats_abreast)
 
     @Attribute
     def length_cabin(self):
@@ -257,8 +264,40 @@ class Fuselage(GeomBase):
                            hidden = False,
                            mesh_deflection=0.00001)
 
+    @Part
+    def seats_front(self):
+        return Seat_row(seats_abreast = self.seats_abreast-2,
+                        quantify=int(np.floor((self.length_nosecone-self.length_cockpit)/(0.8*Seat().k_cabin))),
+                        position=translate(self.position,
+                                       'x', self.length_cockpit + child.index*0.8*Seat().k_cabin),
+                        hidden=False)
 
-class Seat(Fuselage, GeomBase):
+    @Part
+    def seats_middle(self):
+        return Seat_row(seats_abreast=self.seats_abreast,
+                        quantify=int(np.floor((self.length_fuselage - self.length_nosecone - self.length_tailcone) / (0.8 * Seat().k_cabin))),
+                        position=translate(self.position,
+                                           'x', self.length_nosecone  + child.index * 0.8 * Seat().k_cabin),
+                        hidden=False)
+
+    @Part
+    def seats_rear(self):
+        return Seat_row(seats_abreast=self.seats_abreast - 2,
+                        quantify=int((self.n_pax
+                                      - self.seats_abreast*int(np.floor((self.length_fuselage
+                                                                         - self.length_nosecone
+                                                                         - self.length_tailcone) / (0.8 * Seat().k_cabin)))
+                                      - (self.seats_abreast-2)*int(np.floor((self.length_nosecone
+                                                                             -self.length_cockpit)/(0.8*Seat().k_cabin))))
+                                     /(self.seats_abreast - 2)),
+                        position=translate(self.position,
+                                           'x', self.length_fuselage - self.length_tailcone +child.index * 0.8 * Seat().k_cabin),
+                        hidden=False)
+
+
+
+
+class Seat(GeomBase):
 
     @Attribute
     def k_cabin(self):
@@ -284,6 +323,36 @@ class Seat(Fuselage, GeomBase):
             l_seat1 = 1.07
         return l_seat1
 
+    @Attribute
+    def fillets(self):
+        e1= self.seatbox.top_face.edges
+        return e1
+
+    @Part
+    def leg1(self):
+        return Box(length=Fuselage().width_seat/3,
+                   width=self.k_cabin,
+                   height=0.4,
+                   centered=True,
+                   position=translate(self.position,
+                                      "z", 0.2,
+                                      "x", self.k_cabin / 2.,
+                                      'y',Fuselage().width_seat/3),
+                   hidden=True
+                   )
+
+    @Part
+    def leg2(self):
+        return Box(length=Fuselage().width_seat / 3,
+                   width=self.k_cabin,
+                   height=0.4,
+                   centered=True,
+                   position=translate(self.position,
+                                      "z", 0.2,
+                                      "x", self.k_cabin / 2.,
+                                      'y', -Fuselage().width_seat / 3),
+                   hidden=True
+                   )
 
     @Part
     def seatbox(self):
@@ -293,7 +362,8 @@ class Seat(Fuselage, GeomBase):
                    centered=True,
                    position=translate(self.position,
                                       "z", 0.65,
-                                      "x",self.k_cabin/2)
+                                      "x",self.k_cabin/2),
+                   hidden=True
                    )
 
     @Part
@@ -304,7 +374,8 @@ class Seat(Fuselage, GeomBase):
                    centered=True,
                    position=translate(self.position,
                                       "z", 0.25,
-                                      "x", self.l_feet / 2)
+                                      "x", self.l_feet / 2),
+                   hidden=True
                    )
 
     @Part
@@ -315,19 +386,120 @@ class Seat(Fuselage, GeomBase):
                    centered=True,
                    position=translate(self.position,
                                       "z", 0.5+0.4,
-                                      "x",self.l_seat/2))
+                                      "x",self.l_seat/2),
+                   hidden=True)
 
     @Part
-    def seatfeetspace(self):
-        return SubtractedSolid(shape_in=self.seatbox,
-                               tool=self.feetspace,
-                               mesh_deflection=0.00005)
+    def seat_filleted(self):
+        return FilletedSolid(self.seatbox, radius=0.2, edge_table=self.fillets,
+                               hidden=True)
+
 
     @Part
     def seat(self):
-        return SubtractedSolid(shape_in=self.seatfeetspace,
-                               tool=self.seatspace,
+        return SubtractedSolid(shape_in=self.seat_filleted,
+                               tool=(self.feetspace,self.leg1, self.leg2, self.seatspace),
                                mesh_deflection=0.00005)
+
+class Seat_row(GeomBase):
+    width_aisle = Input(I.Width_aisle)
+    width_seat = Input(I.Width_seat)
+    width_armrest = Input(I.Width_armrest)
+
+    seats_abreast = Input()
+
+    @Attribute
+    def n_aisles(self):
+        if self.seats_abreast <7:
+            n_aisle = 1
+        else:
+            n_aisle = 2
+        return n_aisle
+
+    @Attribute
+    def seat_spacing(self):
+        if self.seats_abreast==3:#2 seats, aisle, 1 seats
+            spacing = ([0,
+                        1*self.width_seat + 1*self.width_armrest,
+                        2*self.width_seat + 3*self.width_armrest + self.width_aisle ])
+        elif self.seats_abreast==4:#2 seats, aisle, 2 seats
+            spacing = ([0,
+                        1*self.width_seat + 1*self.width_armrest,
+                        2*self.width_seat + 3*self.width_armrest + self.width_aisle,
+                        3*self.width_seat + 4*self.width_armrest + self.width_aisle ])
+        elif self.seats_abreast ==5: #3 seats, aisle, 2 seats
+            spacing = ([0,
+                        1*self.width_seat + 1*self.width_armrest,
+                        2*self.width_seat + 2*self.width_armrest,
+                        3*self.width_seat + 4*self.width_armrest + self.width_aisle,
+                        4*self.width_seat + 5*self.width_armrest + self.width_aisle])
+        elif self.seats_abreast == 6:#3 seats, aisle, 3 seats
+            spacing = ([0,
+                        1*self.width_seat + 1*self.width_armrest,
+                        2*self.width_seat + 2*self.width_armrest,
+                        3*self.width_seat + 4*self.width_armrest + self.width_aisle,
+                        4*self.width_seat + 5*self.width_armrest + self.width_aisle,
+                        5*self.width_seat + 6*self.width_armrest + self.width_aisle])
+        elif self.seats_abreast == 7:#2 seats, aisle, 3 seats, aisle, 2 seats
+            spacing = ([0,
+                        1*self.width_seat + 1*self.width_armrest,
+                        2*self.width_seat + 3*self.width_armrest + self.width_aisle,
+                        3*self.width_seat + 4*self.width_armrest + self.width_aisle,
+                        4*self.width_seat + 5*self.width_armrest + self.width_aisle,
+                        5*self.width_seat + 7*self.width_armrest + 2*self.width_aisle,
+                        6*self.width_seat + 8*self.width_armrest + 2*self.width_aisle])
+        elif self.seats_abreast == 8:#2 seats, aisle, 4 seats, aisle, 2 seats
+            spacing = ([0,
+                        1*self.width_seat + 1*self.width_armrest,
+                        2*self.width_seat + 3*self.width_armrest + self.width_aisle,
+                        3*self.width_seat + 4*self.width_armrest + self.width_aisle,
+                        4*self.width_seat + 5*self.width_armrest + self.width_aisle,
+                        5*self.width_seat + 6*self.width_armrest + self.width_aisle,
+                        6*self.width_seat + 8*self.width_armrest + 2*self.width_aisle,
+                        7*self.width_seat + 9*self.width_armrest + 2*self.width_aisle])
+        elif self.seats_abreast == 9:  # 3 seats, aisle, 3 seats, aisle, 3 seats
+            spacing = ([0,
+                        1 * self.width_seat + 1 * self.width_armrest,
+                        2 * self.width_seat + 2 * self.width_armrest,
+                        3 * self.width_seat + 4 * self.width_armrest + self.width_aisle,
+                        4 * self.width_seat + 5 * self.width_armrest + self.width_aisle,
+                        5 * self.width_seat + 6 * self.width_armrest + self.width_aisle,
+                        6 * self.width_seat + 8 * self.width_armrest + 2 * self.width_aisle,
+                        7 * self.width_seat + 9 * self.width_armrest + 2 * self.width_aisle,
+                        8 * self.width_seat + 10* self.width_armrest + 2 * self.width_aisle])
+        return spacing
+
+    @Attribute
+    def row_width(self):
+        if self.seats_abreast == 3:
+            width = 2*self.width_seat + 3*self.width_armrest+ self.width_aisle
+        elif self.seats_abreast == 4:
+            width = 3*self.width_seat + 4*self.width_armrest+ self.width_aisle
+        elif self.seats_abreast == 5:
+            width = 4*self.width_seat + 5*self.width_armrest+ self.width_aisle
+        elif self.seats_abreast == 6:
+            width = 5*self.width_seat + 6*self.width_armrest+ self.width_aisle
+        elif self.seats_abreast == 7:
+            width = 6*self.width_seat + 8*self.width_armrest+ 2*self.width_aisle
+        elif self.seats_abreast == 8:
+            width = 7*self.width_seat + 9*self.width_armrest+ 2*self.width_aisle
+        elif self.seats_abreast == 9:
+            width = 8 * self.width_seat + 10 * self.width_armrest + 2 * self.width_aisle
+        return width
+
+    @Part
+    def seat_row(self):
+        return Seat(quantify=int(self.seats_abreast),
+                    position=translate(self.position,
+                                       'y', self.row_width/2 - self.seat_spacing[child.index],
+                                       "z", -Fuselage().height_shoulder),
+                    hidden=False)
+
+
+
+
+
+
 
 
 

@@ -56,9 +56,11 @@ class AircraftGeometry(GeomBase):
     def cg_range(self):
         return CG_calculations()
 
-    @Part
-    def seatt(self):
-        return Seat()
+
+
+    # @Part
+    # def seatt(self):
+    #     return Seat()
 
 
 
