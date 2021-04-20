@@ -17,7 +17,7 @@ class Q3D(GeomBase):
     span       = Input(Wing().span)  # m input total, Q3D puts half of it already
     root_chord = Input(Wing().chord_root)  # m
     tip_chord  = Input(Wing().chord_tip)  # m
-    MAC        = Input(Wing().mean_aerodynamic_chord) #m
+    MAC        = Input(Wing().mean_aerodynamic_chord) # m
 
     twist_tip = Input(Wing().twist)  # deg positive up
     dihedral  = Input(Wing().dihedral)  # deg
@@ -88,16 +88,22 @@ class Q3D(GeomBase):
         [CLdes, CDdes] = eng.Q3Drunner(span, root_chord, tip_chord, twist_chord, twist_tip, dihedral, sweep, airSpeed,
                                       airDensity, altitude, Reynolds, Mach, AoA, Cl, nargout=2)
         eng.quit()
+        res = [CLdes, CDdes]
+        return res
 
-        return[CLdes, CDdes, span, root_chord, tip_chord, twist_chord, twist_tip, dihedral, sweep, airSpeed, airDensity, altitude, Reynolds, Mach, AoA, Cl]
 
     @Attribute
     def CLdes(self):
-        return self.QThreeD(0)
+        CLdes = self.QThreeD[0]
+        return CLdes
 
     @Attribute
     def CDdes(self):
-        return self.QThreeD(1)
+        CDdes = self.QThreeD[1]
+        return CDdes
+
+
+
 
 # span=30.0
 # root_chord = 5.0
