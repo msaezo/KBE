@@ -258,11 +258,30 @@ class Fuselage(GeomBase):
                    hidden=True)
 
     @Part
+    def ceiling(self):
+        return Box(length=self.diameter_fuselage_outer,
+                   width=self.length_fuselage,
+                   height=0.1,
+                   centered=True,
+                   position=translate(self.position,
+                                      "z", -self.height_shoulder  + 2.2,
+                                      "x", self.length_fuselage / 2 + 0.1),
+                   hidden=True)
+
+    @Part
     def floor_cut(self):
         return CommonSolid(shape_in=self.floor,
                            tool=self.fuselage_lofted_solid_inner,
                            hidden = False,
                            mesh_deflection=0.00001)
+
+    @Part
+    def ceiling_cut(self):
+        return CommonSolid(shape_in=self.ceiling,
+                           tool=self.fuselage_lofted_solid_inner,
+                           hidden=False,
+                           mesh_deflection=0.00001,
+                           transparency = 0.5)
 
     @Part
     def seats_front(self):

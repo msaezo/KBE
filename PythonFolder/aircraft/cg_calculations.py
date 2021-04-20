@@ -34,9 +34,9 @@ class CG_calculations(GeomBase):
     @Attribute
     def cg_forward(self):
         OEW_and_payload = (self.x_oew*self.mass_oew + self.x_payload*self.mass_payload)/(self.mass_oew + self.mass_payload)
-        OEW_and_paylod_and_fuel = (self.x_fuel*self.mass_fuel + self.x_oew*self.mass_oew + self.x_payload*self.mass_payload)/(self.mass_fuel + self.mass_oew + self.mass_payload)
+        OEW_and_payload_and_fuel = (self.x_fuel*self.mass_fuel + self.x_oew*self.mass_oew + self.x_payload*self.mass_payload)/(self.mass_fuel + self.mass_oew + self.mass_payload)
         OEW_and_fuel = (self.x_oew*self.mass_oew + self.x_fuel*self.mass_fuel)/(self.mass_fuel + self.mass_oew)
-        return min(OEW_and_fuel, OEW_and_paylod_and_fuel, OEW_and_payload)
+        return min(OEW_and_fuel, OEW_and_payload_and_fuel, OEW_and_payload)
 
     @Attribute
     def cg_aft(self):

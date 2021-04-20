@@ -11,11 +11,20 @@ from aircraft import CG_calculations
 from aircraft import Propeller_engine
 from aircraft import Fan_engine
 from aircraft import Propulsion_System
+from aircraft import Q3D
 
 
 
 
 class AircraftGeometry(GeomBase):
+
+    @Attribute
+    def CLdes(self):
+        return Q3D().CLdes
+
+    @Attribute
+    def CDdes(self):
+        return Q3D().CDdes
 
 
     @Part

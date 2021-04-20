@@ -83,8 +83,6 @@ class Horizontal_Tail(GeomBase):
 
         if option_one > 0.18:
             toverc = 0.18
-        elif option_one < 0.1:
-            toverc = 0.1
         else:
             toverc =option_one
 
@@ -98,7 +96,7 @@ class Horizontal_Tail(GeomBase):
                        position=translate(self.position,
                                           "x", self.HT_x_shift,
                                           "Z", self.HT_z_shift),
-                       factor=0.14,
+                       factor=0.24,
                        mesh_deflection=0.0001)
 
     @Part
@@ -197,7 +195,16 @@ class Vertical_Tail(GeomBase):
 
     @Attribute
     def thickness_to_chord(self):
-        return 0.1
+        cos_halfsweep = np.cos(np.deg2rad(self.sweepMidChordVerticalTail))
+        option_one = (cos_halfsweep**3 * (0.935 - self.mach_drag_divergence * cos_halfsweep) - 0.115 *self.lift_coefficient**1.5)/(cos_halfsweep**2)
+
+        if option_one > 0.18:
+            toverc = 0.18
+        else:
+            toverc =option_one
+
+        return toverc
+
 
     @Part
     def root_airfoil_VT(self):  # root airfoil will receive self.position as default
@@ -208,7 +215,7 @@ class Vertical_Tail(GeomBase):
                            rotate(self.position, "x", np.deg2rad(90)),
                                           "x", self.VT_x_shift,
                                           "Z", self.VT_z_shift),
-                       factor=0.14,
+                       factor=0.24,
                        mesh_deflection=0.0001)
 
     @Part
