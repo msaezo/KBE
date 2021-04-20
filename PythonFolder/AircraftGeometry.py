@@ -17,7 +17,6 @@ import aircraft.Import_Input as I
 class AircraftGeometry(GeomBase):
 
 
-
     @Part
     def fuselage(self):
         return Fuselage()
