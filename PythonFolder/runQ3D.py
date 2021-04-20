@@ -19,7 +19,7 @@ AoA = 2.0  # deg
 Cl = 0.6  # if Cl is used do not use angle of attack
 
 [CLdes, CDdes] = eng.Q3Drunner(span, root_chord, tip_chord, twist_chord, twist_tip, dihedral, sweep, airSpeed,
-                               airDensity, altitude, Reynolds, Mach, AoA, nargout=2)
+                               airDensity, altitude, Reynolds, Mach, AoA, Cl, nargout=2)
 
 eng.quit()
 

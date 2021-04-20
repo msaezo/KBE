@@ -1,4 +1,4 @@
-function [CLdes,CDdes] = Q3Drunner(span,root_chord,tip_chord,twist_chord,twist_tip,dihedral,sweep,airSpeed,airDensity,altitude,Reynolds,Mach,AoA)
+function [CLdes,CDdes] = Q3Drunner(span,root_chord,tip_chord,twist_chord,twist_tip,dihedral,sweep,airSpeed,airDensity,altitude,Reynolds,Mach,AoA,Cl)
 
 
 
@@ -26,7 +26,7 @@ AC.Aero.rho   = airDensity;         % air density  (kg/m3)
 AC.Aero.alt   = altitude;             % flight altitude (m)
 AC.Aero.Re    = Reynolds;        % reynolds number (bqased on mean aerodynamic chord)
 AC.Aero.M     = Mach;           % flight Mach number 
-% AC.Aero.CL    = 0.4;         % lift coefficient -comment this line to run the code for given alpha%
+% AC.Aero.CL    = Cl;         % lift coefficient -comment this line to run the code for given alpha%
 AC.Aero.Alpha = AoA;             % angle of attack - comment this line to run the code for given cl ient - comment this line to run the code for given alpha%
 
 %% 
