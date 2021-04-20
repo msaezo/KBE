@@ -1,9 +1,11 @@
 import matlab.engine
 eng = matlab.engine.start_matlab()
-eng.Q3Drunner(nargout=0)
 
 #a = eng.workspace['a']
+span = 14.5
+
+[CLdes,CDdes] = eng.Q3Drunner(span, nargout=2)
 
 eng.quit()
 
-#print(a)
+print(CLdes,CDdes)

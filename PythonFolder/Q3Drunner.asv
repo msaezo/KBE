@@ -1,15 +1,13 @@
-function [CLdes,CDdes] = Q3Drunner(span)
+function [CLdes,CDdes] = Q3Drunner(Ww,Wf_c,sweep,b,lambda,root,twist,Au_r,Al_r,Au_t,Al_t)
 
 
-
-% Wing planform geometry 
+% Wing 
+planform geometry 
 %                x    y     z   chord(m)    twist angle (deg) 
 AC.Wing.Geom = [0     0     0     3.5         0;
-                0.9  span   0     1.4         0];
-            
+0.9  14.5   0     1.4         0];
 % Wing incidence angle (degree)
 AC.Wing.inc  = 0;   
-
 % Airfoil coefficients input matrix
 %                    | ->     upper curve coeff.  <-|  | ->  lower curve coeff.       <-| 
 AC.Wing.Airfoils = [0.2171 0.3450 0.2975 0.2685 0.2893 -0.1299 -0.2388 -0.1635 -0.0476 0.0797;
@@ -33,6 +31,7 @@ AC.Aero.Alpha = 2;             % angle of attack - comment this line to run the 
 % tic
 
 Res = Q3D_solver(AC);
+
 
 % t=toc
 
