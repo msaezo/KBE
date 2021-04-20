@@ -66,7 +66,7 @@ class Horizontal_Tail(GeomBase):
 
     @Attribute #Hard Coded, maybe set same hight as wing?
     def HT_z_shift(self):
-        return 2
+        return Fuselage().diameter_fuselage_outer*0.8/2
 
     @Attribute  # required input for the superclass LoftedSolid
     def profiles(self):
@@ -145,6 +145,7 @@ class Vertical_Tail(GeomBase):
     sweep_leading_edge_vertical = Input(I.sweep_leading_edge_vertical)
     mach_cruise = Input(I.Mach_cruise)
 
+
     twist_VT = Input(0)  # Hard Coded
     dihedral_VT = Input(0)  # Hard Coded
     lift_coefficient = Input(0.3) #Hard Coded
@@ -181,9 +182,10 @@ class Vertical_Tail(GeomBase):
     def VT_x_shift(self):
         return CG_calculations().cg_aft + self.cg_arm_vertical
 
-    @Attribute #Hard Coded, maybe a bit higher?
+    @Attribute #Hard Coded, relate it to the Xcg
     def VT_z_shift(self):
-        return 2
+        return Fuselage().diameter_fuselage_outer*0.9/2
+
 
     @Attribute
     def sweepMidChordVerticalTail(self):

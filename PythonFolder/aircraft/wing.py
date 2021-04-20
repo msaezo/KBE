@@ -35,7 +35,7 @@ class Wing(GeomBase):
     weight_TO = Input(I.Weight_TO)
     area_wing = Input(I.Wing_area)
     aspect_ratio = Input(I.Aspect_ratio)
-    wing_highlow = Input("low")
+    wing_highlow = Input("high")
     wing_x_shift = Input()
 
 
@@ -164,9 +164,9 @@ class Wing(GeomBase):
     @Attribute
     def wing_z_shift(self):
         if self.wing_highlow == "high":
-            pos = 2
+            pos = Fuselage().diameter_fuselage_outer * 0.9 / 2
         elif self.wing_highlow == "low":
-            pos = -2.4
+            pos = -Fuselage().diameter_fuselage_outer * 0.8 / 2
         return pos
 
 

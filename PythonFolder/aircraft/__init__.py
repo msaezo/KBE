@@ -8,6 +8,7 @@ from .cg_calculations import CG_calculations
 from.propulsion import Propeller_engine
 from .propulsion import Fan_engine
 from. fuselage import Seat
+from .propulsion import Propulsion_System
 
 
 
