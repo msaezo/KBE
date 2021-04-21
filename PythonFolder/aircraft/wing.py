@@ -29,7 +29,7 @@ class Wing(GeomBase):
     airfoil_root = Input("aircraft\whitcomb")
     airfoil_tip = Input("aircraft\simm_airfoil")
 
-    mach_cruise = Input(I.Mach_cruise)
+    mach_cruise = Input(I.Mach_cruise)#I.Mach_cruise)
     altitude_cruise = Input(I.Altitude_cruise)
     weight_TO = Input(I.Weight_TO)
     area_wing = Input(I.Wing_area)

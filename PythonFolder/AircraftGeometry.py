@@ -18,7 +18,7 @@ from aircraft import Tanks
 import xlrd
 
 
-class AircraftGeometry(GeomBase):
+class AircraftGeometry(Base):
 
 
     workbook = xlrd.open_workbook('aircraft\KBE_Input.xls')
