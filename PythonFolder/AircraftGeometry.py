@@ -26,7 +26,7 @@ class AircraftGeometry(GeomBase):
 
     @Attribute
     def CDdes(self):
-        return Q3D().CDdes
+        return Q3D().CLdes
 
     @Part
     def tanks(self):

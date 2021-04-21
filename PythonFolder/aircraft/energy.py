@@ -22,7 +22,7 @@ class Energy(GeomBase):
     velocity = Input(Q3D().airSpeed)
     efficiency = Input(I.total_efficiency)
     energy_density = Input(I.energy_density)
-    n_tanks = Input(3)
+    n_tanks = Input(2)
 
 
     @Attribute
@@ -51,8 +51,8 @@ class Energy(GeomBase):
         roots = np.roots(coeff)
         roots1 = roots[0]
         roots2 = roots[1]
-        print (roots1)
-        print (roots2)
+        # print (roots1)
+        # print (roots2)
         if roots1>0:
             radius = roots1
         else :

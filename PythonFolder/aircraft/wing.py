@@ -35,7 +35,7 @@ class Wing(GeomBase):
     weight_TO = Input(I.Weight_TO)
     area_wing = Input(I.Wing_area)
     aspect_ratio = Input(I.Aspect_ratio)
-    wing_highlow = Input("high")
+    wing_highlow = Input("low")
     wing_x_shift = Input()
 
 

@@ -62,10 +62,10 @@ class Fuselage(GeomBase):
     @Attribute
     def length_cabin(self):
         if self.n_aisles ==1:
-            k_cabin = 1.08
+            k_cabin = 1.25
         elif self.n_aisles ==2:
-            k_cabin = 1.17
-        return self.n_pax/self.seats_abreast * k_cabin
+            k_cabin = 1.5
+        return self.n_pax/self.seats_abreast * k_cabin*1.1
 
     @Attribute
     def diameter_fuselage_inner(self):
@@ -294,9 +294,9 @@ class Fuselage(GeomBase):
     @Part
     def seats_middle(self):
         return Seat_row(seats_abreast=self.seats_abreast,
-                        quantify=int(np.floor((self.length_fuselage - self.length_nosecone - self.length_tailcone) / (0.8 * Seat().k_cabin))),
+                        quantify=int(np.floor((self.length_fuselage - self.length_nosecone - self.length_tailcone) / ( Seat().k_cabin))),
                         position=translate(self.position,
-                                           'x', self.length_nosecone  + child.index * 0.8 * Seat().k_cabin),
+                                           'x', self.length_nosecone  + child.index * Seat().k_cabin),
                         hidden=False)
 
     @Part
@@ -305,7 +305,7 @@ class Fuselage(GeomBase):
                         quantify=int((self.n_pax
                                       - self.seats_abreast*int(np.floor((self.length_fuselage
                                                                          - self.length_nosecone
-                                                                         - self.length_tailcone) / (0.8 * Seat().k_cabin)))
+                                                                         - self.length_tailcone) / (Seat().k_cabin)))
                                       - (self.seats_abreast-2)*int(np.floor((self.length_nosecone
                                                                              -self.length_cockpit)/(0.8*Seat().k_cabin))))
                                      /(self.seats_abreast - 2)),
