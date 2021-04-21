@@ -45,7 +45,7 @@ class Propulsion_System(GeomBase):
             pos1 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.35 * Wing().span/2 - Fan_engine().max_diameter*1.1/2
             z_distr = [pos1, pos1]
         elif self.n_engines == 3:
-            pos1 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.35 * Wing().span / 2 - Fan_engine().max_diameter * 1.1/2
+            pos1 = Wing(wing_highlow="high").wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.35 * Wing().span / 2 - Fan_engine().max_diameter * 1.1/2
             pos2 = Fuselage().diameter_fuselage_outer/2 + Fan_engine().max_diameter * 1.1/2
             z_distr = [pos1, pos2, pos1]
         elif self.n_engines == 4:
