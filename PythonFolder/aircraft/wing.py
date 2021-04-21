@@ -29,32 +29,26 @@ class Wing(GeomBase):
     airfoil_root = Input("aircraft\whitcomb")
     airfoil_tip = Input("aircraft\simm_airfoil")
 
-    # imported parameters from input file
     mach_cruise = Input(I.Mach_cruise)
     altitude_cruise = Input(I.Altitude_cruise)
     weight_TO = Input(I.Weight_TO)
     area_wing = Input(I.Wing_area)
     aspect_ratio = Input(I.Aspect_ratio)
     wing_highlow = Input("low")
-    wing_x_shift = Input()
-
-
     wing_mass_fraction = Input(I.Wing_mass_fraction)
     propulsion_mass_fraction = Input(I.Propulsion_system_mass_fraction)
     wing_cg_loc = Input(I.Wing_cg_loc)
     propulsion_cg_loc = Input(I.Propulsion_system_cg_loc)
     oew_cg_loc = Input(I.OEW_cg_loc)
-
-
-
+    fuselage_mass_fraction = Input(I.Fuselage_mass_fraction)
+    empennage_mass_fraction = Input(I.Empennage_mass_fraction)
+    fixed_equipment_mass_fraction = Input(I.Fixed_equipment_mass_fraction)
 
     # some other parameters
     twist = Input(-5)
     is_mirrored = Input(True)
 
-    @Attribute
-    def test(self):
-        return Fuselage().length_fuselage
+
 
     @Attribute
     def pressure(self):
@@ -132,6 +126,8 @@ class Wing(GeomBase):
             dihed = 3-self.sweep_quarter_chord/10 -2
         elif self.wing_highlow == "low":
             dihed = 3 - self.sweep_quarter_chord / 10 + 2
+        else :
+            dihed=0
         return dihed
 
     @Attribute  # required input for the superclass LoftedSolid
@@ -149,7 +145,7 @@ class Wing(GeomBase):
 
     @Attribute
     def x_le_mac(self):
-        mass_fuselage = Fuselage().fuselage_mass_fraction + Fuselage().empennage_mass_fraction + Fuselage().fixed_equipment_mass_fraction
+        mass_fuselage = self.fuselage_mass_fraction + self.empennage_mass_fraction + self.fixed_equipment_mass_fraction
         mass_wing = self.wing_mass_fraction + self.propulsion_mass_fraction
         mass_wing_over_mass_fuse = mass_wing / mass_fuselage
         return Fuselage().x_fuselage_cg + self.mean_aerodynamic_chord * (

@@ -13,18 +13,18 @@ class Horizontal_Tail(GeomBase):
 
     # airfoil profiles
     airfoil_root = Input("aircraft\simm_airfoil")
-    airfoil_tip = Input("aircraft\simm_airfoil")
+    airfoil_tip  = Input("aircraft\simm_airfoil")
 
-    volume_HT = Input(I.Tail_volume_horizontal)
-    Surface_Area = Input(I.Wing_area)
-    MAC = Input(Wing().mean_aerodynamic_chord)
-    aspect_Ratio_horizontal = Input(I.aspect_Ratio_horizontal)
-    taper_Ratio_horizontal = Input(I.taper_Ratio_horizontal)
+    volume_HT                      = Input(I.Tail_volume_horizontal)
+    Surface_Area                   = Input(I.Wing_area)
+    MAC                            = Input(Wing().mean_aerodynamic_chord)
+    aspect_Ratio_horizontal        = Input(I.aspect_Ratio_horizontal)
+    taper_Ratio_horizontal         = Input(I.taper_Ratio_horizontal)
     sweep_three_quarter_horizontal = Input(I.sweep_three_quarter_horizontal)
-    mach_cruise = Input(I.Mach_cruise)
+    mach_cruise                    = Input(I.Mach_cruise)
 
-    twist = Input(0) #Hard Coded
-    dihedral = Input(0) #Hard Coded
+    twist            = Input(0) #Hard Coded
+    dihedral         = Input(0) #Hard Coded
     lift_coefficient = Input(0.3) #Hard Coded
 
     @Attribute
@@ -133,19 +133,18 @@ class Vertical_Tail(GeomBase):
 
     # airfoil profiles
     airfoil_root = Input("aircraft\simm_airfoil")
-    airfoil_tip = Input("aircraft\simm_airfoil")
+    airfoil_tip  = Input("aircraft\simm_airfoil")
 
-    volume_VT = Input(I.Tail_volume_vertical)
-    Surface_Area = Input(I.Wing_area)
-    Span = Input(Wing().span)
-    aspect_Ratio_vertical = Input(I.aspect_Ratio_vertical)
-    taper_Ratio_vertical = Input(I.taper_Ratio_vertical)
+    volume_VT                   = Input(I.Tail_volume_vertical)
+    Surface_Area                = Input(I.Wing_area)
+    Span                        = Input(Wing().span)
+    aspect_Ratio_vertical       = Input(I.aspect_Ratio_vertical)
+    taper_Ratio_vertical        = Input(I.taper_Ratio_vertical)
     sweep_leading_edge_vertical = Input(I.sweep_leading_edge_vertical)
-    mach_cruise = Input(I.Mach_cruise)
+    mach_cruise                 = Input(I.Mach_cruise)
 
-
-    twist_VT = Input(0)  # Hard Coded
-    dihedral_VT = Input(0)  # Hard Coded
+    twist_VT         = Input(0)  # Hard Coded
+    dihedral_VT      = Input(0)  # Hard Coded
     lift_coefficient = Input(0.3) #Hard Coded
 
     @Attribute

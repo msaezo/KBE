@@ -421,11 +421,11 @@ class Seat(GeomBase):
                                mesh_deflection=0.00005)
 
 class Seat_row(GeomBase):
-    width_aisle = Input(I.Width_aisle)
-    width_seat = Input(I.Width_seat)
-    width_armrest = Input(I.Width_armrest)
+    width_aisle   = Input(Fuselage().width_aisle)
+    width_seat    = Input(Fuselage().width_seat)
+    width_armrest = Input(Fuselage().width_armrest)
 
-    seats_abreast = Input()
+    seats_abreast = Input(Fuselage().seats_abreast)
 
     @Attribute
     def n_aisles(self):

@@ -10,71 +10,89 @@ from aircraft.wing import Wing
 from aircraft.empennage import  Vertical_Tail
 from aircraft.cg_calculations import CG_calculations
 
+class Propulsion_System(GeomBase):
 
-
-class Propeller_engine(GeomBase):
-
-    thrust_to = Input(I.Thrust_TO)
-    n_engines = Input(I.N_engines)
-
-    @Attribute
-    def diameter_engine(self):
-        return 0.2 *((self.thrust_to*10**6)/(1000*self.n_engines))**0.18
+    n_engines          = Input(I.N_engines)
+    thrust_to          = Input(I.Thrust_TO)
+    bypass_ratio       = Input(I.BPR)
+    turbine_inlet_temp = Input(I.Temp_T_4)
+    phi                = Input(I.Phi)
 
     @Attribute
-    def length_engine(self):
-        return 0.1 * ((self.thrust_to * 10**6) / (1000*self.n_engines)) ** 0.4
+    def y_pos(self):
+        if self.n_engines ==1:
+            pos1 = 0
+            y_distr = [pos1]
+        elif self.n_engines ==2:
+            pos1 = 0.35*Wing().span/2
+            y_distr = [-pos1, pos1]
+        elif self.n_engines == 3:
+            pos1 = 0.35 * Wing().span / 2
+            pos2 = 0
+            y_distr = [-pos1, pos2, pos1]
+        elif self.n_engines == 4:
+            pos1 = 0.4 * Wing().span / 2
+            pos2 = 0.7 * Wing().span / 2
+            y_distr = [-pos2, -pos1, pos1, pos2]
+        return y_distr
 
     @Attribute
-    def propeller_diameter(self):
-        return 0.55* ((self.thrust_to*10**6)/(1000*self.n_engines))**(1/4)
+    def z_pos(self):
+        if self.n_engines ==1:
+            pos1 = Fuselage().diameter_fuselage_outer/2 + Fan_engine().max_diameter * 1.1/2
+            z_distr = [pos1]
+        elif self.n_engines == 2:
+            pos1 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.35 * Wing().span/2 - Fan_engine().max_diameter*1.1/2
+            z_distr = [pos1, pos1]
+        elif self.n_engines == 3:
+            pos1 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.35 * Wing().span / 2 - Fan_engine().max_diameter * 1.1/2
+            pos2 = Fuselage().diameter_fuselage_outer/2 + Fan_engine().max_diameter * 1.1/2
+            z_distr = [pos1, pos2, pos1]
+        elif self.n_engines == 4:
+            pos1 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.4 * Wing().span / 2 - Fan_engine().max_diameter * 1.1/2
+            pos2 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.7 * Wing().span / 2 - Fan_engine().max_diameter * 1.1/2
+            z_distr = [pos2, pos1, pos1, pos2]
+        return z_distr
 
     @Attribute
-    def width_envelope(self):
-        return 1.1*self.diameter_engine
-
-    @Attribute
-    def height_envelope(self):
-        return 1.5 * self.diameter_engine
-
-    @Attribute
-    def length_envelope(self):
-        return self.length_engine
+    def x_pos(self):
+        if self.n_engines == 1:
+            pos1 = Vertical_Tail().x_tail_vertical - 0.5
+            x_distr = [pos1]
+        elif self.n_engines ==2:
+            pos1 = Wing().wing_x_shift + np.tan(np.deg2rad(Wing().sweep_leading_edge)) * 0.35 * Wing().span / 2 - 0.5
+            x_distr = [pos1, pos1]
+        elif self.n_engines == 3:
+            pos1 = Wing().wing_x_shift + np.tan(np.deg2rad(Wing().sweep_leading_edge)) * 0.35 * Wing().span / 2 - 0.5
+            pos2 = Vertical_Tail().x_tail_vertical -0.5
+            x_distr = [pos1, pos2, pos1]
+        elif self.n_engines == 4:
+            pos1 = Wing().wing_x_shift + np.tan(np.deg2rad(Wing().sweep_leading_edge)) * 0.4 * Wing().span / 2 - 0.5
+            pos2 = Wing().wing_x_shift + np.tan(np.deg2rad(Wing().sweep_leading_edge)) * 0.7 * Wing().span / 2 - 0.5
+            x_distr = [pos2, pos1, pos1, pos2]
+        return x_distr
 
     @Part
-    def propeller(self):
-        return Cylinder(radius=self.propeller_diameter/2,
-                        height=self.propeller_diameter*0.05,
-                        position= rotate(self.position, "y", np.deg2rad(90)),
-                        color="orange")
+    def propulsion_system(self):
+        return Fan_engine(quantify=int(self.n_engines),
+                        position=translate(self.position,
+                                           'x', self.x_pos[child.index],
+                                           'y', self.y_pos[child.index],
+                                           'z', self.z_pos[child.index]),
+                        hidden=False)
 
-    @Part
-    def shaft(self):
-        return Cylinder(radius=self.diameter_engine/10,
-                        height=self.propeller_diameter*0.11,
-                        position=translate(rotate(self.position, "y", np.deg2rad(90)),
-                                           "z", -0.01 * self.propeller_diameter),
-                        color="orange")
-
-    @Part
-    def engine(self):
-        return Cylinder(radius=self.diameter_engine/2,
-                        height=self.length_engine,
-                        position=translate(rotate(self.position, "y", np.deg2rad(90)),
-                                           "z",0.1*self.propeller_diameter),
-                        color="green")
 
 class Fan_engine(GeomBase):
-    thrust_to = Input(I.Thrust_TO)
-    n_engines = Input(I.N_engines)
-    bypass_ratio = Input(I.BPR)
-    turbine_inlet_temp = Input(I.Temp_T_4)
-    phi = Input(I.Phi)
+    thrust_to          = Input(Propulsion_System().thrust_to)
+    n_engines          = Input(Propulsion_System().n_engines)
+    bypass_ratio       = Input(Propulsion_System().bypass_ratio)
+    turbine_inlet_temp = Input(Propulsion_System().turbine_inlet_temp)
+    phi                = Input(Propulsion_System().phi)
 
-    eta_n = Input(0.97)
-    eta_tf = Input(0.75)
+    eta_n       = Input(0.97)
+    eta_tf      = Input(0.75)
     sound_speed = Input(343)
-    rho_0 = Input(1.225)
+    rho_0       = Input(1.225)
 
 
 
@@ -220,75 +238,9 @@ class Fan_engine(GeomBase):
     def bypass(self):
         return SubtractedSolid(shape_in=self.fused_bypass_outer, tool=self.fused_bypass_inner,color="yellow", transparency = 0.5)
 
-class Propulsion_System(GeomBase):
-
-    n_engines = Input(I.N_engines)
-
-    @Attribute
-    def y_pos(self):
-        if self.n_engines ==1:
-            pos1 = 0
-            y_distr = [pos1]
-        elif self.n_engines ==2:
-            pos1 = 0.35*Wing().span/2
-            y_distr = [-pos1, pos1]
-        elif self.n_engines == 3:
-            pos1 = 0.35 * Wing().span / 2
-            pos2 = 0
-            y_distr = [-pos1, pos2, pos1]
-        elif self.n_engines == 4:
-            pos1 = 0.4 * Wing().span / 2
-            pos2 = 0.7 * Wing().span / 2
-            y_distr = [-pos2, -pos1, pos1, pos2]
-        return y_distr
-
-    @Attribute
-    def z_pos(self):
-        if self.n_engines ==1:
-            pos1 = Fuselage().diameter_fuselage_outer/2 + Fan_engine().max_diameter * 1.1/2
-            z_distr = [pos1]
-        elif self.n_engines == 2:
-            pos1 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.35 * Wing().span/2 - Fan_engine().max_diameter*1.1/2
-            z_distr = [pos1, pos1]
-        elif self.n_engines == 3:
-            pos1 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.35 * Wing().span / 2 - Fan_engine().max_diameter * 1.1/2
-            pos2 = Fuselage().diameter_fuselage_outer/2 + Fan_engine().max_diameter * 1.1/2
-            z_distr = [pos1, pos2, pos1]
-        elif self.n_engines == 4:
-            pos1 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.4 * Wing().span / 2 - Fan_engine().max_diameter * 1.1/2
-            pos2 = Wing().wing_z_shift + np.tan(np.deg2rad(Wing().dihedral)) * 0.7 * Wing().span / 2 - Fan_engine().max_diameter * 1.1/2
-            z_distr = [pos2, pos1, pos1, pos2]
-        return z_distr
-
-    @Attribute
-    def x_pos(self):
-        if self.n_engines == 1:
-            pos1 = Vertical_Tail().x_tail_vertical - 0.5
-            x_distr = [pos1]
-        elif self.n_engines ==2:
-            pos1 = Wing().wing_x_shift + np.tan(np.deg2rad(Wing().sweep_leading_edge)) * 0.35 * Wing().span / 2 - 0.5
-            x_distr = [pos1, pos1]
-        elif self.n_engines == 3:
-            pos1 = Wing().wing_x_shift + np.tan(np.deg2rad(Wing().sweep_leading_edge)) * 0.35 * Wing().span / 2 - 0.5
-            pos2 = Vertical_Tail().x_tail_vertical -0.5
-            x_distr = [pos1, pos2, pos1]
-        elif self.n_engines == 4:
-            pos1 = Wing().wing_x_shift + np.tan(np.deg2rad(Wing().sweep_leading_edge)) * 0.4 * Wing().span / 2 - 0.5
-            pos2 = Wing().wing_x_shift + np.tan(np.deg2rad(Wing().sweep_leading_edge)) * 0.7 * Wing().span / 2 - 0.5
-            x_distr = [pos2, pos1, pos1, pos2]
-        return x_distr
-
-    @Part
-    def propulsion_system(self):
-        return Fan_engine(quantify=int(self.n_engines),
-                        position=translate(self.position,
-                                           'x', self.x_pos[child.index],
-                                           'y', self.y_pos[child.index],
-                                           'z', self.z_pos[child.index]),
-                        hidden=False)
 
 
 if __name__ == '__main__':
     from parapy.gui import display
-    obj1 = Propeller_engine(label="Prop")
+    obj1 = Propulsion_System(label="Prop")
     display(obj1)
