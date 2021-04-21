@@ -12,8 +12,8 @@ AC.Wing.inc  = 0;
 
 % Airfoil coefficients input matrix
 %                    | ->     upper curve coeff.  <-|  | ->  lower curve coeff.       <-| 
-AC.Wing.Airfoils = [0.2171 0.3450 0.2975 0.2685 0.2893 -0.1299 -0.2388 -0.1635 -0.0476 0.0797;
-                    0.2171 0.3450 0.2975 0.2685 0.2893 -0.1299 -0.2388 -0.1635 -0.0476 0.0797];
+AC.Wing.Airfoils = [0.2093 0.3046 0.2407 0.2846 0.2217 -0.1305 -0.1404 -0.0146 -0.0088 0.0447;
+                    0.3407 0.3078 0.3127 0.2541 0.3275 -0.3407 -0.3078 -0.3127 -0.2541 0.3275];
                 
 AC.Wing.eta = [0;1];  % Spanwise location of the airfoil sections
 
