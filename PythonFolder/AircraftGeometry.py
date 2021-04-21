@@ -12,6 +12,8 @@ from aircraft import Propeller_engine
 from aircraft import Fan_engine
 from aircraft import Propulsion_System
 from aircraft import Q3D
+from aircraft import Energy
+from aircraft import Tanks
 
 
 
@@ -19,13 +21,16 @@ from aircraft import Q3D
 class AircraftGeometry(GeomBase):
 
     @Attribute
-    def CLdes(self):
-        return Q3D().CLdes
+    def volume_needed(self):
+        return Energy().vol_needed
 
     @Attribute
     def CDdes(self):
         return Q3D().CDdes
 
+    @Part
+    def tanks(self):
+        return Tanks()
 
     @Part
     def fuselage(self):

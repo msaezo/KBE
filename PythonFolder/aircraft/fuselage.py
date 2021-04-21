@@ -99,7 +99,7 @@ class Fuselage(GeomBase):
 
     @Attribute
     def position_floor_upper(self):
-        return (self.diameter_fuselage_inner/2)/2 - self.height_shoulder
+        return  - self.height_shoulder
 
     @Attribute
     def position_floor_lower(self):
@@ -253,7 +253,7 @@ class Fuselage(GeomBase):
                    height=self.height_floor,
                    centered=True,
                    position=translate(self.position,
-                                      "z", -self.height_shoulder-self.height_floor/2,
+                                      "z", -self.height_shoulder - self.height_floor/2,
                                       "x", self.length_fuselage/2-0.1),
                    hidden=True)
 

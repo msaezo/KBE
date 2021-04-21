@@ -47,3 +47,9 @@ for i in range(57,65):
     Value = worksheet.cell(i,2).value
     exec(Name + "=Value")
 
+# Flight parameters
+for i in range(67, 70):
+    Name = worksheet.cell(i, 1).value
+    Value = worksheet.cell(i, 2).value
+    exec(Name + "=Value")
+

@@ -10,6 +10,8 @@ from .propulsion import Fan_engine
 from. fuselage import Seat
 from .propulsion import Propulsion_System
 from .runQ3D import Q3D
+from .energy import Energy
+from .energy import Tanks
 
 
 

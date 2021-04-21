@@ -89,6 +89,7 @@ class Q3D(GeomBase):
                                       airDensity, altitude, Reynolds, Mach, AoA, Cl, nargout=2)
         eng.quit()
         res = [CLdes, CDdes]
+        # print(res)
         return res
 
 
