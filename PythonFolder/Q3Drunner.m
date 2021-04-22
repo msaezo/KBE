@@ -25,8 +25,8 @@ AC.Aero.rho   = airDensity;         % air density  (kg/m3)
 AC.Aero.alt   = altitude;             % flight altitude (m)
 AC.Aero.Re    = Reynolds;        % reynolds number (bqased on mean aerodynamic chord)
 AC.Aero.M     = Mach;           % flight Mach number 
-AC.Aero.CL    = Cl;         % lift coefficient -comment this line to run the code for given alpha%
-% AC.Aero.Alpha = AoA;             % angle of attack - comment this line to run the code for given cl ient - comment this line to run the code for given alpha%
+% AC.Aero.CL    = Cl;         % lift coefficient -comment this line to run the code for given alpha%
+AC.Aero.Alpha = AoA;             % angle of attack - comment this line to run the code for given cl ient - comment this line to run the code for given alpha%
 
 %% 
 % tic
