@@ -107,20 +107,6 @@ class Wing(GeomBase):
         return self.weight_TO/(self.dynamic_pressure*self.area_wing)
 
     @Attribute
-    def thickness_to_chord(self):
-        cos_halfsweep = np.cos(np.deg2rad(self.sweep_mid_chord))
-        option_one = (cos_halfsweep**3 * (0.935 - self.mach_drag_divergence * cos_halfsweep) - 0.115 *self.lift_coefficient**1.5)/(cos_halfsweep**2)
-
-        if option_one > 0.18:
-            toverc = 0.18
-        elif option_one < 0.1:
-            toverc = 0.1
-        else:
-            toverc =option_one
-
-        return toverc
-
-    @Attribute
     def dihedral(self):
         if self.wing_highlow == "high":
             dihed = 3-self.sweep_quarter_chord/10 -2
@@ -170,7 +156,7 @@ class Wing(GeomBase):
     def root_airfoil(self):  # root airfoil will receive self.position as default
         return Airfoil(airfoil_name=self.airfoil_root,
                        chord=self.chord_root,
-                       thickness_factor=self.thickness_to_chord,
+                       thickness_factor=0.14,
                        position=translate(self.position,
                                           "x", self.wing_x_shift,
                                           "Z", self.wing_z_shift),
@@ -181,7 +167,7 @@ class Wing(GeomBase):
     def tip_airfoil(self):
         return Airfoil(airfoil_name=self.airfoil_tip,
                        chord=self.chord_tip,
-                       thickness_factor=self.thickness_to_chord,
+                       thickness_factor=0.1,
                        factor=0.24,
                        position=translate(
                            rotate(self.position, "y", np.deg2rad(self.twist)),  # apply twist angle
