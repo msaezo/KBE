@@ -138,8 +138,12 @@ class AircraftGeometry(Base):
         return Energy().vol_needed
 
     @Attribute
-    def CDdes(self):
+    def CLdes(self):
         return Q3D().CLdes
+
+    @Attribute
+    def CDdes(self):
+        return Q3D().CDdes
 
     @Attribute
     def test(self):
