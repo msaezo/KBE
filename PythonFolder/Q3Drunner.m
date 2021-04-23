@@ -4,7 +4,7 @@ function [CLdes,CDdes, alpha] = Q3Drunner(span,root_chord,tip_chord,twist_chord,
 % Wing planform geometry 
 %                x    y                z                chord(m)       twist angle (deg) 
 AC.Wing.Geom = [0     0                0                root_chord         twist_chord;
-                span/2*tand(sweep)  span/2   span/2*sind(dihedral)     tip_chord          twist_tip];
+                span/2*tand(sweep)  span/2*sind(sweep)   span/2*sind(dihedral)     tip_chord          twist_tip];
             
 % Wing incidence angle (degree)
 AC.Wing.inc  = 0;   
@@ -12,7 +12,7 @@ AC.Wing.inc  = 0;
 % Airfoil coefficients input matrix
 %                    | ->     upper curve coeff.  <-|  | ->  lower curve coeff.       <-| 
 AC.Wing.Airfoils = [0.2093 0.3046 0.2407 0.2846 0.2217 -0.1305 -0.1404 -0.0146 -0.0088 -0.0447;
-                    0.2093 0.3046 0.2407 0.2846 0.2217 -0.1305 -0.1404 -0.0146 -0.0088 -0.0447];
+                    0.1420 0.1279 0.1309 0.1055 0.1366 -0.1420 -0.1279 -0.1309 -0.1055 -0.1366];
                     %0.2093 0.3046 0.2407 0.2846 0.2217 -0.1305 -0.1404 -0.0146 -0.0088 -0.0447];
                    % 0.1420 0.1279 0.1309 0.1055 0.1366 -0.1420 -0.1279 -0.1309 -0.1055 -0.1366];
                 

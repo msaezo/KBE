@@ -10,10 +10,12 @@ class Q3D(GeomBase):
     twist_chord = Input(0.0)  # deg positive up
     AoA      = Input(2.0)  # deg
     T_zero   = Input(288) #Kelvin
+    T_zero_vs= Input(273) #Kelvin
+    S_vis    = Input(111) #Kelvin
     P_zero   = Input(101325) #Pa
     Rho_zero = Input(1.225) #kg/m3
     deltaT   = Input(-0.0065) #K/m
-    viscosity_dyn_zero = Input(1.81*10**(-5))
+    viscosity_dyn_zero = Input(1.716*10**(-5))
     span       = Input(Wing().span)  # m input total, Q3D puts half of it already
     root_chord = Input(Wing().chord_root)  # m
     tip_chord  = Input(Wing().chord_tip)  # m
@@ -57,7 +59,8 @@ class Q3D(GeomBase):
 
     @Attribute
     def viscosity_dyn(self):
-        return self.viscosity_dyn_zero*(self.temperature/self.T_zero)**0.7
+        return self.viscosity_dyn_zero*((self.temperature/self.T_zero_vs)**(3/2)*(self.T_zero_vs+self.S_vis)/\
+                                        (self.temperature+self.S_vis))  # Sutherlands' Law
 
     @Attribute
     def Reynolds(self):
