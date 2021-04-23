@@ -85,10 +85,10 @@ class Q3D(GeomBase):
 
         # eng = matlab.engine.start_matlab()
         # run Q3D function
-        [CLdes, CDdes] = eng.Q3Drunner(span, root_chord, tip_chord, twist_chord, twist_tip, dihedral, sweep, airSpeed,
-                                      airDensity, altitude, Reynolds, Mach, AoA, Cl, nargout=2)
+        [CLdes, CDdes, alpha] = eng.Q3Drunner(span, root_chord, tip_chord, twist_chord, twist_tip, dihedral, sweep, airSpeed,
+                                      airDensity, altitude, Reynolds, Mach, AoA, Cl, nargout=3)
         eng.quit()
-        res = [CLdes, CDdes]
+        res = [CLdes, CDdes, alpha]
         # print(res)
         return res
 
@@ -103,6 +103,10 @@ class Q3D(GeomBase):
         CDdes = self.QThreeD[1]
         return CDdes
 
+    @Attribute
+    def Alpha(self):
+        alpha = self.QThreeD[2]
+        return alpha
 
 
 

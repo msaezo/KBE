@@ -14,6 +14,8 @@ from aircraft import Propulsion_System
 from aircraft import Q3D
 from aircraft import Energy
 from aircraft import Tanks
+from aircraft import new_fuselage
+from aircraft import new_fuselage_profile
 
 import xlrd
 
@@ -138,12 +140,24 @@ class AircraftGeometry(Base):
         return Energy().vol_needed
 
     @Attribute
-    def CLdes(self):
+    def CL_in(self):
+        return Wing().lift_coefficient
+
+    @Attribute
+    def CL_out(self):
         return Q3D().CLdes
 
     @Attribute
-    def CDdes(self):
+    def CD_out(self):
         return Q3D().CDdes
+
+    @Attribute
+    def ALpha(self):
+        return Q3D().Alpha
+
+    @Attribute
+    def Reynolds(self):
+        return Q3D().Reynolds
 
     @Attribute
     def test(self):
@@ -233,7 +247,13 @@ class AircraftGeometry(Base):
                                mass_payload = self.mass_payload,
                                mass_fuel = self.mass_fuel)
 
+    @Part
+    def newprofile(self):
+        return new_fuselage()
 
+    @Part
+    def newprofile_aaa(self):
+        return new_fuselage_profile()
 
 
 if __name__ == '__main__':

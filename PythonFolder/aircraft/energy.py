@@ -20,14 +20,33 @@ class Tanks(GeomBase):
     efficiency       = Input(I.total_efficiency)
     energy_density   = Input(I.energy_density)
 
+    @Attribute
+    def y_pos(self):
+        return (1.1 * Energy().diameter_tank_final * (Energy().number_of_tanks - 1)) / 2
+
+    @Attribute
+    def z_pos(self):
+        return Fuselage().position_floor_lower - 1.1 * Energy().diameter_tank_final / 2
+
+    @Attribute
+    def tank_max_dim(self):
+        return np.sqrt(self.Y_pos**2 + self.z_pos**2)+Energy().diameter_tank_final/2
+
+    @Attribute
+    def new_fuselage(self):
+        if self.tank_max_dim < Fuselage().diameter_fuselage_inner:
+            result = 'False'
+        else:
+            result = 'True'
+        return result
+
     @Part
     def tank(self):
         return Energy(quantify=Energy().number_of_tanks,
                       position=translate(self.position,
                                          'x', Fuselage().length_cockpit,
-                                         'y', (1.1 * Energy().diameter_tank_final * (
-                                      Energy().number_of_tanks - 1)) / 2 - 1.1 * Energy().diameter_tank_final * child.index,
-                                         'z', Fuselage().position_floor_lower - 1.1 * Energy().diameter_tank_final / 2),
+                                         'y', self.y_pos - 1.1 * Energy().diameter_tank_final * child.index,
+                                         'z', self.z_pos),
                       hidden=False)
 
 class Energy(GeomBase):
@@ -45,7 +64,11 @@ class Energy(GeomBase):
 
     @Attribute
     def drag(self):
-        return 0.5*self.density*self.velocity**2 * self.lift_coefficient/14 * self.surface
+        if np.isnan(self.drag_coefficient) == True:
+            cd = self.lift_coefficient/20
+        else:
+            cd = self.drag_coefficient
+        return 0.5*self.density*self.velocity**2 * cd * self.surface
 
     @Attribute
     def work(self):
@@ -99,6 +122,8 @@ class Energy(GeomBase):
     @Attribute
     def diameter_tank_final(self):
         return self.diameter_tank[self.number_of_tanks-1]
+
+
 
     @Part
     def cylinder(self):

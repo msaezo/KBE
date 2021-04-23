@@ -48,15 +48,39 @@ class Wing(GeomBase):
     twist = Input(-5)
     is_mirrored = Input(True)
 
-
+    @Attribute
+    def temperature(self):
+        if self.altitude_cruise < 11001:
+            temp = 288 + self.altitude_cruise * (-0.0065)
+        else:
+            temp = 288 + 11000 * (-0.0065)
+        return temp
 
     @Attribute
-    def pressure(self):
-        return 101325*(1-(0.0065*self.altitude_cruise)/288)**(9.81/(287*0.0065))
+    def pressure_static(self):
+        if self.altitude_cruise < 11001:
+            press = 101325 * (np.e) ** ((-9.81665 / (287 * self.temperature)) * (self.altitude_cruise))
+        else:
+            press = 22632 * (self.temperature / 216.65) ** (-9.81665 / (self.altitude_cruise * 287))
+        return press
+
+    @Attribute
+    def soundSpeed(self):
+        return np.sqrt(1.4 * 287 * self.temperature)
+
+    @Attribute
+    def airSpeed(self):
+        print(self.mach_cruise * self.soundSpeed)
+        return self.mach_cruise * self.soundSpeed
+
+    @Attribute
+    def airDensity(self):
+        return self.pressure_static / (287 * self.temperature)
+
 
     @Attribute
     def dynamic_pressure(self):
-        return 0.7*self.pressure*self.mach_cruise**2
+        return 0.7*self.pressure_static*self.mach_cruise**2
 
     @Attribute
     def mach_drag_divergence(self):

@@ -11,6 +11,8 @@ from .propulsion import Propulsion_System
 from .runQ3D import Q3D
 from .energy import Energy
 from .energy import Tanks
+from .Fuselage_new import new_fuselage
+from .Fuselage_new import new_fuselage_profile
 
 
 

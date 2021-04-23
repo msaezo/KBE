@@ -83,6 +83,8 @@ class Horizontal_Tail(GeomBase):
 
         if option_one > 0.18:
             toverc = 0.18
+        elif option_one <0.1:
+            toverc = 0.1
         else:
             toverc =option_one
 
