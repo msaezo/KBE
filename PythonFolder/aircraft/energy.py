@@ -30,7 +30,7 @@ class Tanks(GeomBase):
 
     @Attribute
     def tank_max_dim(self):
-        return np.sqrt(self.Y_pos**2 + self.z_pos**2)+Energy().diameter_tank_final/2
+        return np.sqrt(self.y_pos**2 + self.z_pos**2)+Energy().diameter_tank_final/2
 
     @Attribute
     def new_fuselage(self):
@@ -84,7 +84,7 @@ class Energy(GeomBase):
 
     @Attribute
     def length_tank(self):
-        return (Fuselage().length_fuselage-Fuselage().length_cockpit-Fuselage().length_tailcone)
+        return (Fuselage().length_fuselage-Fuselage().length_cockpit-Fuselage().length_tailcone)*0.95
 
     @Attribute
     def diameter_tank(self):

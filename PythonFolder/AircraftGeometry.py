@@ -14,8 +14,8 @@ from aircraft import Propulsion_System
 from aircraft import Q3D
 from aircraft import Energy
 from aircraft import Tanks
-from aircraft import new_fuselage
-from aircraft import new_fuselage_profile
+from aircraft import new_fuselage1
+from aircraft import new_fuselage2
 
 import xlrd
 
@@ -160,8 +160,32 @@ class AircraftGeometry(Base):
         return Q3D().Reynolds
 
     @Attribute
-    def test(self):
-        return
+    def new_fuselage_input(self):
+        if Tanks().tank_max_dim > Fuselage().diameter_fuselage_inner/2:
+            input= [Fuselage().outer_profile_set[0],
+                               Fuselage().outer_profile_set[1],
+                               new_fuselage1().new_profile_first.composed_crv,
+                               new_fuselage1().new_profile_set[0].composed_crv,
+                               new_fuselage1().new_profile_set[1].composed_crv,
+                               new_fuselage1().new_profile_set[2].composed_crv,
+                               new_fuselage1().new_profile_set[3].composed_crv,
+                               new_fuselage1().new_profile_set[4].composed_crv,
+                               Fuselage().outer_profile_set[9],
+                               Fuselage().outer_profile_set[10]]
+        else:
+            input= [Fuselage().outer_profile_set[0],
+                                     Fuselage().outer_profile_set[1],
+                                     Fuselage().outer_profile_set[2],
+                                     Fuselage().outer_profile_set[3],
+                                     Fuselage().outer_profile_set[4],
+                                     Fuselage().outer_profile_set[5],
+                                     Fuselage().outer_profile_set[6],
+                                     Fuselage().outer_profile_set[7],
+                                     Fuselage().outer_profile_set[8],
+                                     Fuselage().outer_profile_set[9],
+                                     Fuselage().outer_profile_set[10]]
+        return  input
+
     @Part
     def tanks(self):
         return Tanks(range = self.range,
@@ -247,13 +271,12 @@ class AircraftGeometry(Base):
                                mass_payload = self.mass_payload,
                                mass_fuel = self.mass_fuel)
 
-    @Part
-    def newprofile(self):
-        return new_fuselage()
 
     @Part
-    def newprofile_aaa(self):
-        return new_fuselage_profile()
+    def newprofile(self):
+        return new_fuselage2(input_profile_set=self.new_fuselage_input)
+
+
 
 
 if __name__ == '__main__':
