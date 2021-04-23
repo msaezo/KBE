@@ -13,6 +13,8 @@ from aircraft.energy import Energy
 
 class new_fuselage(GeomBase):
 
+
+
     @Part
     def new_profile_first(self):
         return new_fuselage_profile(Fuselage_diameter=0.9*Fuselage().diameter_fuselage_outer,
@@ -27,8 +29,162 @@ class new_fuselage(GeomBase):
                                     #                    "x", Fuselage().section_length_outer[child.index+3]))
 
     @Part
+    def splittingrectangle(self):
+        return RectangularFace(width=Fuselage().length_fuselage + 1,
+                               length=10,
+                               position=translate(rotate(self.position, "x", np.deg2rad(90)),
+                                                  "x", Fuselage().length_fuselage / 2))
+
+    @Part
+    def filled_surface0(self):
+        return Face(island=Fuselage().outer_profile_set[0])
+
+    @Part
+    def filled_surface1(self):
+        return Face(island=Fuselage().outer_profile_set[1])
+
+    @Part
+    def filled_surface2(self):
+        return Face(island=self.new_profile_first.composed_crv)
+
+    @Part
+    def filled_surface3(self):
+        return Face(island=self.new_profile_set[0].composed_crv)
+
+    @Part
+    def filled_surface4(self):
+        return Face(island=self.new_profile_set[1].composed_crv)
+
+    @Part
+    def filled_surface5(self):
+        return Face(island=self.new_profile_set[2].composed_crv)
+
+    @Part
+    def filled_surface6(self):
+        return Face(island=self.new_profile_set[3].composed_crv)
+
+    @Part
+    def filled_surface7(self):
+        return Face(island=self.new_profile_set[4].composed_crv)
+
+    @Part
+    def filled_surface8(self):
+        return Face(island=Fuselage().outer_profile_set[8])
+
+    @Part
+    def filled_surface9(self):
+        return Face(island=Fuselage().outer_profile_set[9])
+
+    @Part
+    def filled_surface10(self):
+        return Face(island=Fuselage().outer_profile_set[10])
+
+
+
+    @Part
+    def ref_line0(self):
+        return IntersectedShapes(shape_in=self.filled_surface0,
+                                 tool=self.splittingrectangle)
+
+    @Part
+    def ref_line1(self):
+        return IntersectedShapes(shape_in=self.filled_surface1,
+                                 tool=self.splittingrectangle)
+
+    @Part
+    def ref_line2(self):
+        return IntersectedShapes(shape_in=self.filled_surface2,
+                                 tool=self.splittingrectangle)
+
+    @Part
+    def ref_line3(self):
+        return IntersectedShapes(shape_in=self.filled_surface3,
+                                 tool=self.splittingrectangle)
+
+    @Part
+    def ref_line4(self):
+        return IntersectedShapes(shape_in=self.filled_surface4,
+                                 tool=self.splittingrectangle)
+    @Part
+    def ref_line5(self):
+        return IntersectedShapes(shape_in=self.filled_surface5,
+                      tool=self.splittingrectangle)
+
+    @Part
+    def ref_line6(self):
+        return IntersectedShapes(shape_in=self.filled_surface6,
+                                 tool=self.splittingrectangle)
+
+    @Part
+    def ref_line7(self):
+        return IntersectedShapes(shape_in=self.filled_surface7,
+                                 tool=self.splittingrectangle)
+
+    @Part
+    def ref_line8(self):
+        return IntersectedShapes(shape_in=self.filled_surface8,
+                                 tool=self.splittingrectangle)
+
+    @Part
+    def ref_line9(self):
+        return IntersectedShapes(shape_in=self.filled_surface9,
+                                 tool=self.splittingrectangle)
+
+    @Part
+    def ref_line10(self):
+        return IntersectedShapes(shape_in=self.filled_surface10,
+                                 tool=self.splittingrectangle)
+
+    @Part
+    def path(self):
+        return FittedCurve(points=[self.ref_line0.edges[0].vertices[0].point,
+                                   self.ref_line1.edges[0].vertices[0].point,
+                                   self.ref_line2.edges[0].vertices[0].point,
+                                   self.ref_line3.edges[0].vertices[0].point,
+                                   self.ref_line4.edges[0].vertices[0].point,
+                                   self.ref_line5.edges[0].vertices[0].point,
+                                   self.ref_line6.edges[0].vertices[0].point,
+                                   self.ref_line7.edges[0].vertices[0].point,
+                                   self.ref_line8.edges[0].vertices[0].point,
+                                   self.ref_line9.edges[0].vertices[0].point,
+                                   self.ref_line10.edges[0].vertices[0].point])
+
+
+
+    @Part
+    def splitcurve0(self):
+        return SplitCurve(curve_in=Fuselage().outer_profile_set[0],
+                          tool=self.ref_line0.edges[0].vertices[0].point)
+
+    @Part
+    def splitcurve1(self):
+        return SplitCurve(curve_in=Fuselage().outer_profile_set[1],
+                          tool=self.ref_line1.edges[0].vertices[0].point)
+
+    @Part
+    def splitcurve2(self):
+        return SplitCurve(curve_in=self.new_profile_first.composed_crv,
+                          tool=self.ref_line2.edges[0].vertices[0].point)
+
+    @Part
+    def splitcurve3(self):
+        return SplitCurve(curve_in=self.new_profile_set[0].composed_crv,
+                          tool=self.ref_line3.edges[0].vertices[0].point)
+
+
+    @Part
     def fuselage_lofted_shell_outer1(self):
-        return LoftedSolid(profiles=[Fuselage().outer_profile_set[0],
+        return LoftedShell(profiles=[self.splitcurve0,
+                                     self.splitcurve1,
+                                     self.splitcurve2,
+                                     self.splitcurve3],
+                           color="green",
+                           mesh_deflection=0.00001,
+                           transparency = 0.8)
+
+    @Part
+    def fuselage_lofted_shell_outer2(self):
+        return LoftedShell(profiles=[Fuselage().outer_profile_set[0],
                                      Fuselage().outer_profile_set[1],
                                      self.new_profile_first.composed_crv,
                                      self.new_profile_set[0].composed_crv,
@@ -36,7 +192,9 @@ class new_fuselage(GeomBase):
                                      self.new_profile_set[2].composed_crv,
                                      self.new_profile_set[3].composed_crv,
                                      self.new_profile_set[4].composed_crv,
-                                     Fuselage().outer_profile_set[8]],
+                                     Fuselage().outer_profile_set[8],
+                                     Fuselage().outer_profile_set[9],
+                                     Fuselage().outer_profile_set[10]],
                            color="green",
                            mesh_deflection=0.00001,
                            transparency = 0.8)
