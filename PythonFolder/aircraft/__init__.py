@@ -5,6 +5,7 @@ from .airfoil import Airfoil
 from .empennage import Vertical_Tail
 from .empennage import Horizontal_Tail
 from .cg_calculations import CG_calculations
+from .cg_calculations import CG_calculations_hyd
 from .propulsion import Fan_engine
 from .fuselage import Seat
 from .propulsion import Propulsion_System

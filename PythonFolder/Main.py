@@ -18,7 +18,7 @@
 #       - Decrease range                    (good option, but not preferable)
 #       - Give options to user              (input different airfoil,...)
 #       - WARNING: - Tank diameter too big, action point taken -
-#   - C.G.Range Hydrogen  > C.G. Range Kerosene   -- Just give warning
+#   - C.G.Range Hydrogen > C.G. Range Kerosene   -- Just give warning
 #       - WARNING: - Problems might arise due to higher C.G. range than before -
 #   - Any other?
 
