@@ -26,3 +26,10 @@
 #   - Include the drag of the fuselage, theoretically we could extend it and drag would not increase (good that tank is limited by the fus length)
 #   - Fuel weight defined twice? once in fuel mass fraction (guessing kerosene) twice range (guessing hydrogen)
 #   - Cargo not included at all
+from parapy.core import *
+from parapy.geom import *
+
+from AircraftGeometry import AircraftGeometry
+
+
+AircraftGeometry()

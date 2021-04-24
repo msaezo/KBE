@@ -7,6 +7,7 @@ from parapy.geom import *
 
 from aircraft.fuselage import Fuselage
 from aircraft.wing import Wing
+from aircraft.energy import Energy
 
 
 
@@ -63,14 +64,28 @@ class CG_calculations(GeomBase):
 
 #Hydrogen Based CG  ---- Not sure if imports are correct (hardcoded obviously not) but calculations are.
 #Maybe place in a different file so we only run it if necessary.
-class CG_calculations(GeomBase):
+class CG_calculations_hyd(GeomBase):
     payload_cg_loc = Input(I.Payload_cg_loc)
-    fuel_cg_loc = # here should be the middle point of the tanks
-    tank_cg_loc = # here should be the middle point of the tanks
-    mass_fuel   = # output from range calculation
+    tank_length = Input(Energy().length_tank) #
+    tank_front_loc = Input(Fuselage().length_cockpit)
+    vol_needed = Input(Energy().vol_needed)
+    hyd_density = Input(I.hyd_density)
     g_i         = Input(0.5) # gravimetric index taken from report on flying V, cryogenic tank
     mass_oew = Input(I.OEW_mass_fraction)
     mass_payload = Input(I.Payload_mass_fraction)
+
+    @Attribute
+    def fuel_cg_loc(self):
+        return self.tank_front_loc/2 + self.tank_front_loc
+
+    @Attribute
+    def tank_cg_loc(self):
+        return self.fuel_cg_loc
+
+    @Attribute
+    def mass_fuel(self):
+        return self.vol_needed * self.hyd_density
+
 
     @Attribute
     def mass_tank(self):
