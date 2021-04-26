@@ -17,11 +17,11 @@ from aircraft.runQ3D import Q3D
 
 class Tanks(GeomBase):
     range            = Input(I.Range)
-    lift_coefficient = Input(Q3D().cldes)
-    drag_coefficient = Input(Q3D().cddes)
-    surface          = Input(Wing().area_wing)
-    density          = Input(Q3D().air_density)
-    velocity         = Input(Q3D().air_speed)
+    lift_coefficient = Input(Q3D().CLdes)
+    drag_coefficient = Input(Q3D().CDdes)
+    surface          = Input(I.Wing_area)
+    density          = Input(Q3D().airDensity)
+    velocity         = Input(Q3D().airSpeed)
     efficiency       = Input(I.total_efficiency)
     energy_density   = Input(I.energy_density)
 
@@ -31,15 +31,7 @@ class Tanks(GeomBase):
 
     @Attribute
     def z_pos(self):
-        if Energy().doesthiswork >= 0.5 * Fuselage().diameter_fuselage_inner:
-          msg = "The diameter of the hydrogen tanks might be too big to be realistic, a lower ratio compared to the " \
-              "fuselage diameter is expected. " \
-              "Suggested options:" \
-              "     - Decrease range of the aircraft"
-        warnings.warn(msg)
         return Fuselage().position_floor_lower - 1.1 * Energy().diameter_tank_final / 2
-
-
 
     @Attribute
     def tank_max_dim(self):
@@ -73,10 +65,10 @@ class Drag(GeomBase):
     eq_skinfriction_coefficient = Input(I.eq_skinfriction_coefficient)
     fus_diam                    = Input(Fuselage().diameter_fuselage_outer)
     fus_len                     = Input(Fuselage().length_fuselage)
-    ht_surface                  = Input(Horizontal_Tail().surface_horizontal_tail)
-    ht_sweep                    = Input(Horizontal_Tail().sweep_cuarter_chord_horizontal_tail)
-    vt_surface                  = Input(Vertical_Tail().surface_vertical_tail)
-    vt_sweep                    = Input(Vertical_Tail().sweep_cuarter_chord_vertical_tail)
+    ht_surface                  = Input(Horizontal_Tail().surfaceHorizontalTail)
+    ht_sweep                    = Input(Horizontal_Tail().sweepCuarterChordHorizontalTail)
+    vt_surface                  = Input(Vertical_Tail().surfaceVerticalTail)
+    vt_sweep                    = Input(Vertical_Tail().sweepCuarterChordVerticalTail)
     thick_to_chord              = Input(0.24)
     max_thick                   = Input(0.25)
     len_nacelle                  = Input(Fan_engine().nacelle_length)
@@ -92,12 +84,12 @@ class Drag(GeomBase):
     q_fuselage                  = Input(1)
     q_emp                       = Input(1.04)
 
-    t_zero   = Input(288) #Kelvin
-    t_zero_vs= Input(273) #Kelvin
-    s_vis    = Input(111) #Kelvin
-    p_zero   = Input(101325) #Pa
-    rho_zero = Input(1.225) #kg/m3
-    deltat   = Input(-0.0065) #K/m
+    T_zero   = Input(288) #Kelvin
+    T_zero_vs= Input(273) #Kelvin
+    S_vis    = Input(111) #Kelvin
+    P_zero   = Input(101325) #Pa
+    Rho_zero = Input(1.225) #kg/m3
+    deltaT   = Input(-0.0065) #K/m
     viscosity_dyn_zero = Input(1.716*10**(-5))
     span       = Input(Wing().span)  # m input total, Q3D puts half of it already
     root_chord = Input(Wing().chord_root)  # m
@@ -105,45 +97,47 @@ class Drag(GeomBase):
     MAC        = Input(Wing().mean_aerodynamic_chord) # m
 
     altitude = Input(Wing().altitude_cruise)  # m
-    mach     = Input(Wing().mach_cruise)  # make it in accordance with the flight speed and altitude
-    cl       = Input(Wing().lift_coefficient) # if Cl is used do not use angle of attack
+    Mach     = Input(Wing().mach_cruise)  # make it in accordance with the flight speed and altitude
+    Cl       = Input(Wing().lift_coefficient) # if Cl is used do not use angle of attack
+
+    popup_gui = Input(False)
 
     @Attribute
     def temperature(self):
         if self.altitude <11001:
-            temp = self.t_zero + self.altitude*self.deltat
+            temp = self.T_zero + self.altitude*self.deltaT
         else:
-            temp = self.t_zero + 11000*self.deltat
+            temp = self.T_zero + 11000*self.deltaT
         return temp
 
     @Attribute
     def pressure(self):
         if self.altitude <11001:
-            press = self.p_zero * (np.e) ** ((-9.81665 / (287 * self.temperature)) * (self.altitude))
+            press = self.P_zero * (np.e) ** ((-9.81665 / (287 * self.temperature)) * (self.altitude))
         else:
             press = 22632 * (self.temperature / 216.65) ** (-9.81665 / (self.altitude * 287))
         return press
 
     @Attribute
-    def sound_speed(self):
+    def soundSpeed(self):
         return np.sqrt(1.4*287*self.temperature)
 
     @Attribute
-    def air_speed(self):
-        return self.mach *self.sound_speed
+    def airSpeed(self):
+        return self.Mach *self.soundSpeed
 
     @Attribute
-    def air_density(self):
+    def airDensity(self):
         return self.pressure/(287*self.temperature)
 
     @Attribute
     def viscosity_dyn(self):
-        return self.viscosity_dyn_zero*((self.temperature/self.t_zero_vs)**(3/2)*(self.t_zero_vs+self.s_vis)/\
-                                        (self.temperature+self.s_vis))  # Sutherlands' Law
+        return self.viscosity_dyn_zero*((self.temperature/self.T_zero_vs)**(3/2)*(self.T_zero_vs+self.S_vis)/\
+                                        (self.temperature+self.S_vis))  # Sutherlands' Law
 
     @Attribute
     def reynolds(self):
-        return self.air_density*self.air_speed*self.MAC/self.viscosity_dyn
+        return self.airDensity*self.airSpeed*self.MAC/self.viscosity_dyn
 
 
     @Attribute
@@ -156,7 +150,7 @@ class Drag(GeomBase):
 
     @Attribute
     def wet_area_ht(self):
-        return 4*self.ht_surface * 0.8 * (1+0.25*self.thick_to_chord)  # 0.8 is the ratio of area inside the fus
+        return 2*self.ht_surface * 0.8 * (1+0.25*self.thick_to_chord)  # 0.8 is the ratio of area inside the fus
 
     @Attribute
     def wet_area_vt(self):
@@ -179,17 +173,17 @@ class Drag(GeomBase):
 
     @Attribute
     def skin_friction(self):
-        return 0.455/(log(self.reynolds)**2.58 * (1+0.144 * self.mach**2)**0.65)
+        return 0.455/(log(self.reynolds)**2.58 * (1+0.144 * self.Mach**2)**0.65)
 
     @Attribute
     def form_factor_ht(self):
         return (1+0.6/self.max_thick * self.thick_to_chord +100 * self.thick_to_chord**4)*\
-               (1.34*self.mach**0.18*cos(self.ht_sweep * pi/180)**0.28)
+               (1.34*self.Mach**0.18*cos(self.ht_sweep * pi/180)**0.28)
 
     @Attribute
     def form_factor_vt(self):
         return (1+0.6/self.max_thick * self.thick_to_chord +100 * self.thick_to_chord**4)*\
-               (1.34*self.mach**0.18*cos(self.vt_sweep * pi/180)**0.28)
+               (1.34*self.Mach**0.18*cos(self.vt_sweep * pi/180)**0.28)
 
     @Attribute
     def form_factor_fus(self):
@@ -242,6 +236,7 @@ class Energy(GeomBase):
     drag             = Input(Drag().drag)
     fus_diam         = Input(Fuselage().diameter_fuselage_inner)
 
+    popup_gui = Input(False)
 
     @Attribute
     def work(self):
@@ -274,6 +269,16 @@ class Energy(GeomBase):
             else :
                 radius = roots2
             diameter.append(radius*2)
+
+            if diameter[0] >= 0.7*self.fus_diam:
+                msg = "The diameter of the hydrogen tanks is too big to be realistic, a lower ratio compared to the " \
+                      "fuselage diameter is expected. " \
+                      "Suggested options:" \
+                      "     - Decrease range of the aircraft"
+                warnings.warn(msg)
+                if self.popup_gui:  # invoke pop-up dialogue box using Tk"""
+                    generate_warning("Warning: Value changed", msg)
+
         return diameter
 
     @Attribute
@@ -297,9 +302,6 @@ class Energy(GeomBase):
         return self.diameter_tank[self.number_of_tanks-1]
 
 
-    @Attribute
-    def doesthiswork(self):
-        return self.diameter_tank[self.number_of_tanks-1]*1.1
 
     @Part
     def cylinder(self):
@@ -338,3 +340,23 @@ class Energy(GeomBase):
                           hidden=False,
                           color="Orange")
 
+
+def generate_warning(warning_header, msg):
+    """
+    This function generates the warning dialog box
+    :param warning_header: The text to be shown on the dialog box header
+    :param msg: the message to be shown in dialog box
+    :return: None as it is GUI operation
+    """
+    from tkinter import Tk, messagebox
+
+    # initialization
+    window = Tk()
+    window.withdraw()
+
+    # generates message box
+    messagebox.showwarning(warning_header, msg)
+
+    # kills the gui
+    window.deiconify()
+    window.destroy()
