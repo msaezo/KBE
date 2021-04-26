@@ -99,7 +99,7 @@ class CG_calculations_hyd(GeomBase):
                   "     - Further investigation of stability required"
             warnings.warn(msg)
 
-        elif (max_cg_hyd-self.min_cg_hyd) > (self.max_cg_fuel - self.min_cg_fuel):
+        elif (max_cg_hyd-self.cg_forward) >= (self.max_cg_fuel - self.min_cg_fuel):
             msg = "The center of gravity range of the hydrogen aircraft is larger than the center of gravity range" \
                   "of the kerosene aircraft. Aircraft might be unstable" \
                   "Suggested options:" \
