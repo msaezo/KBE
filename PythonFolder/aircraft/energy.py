@@ -267,7 +267,7 @@ class Energy(GeomBase):
                 radius = roots2
             diameter.append(radius*2)
 
-            if diameter >= 0.7*self.fus_diam:
+            if diameter[0] >= 0.7*self.fus_diam:
                 msg = "The diameter of the hydrogen tanks is too big to be realistic, a lower ratio compared to the " \
                       "fuselage diameter is expected. " \
                       "Suggested options:" \
