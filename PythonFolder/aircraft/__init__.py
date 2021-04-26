@@ -5,7 +5,6 @@ from .airfoil import Airfoil
 from .empennage import Vertical_Tail
 from .empennage import Horizontal_Tail
 from .cg_calculations import CG_calculations
-from .cg_calculations import CG_calculations_hyd
 from .propulsion import Fan_engine
 from .fuselage import Seat
 from .propulsion import Propulsion_System
@@ -15,6 +14,7 @@ from .energy import Tanks
 from .Fuselage_new import new_fuselage1
 from .Fuselage_new import new_fuselage_profile
 from .Fuselage_new import new_fuselage2
+# from .cg_calculations_hyd import CG_calculations_hyd
 
 
 

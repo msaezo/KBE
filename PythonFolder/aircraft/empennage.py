@@ -55,6 +55,11 @@ class Horizontal_Tail(GeomBase):
     def sweepLeadingEdgeHorizontalTail(self): #self.sweep_three_quarter_horizontal
         return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_three_quarter_horizontal)) - 4 / self.aspect_Ratio_horizontal * (-3 / 4) * (1 - self.taper_Ratio_horizontal) / (1 + self.taper_Ratio_horizontal)))
 
+    @Attribute
+    def sweepCuarterChordHorizontalTail(self):  # self.sweep_three_quarter_horizontal
+        return np.rad2deg(np.arctan(
+            np.tan(np.deg2rad(self.sweep_three_quarter_horizontal)) - 4 / self.aspect_Ratio_horizontal * (-2 / 4) * (
+                        1 - self.taper_Ratio_horizontal) / (1 + self.taper_Ratio_horizontal)))
 
     @Attribute
     def sweepMidChordHorizontalTail(self):  # self.sweep_three_quarter_horizontal
@@ -191,6 +196,10 @@ class Vertical_Tail(GeomBase):
         return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_leading_edge_vertical)) - 4 / self.aspect_Ratio_vertical * (1 / 2) * (1 - self.taper_Ratio_vertical) / (1 + self.taper_Ratio_vertical)))
 
     @Attribute
+    def sweepCuarterChordVerticalTail(self):
+        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_leading_edge_vertical)) - 4 / self.aspect_Ratio_vertical * (1 / 4) * (1 - self.taper_Ratio_vertical) / (1 + self.taper_Ratio_vertical)))
+
+    @Attribute
     def mach_drag_divergence(self):
         return self.mach_cruise + 0.03
 
@@ -227,7 +236,7 @@ class Vertical_Tail(GeomBase):
                        factor=0.24,
                        position=translate(
                            rotate(self.position, "x", np.deg2rad(90)),  # apply twist angle
-                        
+
                            "x", self.VT_x_shift + self.spanVerticalTail * np.tan(np.deg2rad(self.sweep_leading_edge_vertical)),
                            "y", self.VT_z_shift + self.spanVerticalTail ),
                        mesh_deflection=0.0001)

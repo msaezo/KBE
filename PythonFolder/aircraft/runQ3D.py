@@ -55,7 +55,7 @@ class Q3D(GeomBase):
 
     @Attribute
     def airDensity(self):
-        return  self.pressure/(287*self.temperature)
+        return self.pressure/(287*self.temperature)
 
     @Attribute
     def viscosity_dyn(self):
