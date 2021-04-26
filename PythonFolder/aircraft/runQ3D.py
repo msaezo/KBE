@@ -1,5 +1,8 @@
+import math
+
 import matlab.engine
 import numpy as np
+import warnings
 from aircraft import Wing
 
 from parapy.core import *
@@ -104,6 +107,14 @@ class Q3D(GeomBase):
     @Attribute
     def CDdes(self):
         CDdes = self.QThreeD[1]
+        if math.isnan(CDdes):
+            msg = "The drag coefficient of the wing calculated by the Q3D program could not be found" \
+                  "Action taken: Cd of the wing based on Cl/20" \
+                  "Suggested options:" \
+                  "     - Change to thinner airfoil" \
+                  "     - Increase wing area" \
+                  "     - Decrease flight altitude"
+            warnings.warn(msg)
         return CDdes
 
     @Attribute

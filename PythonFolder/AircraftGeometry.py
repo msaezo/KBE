@@ -274,6 +274,7 @@ class AircraftGeometry(Base):
 
     @Part
     def cg_range_hyd(self):
+
         return CG_calculations_hyd(payload_cg_loc=self.payload_cg_loc,
                                    mass_oew_fr=self.mass_oew,
                                    mass_payload_fr=self.mass_payload)

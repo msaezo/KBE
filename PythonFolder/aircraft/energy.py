@@ -1,6 +1,7 @@
 import numpy as np
 import aircraft.Import_Input as I
 from math import *
+import warnings
 
 from parapy.core import *
 from parapy.geom import *
@@ -231,6 +232,7 @@ class Energy(GeomBase):
     energy_density   = Input(Tanks().energy_density)
     n_tanks          = Input([1,2,3,4])
     drag             = Input(Drag().drag)
+    fus_diam         = Input(Fuselage().diameter_fuselage_inner)
 
 
     @Attribute
@@ -264,6 +266,14 @@ class Energy(GeomBase):
             else :
                 radius = roots2
             diameter.append(radius*2)
+
+            if diameter >= 0.7*self.fus_diam:
+                msg = "The diameter of the hydrogen tanks is too big to be realistic, a lower ratio compared to the " \
+                      "fuselage diameter is expected. " \
+                      "Suggested options:" \
+                      "     - Decrease range of the aircraft"
+                warnings.warn(msg)
+
         return diameter
 
     @Attribute
