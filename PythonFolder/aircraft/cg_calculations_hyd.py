@@ -5,6 +5,7 @@ from parapy.geom import *
 
 from aircraft.energy import Energy
 from aircraft.fuselage import Fuselage
+from aircraft.wing import Wing
 
 # Hydrogen Based CG  ---- Not sure if imports are correct (hardcoded obviously not) but calculations are.
 # Maybe place in a different file so we only run it if necessary.

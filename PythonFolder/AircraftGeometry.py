@@ -6,7 +6,7 @@ from aircraft import Fuselage
 from aircraft import Vertical_Tail
 from aircraft import Horizontal_Tail
 from aircraft import CG_calculations
-#from aircraft import CG_calculations_hyd
+from aircraft import CG_calculations_hyd
 
 from aircraft import Fan_engine
 from aircraft import Propulsion_System
@@ -263,11 +263,11 @@ class AircraftGeometry(Base):
                                mass_payload=self.mass_payload,
                                mass_fuel=self.mass_fuel)
 
-    # @Part
-    # def cg_range_hyd(self):
-    #     return CG_calculations_hyd(payload_cg_loc=self.payload_cg_loc,
-    #                                mass_oew_fr=self.mass_oew,
-    #                                mass_payload_fr=self.mass_payload)
+    @Part
+    def cg_range_hyd(self):
+        return CG_calculations_hyd(payload_cg_loc=self.payload_cg_loc,
+                                   mass_oew_fr=self.mass_oew,
+                                   mass_payload_fr=self.mass_payload)
 
     @Part
     def newprofile(self):

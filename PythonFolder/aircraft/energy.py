@@ -156,7 +156,7 @@ class Drag(GeomBase):
     @Attribute
     def wet_area_nacelle(self):
         wet_area_cowl = self.cowling_length*self.cowling_diam*(2+0.35*self.cowling_length_1/self.cowling_length *
-                                                               0.8*(self.cowling_lenght * self.cowling_fan)/
+                                                               0.8*(self.cowling_length * self.cowling_fan)/
                                                                (self.cowling_length * self.cowling_diam) +
                                                                1.15*(1-self.cowling_length_1/self.cowling_length)*
                                                                self.cowling_ef/self.cowling_diam)
@@ -230,7 +230,7 @@ class Energy(GeomBase):
     efficiency       = Input(Tanks().efficiency)
     energy_density   = Input(Tanks().energy_density)
     n_tanks          = Input([1,2,3,4])
-    drag             = Input(Drag.drag)
+    drag             = Input(Drag().drag)
 
 
     @Attribute

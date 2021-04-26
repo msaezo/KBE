@@ -14,7 +14,7 @@ from .energy import Tanks
 from .Fuselage_new import new_fuselage1
 from .Fuselage_new import new_fuselage_profile
 from .Fuselage_new import new_fuselage2
-# from .cg_calculations_hyd import CG_calculations_hyd
+from .cg_calculations_hyd import CG_calculations_hyd
 
 
 
