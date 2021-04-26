@@ -89,7 +89,7 @@ class AircraftGeometry(Base):
     mach_cruise = Input(Mach_cruise)
     altitude_cruise = Input(Altitude_cruise)
     weight_TO = Input(Weight_TO)
-    area_wing = Input(Wing_area)
+    wing_loading = Input(Wing_loading)
     aspect_ratio = Input(Aspect_ratio)
     wing_highlow = Input("low")
 
@@ -135,31 +135,31 @@ class AircraftGeometry(Base):
         return Energy().vol_needed
 
     @Attribute
-    def CL_in(self):
+    def cl_in(self):
         return Wing().lift_coefficient
 
     @Attribute
-    def CL_out(self):
-        return Q3D().CLdes
+    def cl_out(self):
+        return Q3D().cldes
 
     @Attribute
-    def CD_out(self):
-        return Q3D().CDdes
+    def cd_out(self):
+        return Q3D().cddes
 
     @Attribute
-    def ALpha(self):
-        return Q3D().Alpha
+    def aLpha(self):
+        return Q3D().alpha
 
     @Attribute
-    def Reynolds(self):
-        return Q3D().Reynolds
+    def reynolds(self):
+        return Q3D().reynolds
 
     @Attribute
-    def CD_total(self):
+    def cd_total(self):
         return Drag().drag_coefficient_total
 
     @Attribute
-    def Drag_total(self):
+    def drag_total(self):
         return Drag().drag
 
     @Attribute
@@ -192,7 +192,7 @@ class AircraftGeometry(Base):
     @Part
     def tanks(self):
         return Tanks(range=self.range,
-                     surface=self.area_wing,
+                     surface=Wing().area_wing,
                      efficiency=self.efficiency,
                      energy_density=self.energy_density)
 
@@ -224,7 +224,7 @@ class AircraftGeometry(Base):
         return Wing(mach_cruise=self.mach_cruise,
                     altitude_cruise=self.altitude_cruise,
                     weight_TO=self.weight_TO,
-                    area_wing=self.area_wing,
+                    wing_loading=self.wing_loading,
                     aspect_ratio=self.aspect_ratio,
                     wing_highlow=self.wing_highlow,
                     wing_mass_fraction=self.wing_mass_fraction,
@@ -238,21 +238,21 @@ class AircraftGeometry(Base):
 
     @Part
     def vertical_tail(self):
-        return Vertical_Tail(volume_VT=self.volume_VT,
-                             Surface_Area=self.area_wing,
-                             Span=Wing().span,
-                             aspect_Ratio_vertical=self.aspect_Ratio_vertical,
-                             taper_Ratio_vertical=self.taper_Ratio_vertical,
+        return Vertical_Tail(volume_vt=self.volume_VT,
+                             surface_area=Wing().area_wing,
+                             span=Wing().span,
+                             aspect_ratio_vertical=self.aspect_Ratio_vertical,
+                             taper_ratio_vertical=self.taper_Ratio_vertical,
                              sweep_leading_edge_vertical=self.sweep_leading_edge_vertical,
                              mach_cruise=self.mach_cruise)
 
     @Part
     def horizontal_tail(self):
-        return Horizontal_Tail(volume_HT=self.volume_HT,
-                               Surface_Area=self.area_wing,
-                               MAC=Wing().mean_aerodynamic_chord,
-                               aspect_Ratio_horizontal=self.aspect_Ratio_horizontal,
-                               taper_Ratio_horizontal=self.taper_Ratio_horizontal,
+        return Horizontal_Tail(volume_ht=self.volume_HT,
+                               surface_area=Wing().area_wing,
+                               mac=Wing().mean_aerodynamic_chord,
+                               aspect_ratio_horizontal=self.aspect_Ratio_horizontal,
+                               taper_ratio_horizontal=self.taper_Ratio_horizontal,
                                sweep_three_quarter_horizontal=self.sweep_three_quarter_horizontal,
                                mach_cruise=self.mach_cruise)
 
@@ -270,18 +270,23 @@ class AircraftGeometry(Base):
                                fuel_cg_loc=self.fuel_cg_loc,
                                mass_oew=self.mass_oew,
                                mass_payload=self.mass_payload,
-                               mass_fuel=self.mass_fuel)
+                               mass_fuel=self.mass_fuel,
+                               color = 'green')
 
     @Part
     def cg_range_hyd(self):
-
         return CG_calculations_hyd(payload_cg_loc=self.payload_cg_loc,
                                    mass_oew_fr=self.mass_oew,
-                                   mass_payload_fr=self.mass_payload)
+                                   mass_payload_fr=self.mass_payload,
+                                   color = 'blue')
 
     @Part
     def newprofile(self):
         return new_fuselage2(input_profile_set=self.new_fuselage_input)
+
+    @Part
+    def testprofile(self):
+        return new_fuselage1()
 
 
 if __name__ == '__main__':

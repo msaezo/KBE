@@ -12,11 +12,11 @@ import aircraft.Import_Input as I
 class Q3D(GeomBase):
     twist_chord = Input(0.0)  # deg positive up
     AoA      = Input(2.0)  # deg
-    T_zero   = Input(288) #Kelvin
-    T_zero_vs= Input(273) #Kelvin
-    S_vis    = Input(111) #Kelvin
-    P_zero   = Input(101325) #Pa
-    Rho_zero = Input(1.225) #kg/m3
+    t_zero   = Input(288) #Kelvin
+    t_zero_vs= Input(273) #Kelvin
+    s_vis    = Input(111) #Kelvin
+    p_zero   = Input(101325) #Pa
+    rho_zero = Input(1.225) #kg/m3
     deltaT   = Input(-0.0065) #K/m
     viscosity_dyn_zero = Input(1.716*10**(-5))
     span       = Input(Wing().span)  # m input total, Q3D puts half of it already
@@ -29,48 +29,48 @@ class Q3D(GeomBase):
     sweep     = Input(Wing().sweep_leading_edge)  # deg
 
     altitude = Input(Wing().altitude_cruise)  # m
-    Mach     = Input(Wing().mach_cruise)  # make it in accordance with the flight speed and altitude
-    Cl       = Input(Wing().lift_coefficient) # if Cl is used do not use angle of attack
+    mach     = Input(Wing().mach_cruise)  # make it in accordance with the flight speed and altitude
+    cl       = Input(Wing().lift_coefficient) # if Cl is used do not use angle of attack
 
     @Attribute
     def temperature(self):
         if self.altitude <11001:
-            temp = self.T_zero + self.altitude*self.deltaT
+            temp = self.t_zero + self.altitude*self.deltaT
         else:
-            temp = self.T_zero + 11000*self.deltaT
+            temp = self.t_zero + 11000*self.deltaT
         return temp
 
     @Attribute
     def pressure(self):
         if self.altitude <11001:
-            press = self.P_zero * (np.e) ** ((-9.81665 / (287 * self.temperature)) * (self.altitude))
+            press = self.p_zero * (np.e) ** ((-9.81665 / (287 * self.temperature)) * (self.altitude))
         else:
             press = 22632 * (self.temperature / 216.65) ** (-9.81665 / (self.altitude * 287))
         return press
 
     @Attribute
-    def soundSpeed(self):
+    def sound_speed(self):
         return np.sqrt(1.4*287*self.temperature)
 
     @Attribute
-    def airSpeed(self):
-        return self.Mach *self.soundSpeed
+    def air_speed(self):
+        return self.mach *self.sound_speed
 
     @Attribute
-    def airDensity(self):
+    def air_density(self):
         return self.pressure/(287*self.temperature)
 
     @Attribute
     def viscosity_dyn(self):
-        return self.viscosity_dyn_zero*((self.temperature/self.T_zero_vs)**(3/2)*(self.T_zero_vs+self.S_vis)/\
-                                        (self.temperature+self.S_vis))  # Sutherlands' Law
+        return self.viscosity_dyn_zero*((self.temperature/self.t_zero_vs)**(3/2)*(self.t_zero_vs+self.s_vis)/\
+                                        (self.temperature+self.s_vis))  # Sutherlands' Law
 
     @Attribute
-    def Reynolds(self):
-        return self.airDensity*self.airSpeed*self.MAC/self.viscosity_dyn
+    def reynolds(self):
+        return self.air_density*self.air_speed*self.MAC/self.viscosity_dyn
 
     @Attribute
-    def QThreeD(self):
+    def q_three_d(self):
 
         eng = matlab.engine.start_matlab()
 
@@ -81,13 +81,13 @@ class Q3D(GeomBase):
         twist_tip   = float(self.twist_tip)
         dihedral    = float(self.dihedral)
         sweep       = float(self.sweep)
-        airSpeed    = float(self.airSpeed)
-        airDensity  = float(self.airDensity)
+        airSpeed    = float(self.air_speed)
+        airDensity  = float(self.air_density)
         altitude    = float(self.altitude)
-        Reynolds    = float(self.Reynolds)
-        Mach        = float(self.Mach)
+        Reynolds    = float(self.reynolds)
+        Mach        = float(self.mach)
         AoA         = float(self.AoA)
-        Cl          = float(self.Cl)
+        Cl          = float(self.cl)
 
         # eng = matlab.engine.start_matlab()
         # run Q3D function
@@ -100,14 +100,14 @@ class Q3D(GeomBase):
 
 
     @Attribute
-    def CLdes(self):
-        CLdes = self.QThreeD[0]
-        return CLdes
+    def cldes(self):
+        cldes = self.q_three_d[0]
+        return cldes
 
     @Attribute
-    def CDdes(self):
-        CDdes = self.QThreeD[1]
-        if math.isnan(CDdes):
+    def cddes(self):
+        cddes = self.q_three_d[1]
+        if math.isnan(cddes):
             msg = "The drag coefficient of the wing calculated by the Q3D program could not be found" \
                   "Action taken: Cd of the wing based on Cl/20" \
                   "Suggested options:" \
@@ -115,12 +115,12 @@ class Q3D(GeomBase):
                   "     - Increase wing area" \
                   "     - Decrease flight altitude"
             warnings.warn(msg)
-        return CDdes
+        return cddes
 
     @Attribute
-    def Alpha(self):
-        alpha = self.QThreeD[2]
-        return alpha
+    def alpha(self):
+        alphaa = self.q_three_d[2]
+        return alphaa
 
 
 

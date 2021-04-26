@@ -12,7 +12,7 @@ from aircraft.cg_calculations import CG_calculations
 # Hydrogen Based CG  ---- Not sure if imports are correct (hardcoded obviously not) but calculations are.
 # Maybe place in a different file so we only run it if necessary.
 class CG_calculations_hyd(GeomBase):
-    MTOW = Input(I.Weight_TO)
+    mtow = Input(I.Weight_TO)
     payload_cg_loc = Input(I.Payload_cg_loc)
     tank_length = Input(Energy().length_tank)  #
     tank_front_loc = Input(Fuselage().length_cockpit)
@@ -25,16 +25,16 @@ class CG_calculations_hyd(GeomBase):
     min_cg_fuel = Input(CG_calculations().cg_forward)
 
     @Attribute
-    def MTOM(self):
-        return self.MTOW/9.81
+    def mtom(self):
+        return self.mtow/9.81
 
     @Attribute
     def mass_oew(self):
-        return self.MTOM*self.mass_oew_fr
+        return self.mtom*self.mass_oew_fr
 
     @Attribute
     def mass_payload(self):
-        return self.MTOM*self.mass_payload_fr
+        return self.mtom*self.mass_payload_fr
 
     @Attribute
     def x_fuel(self):
@@ -64,14 +64,14 @@ class CG_calculations_hyd(GeomBase):
 
     @Attribute
     def cg_forward(self):
-        OEW_and_payload = (self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
+        oew_and_payload = (self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
                 self.mass_oew + self.mass_payload)
-        OEW_and_payload_and_fuel = (
+        oew_and_payload_and_fuel = (
                                            self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
                                            self.mass_fuel + self.mass_oew + self.mass_payload)
-        OEW_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (
+        oew_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (
                 self.mass_fuel + self.mass_oew)
-        min_cg_hyd = min(OEW_and_fuel, OEW_and_payload_and_fuel, OEW_and_payload)
+        min_cg_hyd = min(oew_and_fuel, oew_and_payload_and_fuel, oew_and_payload)
         if min_cg_hyd > self.max_cg_fuel:
             msg = "The most forward center of gravity location for the hydrogen aircraft is less stable than " \
                   "the most after center of gravity location for the kerosene aircraft. Aircraft might be unstable" \
@@ -83,14 +83,14 @@ class CG_calculations_hyd(GeomBase):
 
     @Attribute
     def cg_aft(self):
-        OEW_and_payload = (self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
+        oew_and_payload = (self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
                 self.mass_oew + self.mass_payload)
-        OEW_and_paylod_and_fuel = (
+        oew_and_paylod_and_fuel = (
                                           self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
                                           self.mass_fuel + self.mass_oew + self.mass_payload)
-        OEW_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (
+        oew_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (
                 self.mass_fuel + self.mass_oew)
-        max_cg_hyd = max(OEW_and_fuel, OEW_and_paylod_and_fuel, OEW_and_payload)
+        max_cg_hyd = max(oew_and_fuel, oew_and_paylod_and_fuel, oew_and_payload)
 
         if max_cg_hyd > self.max_cg_fuel:
             msg = "The most after center of gravity location for the hydrogen aircraft is less stable than " \
