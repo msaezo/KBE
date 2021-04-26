@@ -11,6 +11,7 @@ from aircraft import CG_calculations_hyd
 from aircraft import Fan_engine
 from aircraft import Propulsion_System
 from aircraft import Q3D
+from aircraft import Drag
 from aircraft import Energy
 from aircraft import Tanks
 from aircraft import new_fuselage1
@@ -152,6 +153,14 @@ class AircraftGeometry(Base):
     @Attribute
     def Reynolds(self):
         return Q3D().Reynolds
+
+    @Attribute
+    def CD_total(self):
+        return Drag().drag_coefficient_total
+
+    @Attribute
+    def Drag_total(self):
+        return Drag().drag
 
     @Attribute
     def new_fuselage_input(self):

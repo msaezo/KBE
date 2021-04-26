@@ -9,6 +9,7 @@ from .propulsion import Fan_engine
 from .fuselage import Seat
 from .propulsion import Propulsion_System
 from .runQ3D import Q3D
+from .energy import Drag
 from .energy import Energy
 from .energy import Tanks
 from .Fuselage_new import new_fuselage1
