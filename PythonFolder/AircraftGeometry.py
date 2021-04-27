@@ -172,19 +172,19 @@ class AircraftGeometry(Base):
             warnings.warn(msg)
 
         span = sqrt(self.aspect_ratio*self.weight_TO/9.81/self.wing_loading)
-        if span >= 80 or span <= 36:
+        if span >= 80 or span <= 22:
             msg = "The wing span resulting from the Input File might be outside of bounds for the typical transportation aircraft. " \
                   "Suggested options:" \
                   "     - Change the aspect ratio between the bounds" \
                   "     - Change the wing loading"
             warnings.warn(msg)
 
-        range_average = 0.0174 * self.weight_TO / 9.81 + 1522.4
+        range_average = 0.0323 * self.weight_TO / 9.81 + 2819.4
         if self.range < range_average * 0.60 or self.range > range_average * 1.40:
             msg = "The range on the Input File might be outside of bounds for the selected MTOW " \
                   "Suggested options:" \
                   "     - Change range using the following approximation" \
-                  "     - range = 0.0174 * MTOW [kg] + 1522.4"
+                  "     - range = 0.0323 * MTOW [kg] + 2819.4"
             warnings.warn(msg)
         finish = 'Look in terminal for warnings'
         return finish

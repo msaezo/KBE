@@ -113,8 +113,9 @@ class Q3D(GeomBase):
                   "Suggested options:" \
                   "     - Change to thinner airfoil" \
                   "     - Increase wing area" \
+                  "     - Increase sweep" \
                   "     - Decrease flight altitude"
-            warnings.warn(msg)
+            warnings.warn(msg, source=None)
         return cddes
 
     @Attribute
