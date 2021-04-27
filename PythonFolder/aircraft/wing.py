@@ -32,7 +32,7 @@ class Wing(GeomBase):
     mach_cruise = Input(I.Mach_cruise)#I.Mach_cruise)
     altitude_cruise = Input(I.Altitude_cruise)
     weight_TO = Input(I.Weight_TO)
-    area_wing = Input(I.Wing_area)
+    wing_loading = Input(I.Wing_loading)
     aspect_ratio = Input(I.Aspect_ratio)
     wing_highlow = Input("low")
     wing_mass_fraction = Input(I.Wing_mass_fraction)
@@ -47,6 +47,10 @@ class Wing(GeomBase):
     # some other parameters
     twist = Input(-5)
     is_mirrored = Input(True)
+
+    @Attribute
+    def area_wing(self):
+        return self.weight_TO/(9.81*self.wing_loading)
 
     @Attribute
     def temperature(self):
@@ -65,13 +69,13 @@ class Wing(GeomBase):
         return press
 
     @Attribute
-    def soundSpeed(self):
+    def sound_speed(self):
         return np.sqrt(1.4 * 287 * self.temperature)
 
     @Attribute
-    def airSpeed(self):
-        print(self.mach_cruise * self.soundSpeed)
-        return self.mach_cruise * self.soundSpeed
+    def air_speed(self):
+        print(self.mach_cruise * self.sound_speed)
+        return self.mach_cruise * self.sound_speed
 
     @Attribute
     def airDensity(self):

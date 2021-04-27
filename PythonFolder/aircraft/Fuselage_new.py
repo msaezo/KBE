@@ -41,14 +41,18 @@ class new_fuselage1(GeomBase):
     def new_profile_first(self):
         return new_fuselage_profile(Fuselage_diameter=0.9*Fuselage().diameter_fuselage_outer,
                                     x_pos = Fuselage().section_length_outer[2]*Fuselage().length_fuselage,
-                                    hidden=True)
+                                    zzpos = 0.04*Fuselage().diameter_fuselage_outer,
+                                    factor = 0.9,
+                                    hidden=False)
 
     @Part
     def new_profile_set(self):
         return new_fuselage_profile(quantify=5,
                                     Fuselage_diameter=Fuselage().diameter_fuselage_outer,
                                     x_pos=Fuselage().section_length_outer[child.index+3]*Fuselage().length_fuselage,
-                                    hidden=True)
+                                    factor=1,
+                                    zzpos=0,
+                                    hidden=False)
 
 
 
@@ -86,6 +90,8 @@ class new_fuselage_profile(GeomBase):
 
     Fuselage_diameter= Input(Fuselage().diameter_fuselage_outer)
     x_pos = Input(0)
+    zzpos = Input(0)
+    factor=Input(1)
 
     @Attribute
     def delta_radius(self):
@@ -125,27 +131,27 @@ class new_fuselage_profile(GeomBase):
 
     @Part
     def line_1(self):
-        return LineSegment(start=Point(self.x_pos, self.y_lower, self.z_lower ),
+        return LineSegment(start=Point(self.x_pos, self.y_lower , self.z_lower),
                            end=Point(self.x_pos, self.y_upper, self.z_upper),
                            hidden= False)
 
     @Part
     def line_2(self):
-        return LineSegment(start=Point(self.x_pos, -self.y_lower, self.z_lower),
+        return LineSegment(start=Point(self.x_pos, -self.y_lower , self.z_lower),
                            end=Point(self.x_pos, -self.y_upper, self.z_upper),
                            hidden= False)
 
     @Part
     def line_bottom1(self):
         return LineSegment(start=Point(self.x_pos, -Tanks().y_pos, Tanks().z_pos-Energy().diameter_tank_final/2 * 1.1),
-                           end=Point(self.x_pos, 0, Tanks().z_pos-Energy().diameter_tank_final/2 * 1.1),
+                           end=Point(self.x_pos, 0, Tanks().z_pos-Energy().diameter_tank_final/2 * 1.1 ),
                            hidden= False)
 
     @Part
     def line_bottom2(self):
         return LineSegment(
-            start=Point(self.x_pos, 0, Tanks().z_pos - Energy().diameter_tank_final / 2 * 1.1),
-            end=Point(self.x_pos, Tanks().y_pos, Tanks().z_pos - Energy().diameter_tank_final / 2 * 1.1),
+            start=Point(self.x_pos, 0, Tanks().z_pos - Energy().diameter_tank_final / 2 * 1.1  ),
+            end=Point(self.x_pos, Tanks().y_pos, Tanks().z_pos - Energy().diameter_tank_final / 2 * 1.1 ),
             hidden=False)
 
     @Part
@@ -157,7 +163,7 @@ class new_fuselage_profile(GeomBase):
 
     @Part
     def circle_tank_1(self):
-        return Circle(radius=Energy().diameter_tank_final * 1.1 / 2,
+        return Circle(radius=Energy().diameter_tank_final * 1.1 / 2 ,
                       position=translate(rotate(self.position, "y", np.deg2rad(90)),
                                          "z",self.x_pos,
                                          "x",-Tanks().z_pos,
