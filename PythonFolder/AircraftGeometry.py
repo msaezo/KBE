@@ -90,51 +90,12 @@ class AircraftGeometry(Base):
 
     mach_cruise = Input(Mach_cruise)
 
-    if mach_cruise <= 0.75 or mach_cruise >= 0.92:
-        msg = "The mach number on the Input File might be outside of bounds for typical transport aviation." \
-              "Suggested options:" \
-              "     - Change mach_cruise between the bounds" \
-              "     - 0.75 and 0.92"
-        warnings.warn(msg)
-
     altitude_cruise = Input(Altitude_cruise)
     weight_TO = Input(Weight_TO)
 
-    pax_average = 0.0012*weight_TO/9.81 + 86.01
-    if n_pax <= pax_average*0.75 or n_pax >= pax_average*1.25:
-        msg = "The number of passengers on the Input File might be outside of bounds for the selected MTOW " \
-              "Suggested options:" \
-              "     - Change passengers using the following approximation" \
-              "     - n_pax = 0.0012 * MTOW [kg] + 86.01"
-        warnings.warn(msg)
 
     wing_loading = Input(Wing_loading)
-
-    wing_loading_average = 0.0005*weight_TO/9.81 + 547.52
-    if wing_loading <= wing_loading_average*0.77 or wing_loading >= wing_loading_average*1.23:
-        msg = "The wing loading on the Input File might be outside of bounds for the selected MTOW " \
-              "Suggested options:" \
-              "     - Change wing_loading using the following approximation" \
-              "     - wing_loading = 0.0005 * MTOW [kg] + 547.52"
-        warnings.warn(msg)
-
     aspect_ratio = Input(Aspect_ratio)
-
-    if aspect_ratio <= 7.73 or aspect_ratio >= 9.44:
-        msg = "The aspect ratio on the Input File might be outside of bounds for the typical transportation aircraft. " \
-              "Suggested options:" \
-              "     - Change to aspect_ratio between the following bounds" \
-              "     - 7.73 to 9.44"
-        warnings.warn(msg)
-
-    span = sqrt(aspect_ratio*weight_TO/wing_loading)
-    if span >= 80 or span <= 36:
-        msg = "The wing span resulting from the Input File might be outside of bounds for the typical transportation aircraft. " \
-              "Suggested options:" \
-              "     - Change the aspect ratio between the bounds" \
-              "     - Change the wing loading"
-        warnings.warn(msg)
-
     wing_highlow = Input("low")
 
     n_engines = Input(N_engines)
@@ -171,19 +132,62 @@ class AircraftGeometry(Base):
     sweep_leading_edge_vertical = Input(sweep_leading_edge_vertical)
 
     range = Input(Range)
-
-    range_average = 0.0174 * weight_TO / 9.81 + 1522.4
-    if n_pax <= range_average * 0.60 or n_pax >= pax_average * 1.40:
-        msg = "The range on the Input File might be outside of bounds for the selected MTOW " \
-              "Suggested options:" \
-              "     - Change range using the following approximation" \
-              "     - range = 0.0174 * MTOW [kg] + 1522.4"
-        warnings.warn(msg)
-
     efficiency = Input(total_efficiency)
     energy_density = Input(energy_density)
     hyd_density = Input(hyd_density)
     skinfric_coeff = Input(eq_skinfriction_coefficient)
+
+    @Attribute
+    def warnings_inputs(self):
+
+        if self.mach_cruise <= 0.75 or self.mach_cruise >= 0.92:
+            msg = "The mach number on the Input File might be outside of bounds for typical transport aviation." \
+                  "Suggested options:" \
+                  "     - Change mach_cruise between the bounds" \
+                  "     - 0.75 and 0.92"
+            warnings.warn(msg)
+
+
+        pax_average = 0.0012*self.weight_TO/9.81 + 86.01
+        if self.n_pax <= pax_average*0.75 or self.n_pax >= pax_average*1.25:
+            msg = "The number of passengers on the Input File might be outside of bounds for the selected MTOW " \
+                  "Suggested options:" \
+                  "     - Change passengers using the following approximation" \
+                  "     - n_pax = 0.0012 * MTOW [kg] + 86.01"
+            warnings.warn(msg)
+
+        wing_loading_average = 0.0005*self.weight_TO/9.81 + 547.52
+        if self.wing_loading <= wing_loading_average*0.77 or self.wing_loading >= wing_loading_average*1.23:
+            msg = "The wing loading on the Input File might be outside of bounds for the selected MTOW " \
+                  "Suggested options:" \
+                  "     - Change wing_loading using the following approximation" \
+                  "     - wing_loading = 0.0005 * MTOW [kg] + 547.52"
+            warnings.warn(msg)
+
+        if self.aspect_ratio <= 7.73 or self.aspect_ratio >= 9.44:
+            msg = "The aspect ratio on the Input File might be outside of bounds for the typical transportation aircraft. " \
+                  "Suggested options:" \
+                  "     - Change to aspect_ratio between the following bounds" \
+                  "     - 7.73 to 9.44"
+            warnings.warn(msg)
+
+        span = sqrt(self.aspect_ratio*self.weight_TO/self.wing_loading)
+        if span >= 80 or span <= 36:
+            msg = "The wing span resulting from the Input File might be outside of bounds for the typical transportation aircraft. " \
+                  "Suggested options:" \
+                  "     - Change the aspect ratio between the bounds" \
+                  "     - Change the wing loading"
+            warnings.warn(msg)
+
+        range_average = 0.0174 * self.weight_TO / 9.81 + 1522.4
+        if self.n_pax <= range_average * 0.60 or self.n_pax >= pax_average * 1.40:
+            msg = "The range on the Input File might be outside of bounds for the selected MTOW " \
+                  "Suggested options:" \
+                  "     - Change range using the following approximation" \
+                  "     - range = 0.0174 * MTOW [kg] + 1522.4"
+            warnings.warn(msg)
+        finish = True
+        return finish
 
     @Attribute
     def volume_needed(self):
