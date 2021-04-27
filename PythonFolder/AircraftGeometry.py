@@ -173,6 +173,7 @@ class AircraftGeometry(Base):
                      new_fuselage1().new_profile_set[2].composed_crv,
                      new_fuselage1().new_profile_set[3].composed_crv,
                      new_fuselage1().new_profile_set[4].composed_crv,
+                     Fuselage().outer_profile_set[8],
                      Fuselage().outer_profile_set[9],
                      Fuselage().outer_profile_set[10]]
         else:

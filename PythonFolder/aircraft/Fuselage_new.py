@@ -42,7 +42,6 @@ class new_fuselage1(GeomBase):
         return new_fuselage_profile(Fuselage_diameter=0.9*Fuselage().diameter_fuselage_outer,
                                     x_pos = Fuselage().section_length_outer[2]*Fuselage().length_fuselage,
                                     zzpos = 0.04*Fuselage().diameter_fuselage_outer,
-                                    factor = 0.9,
                                     hidden=False)
 
     @Part
@@ -50,8 +49,6 @@ class new_fuselage1(GeomBase):
         return new_fuselage_profile(quantify=5,
                                     Fuselage_diameter=Fuselage().diameter_fuselage_outer,
                                     x_pos=Fuselage().section_length_outer[child.index+3]*Fuselage().length_fuselage,
-                                    factor=1,
-                                    zzpos=0,
                                     hidden=False)
 
 
@@ -90,8 +87,7 @@ class new_fuselage_profile(GeomBase):
 
     Fuselage_diameter= Input(Fuselage().diameter_fuselage_outer)
     x_pos = Input(0)
-    zzpos = Input(0)
-    factor=Input(1)
+
 
     @Attribute
     def delta_radius(self):
