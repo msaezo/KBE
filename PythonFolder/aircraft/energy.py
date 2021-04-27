@@ -100,7 +100,6 @@ class Drag(GeomBase):
     Mach     = Input(Wing().mach_cruise)  # make it in accordance with the flight speed and altitude
     Cl       = Input(Wing().lift_coefficient) # if Cl is used do not use angle of attack
 
-    popup_gui = Input(False)
 
     @Attribute
     def temperature(self):
@@ -236,8 +235,6 @@ class Energy(GeomBase):
     drag             = Input(Drag().drag)
     fus_diam         = Input(Fuselage().diameter_fuselage_inner)
 
-    popup_gui = Input(False)
-
     @Attribute
     def work(self):
         return self.drag*self.range*1000
@@ -276,8 +273,6 @@ class Energy(GeomBase):
                       "Suggested options:" \
                       "     - Decrease range of the aircraft"
                 warnings.warn(msg)
-                if self.popup_gui:  # invoke pop-up dialogue box using Tk"""
-                    generate_warning("Warning: Value changed", msg)
 
         return diameter
 
@@ -339,24 +334,3 @@ class Energy(GeomBase):
                           tool=self.sphere2,
                           hidden=False,
                           color="Orange")
-
-
-def generate_warning(warning_header, msg):
-    """
-    This function generates the warning dialog box
-    :param warning_header: The text to be shown on the dialog box header
-    :param msg: the message to be shown in dialog box
-    :return: None as it is GUI operation
-    """
-    from tkinter import Tk, messagebox
-
-    # initialization
-    window = Tk()
-    window.withdraw()
-
-    # generates message box
-    messagebox.showwarning(warning_header, msg)
-
-    # kills the gui
-    window.deiconify()
-    window.destroy()
