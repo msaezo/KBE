@@ -180,7 +180,7 @@ class AircraftGeometry(Base):
             warnings.warn(msg)
 
         range_average = 0.0174 * self.weight_TO / 9.81 + 1522.4
-        if self.range <= range_average * 0.60 or self.range >= pax_average * 1.40:
+        if self.range < range_average * 0.60 or self.range > range_average * 1.40:
             msg = "The range on the Input File might be outside of bounds for the selected MTOW " \
                   "Suggested options:" \
                   "     - Change range using the following approximation" \
