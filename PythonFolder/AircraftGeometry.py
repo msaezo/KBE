@@ -140,7 +140,7 @@ class AircraftGeometry(Base):
     @Attribute
     def warnings_inputs(self):
 
-        if self.mach_cruise <= 0.75 or self.mach_cruise >= 0.92:
+        if self.mach_cruise < 0.75 or self.mach_cruise > 0.92:
             msg = "The mach number on the Input File might be outside of bounds for typical transport aviation." \
                   "Suggested options:" \
                   "     - Change mach_cruise between the bounds" \
@@ -164,14 +164,14 @@ class AircraftGeometry(Base):
                   "     - wing_loading = 0.0005 * MTOW [kg] + 547.52"
             warnings.warn(msg)
 
-        if self.aspect_ratio <= 7.73 or self.aspect_ratio >= 9.44:
+        if self.aspect_ratio < 7.73 or self.aspect_ratio > 9.44:
             msg = "The aspect ratio on the Input File might be outside of bounds for the typical transportation aircraft. " \
                   "Suggested options:" \
                   "     - Change to aspect_ratio between the following bounds" \
                   "     - 7.73 to 9.44"
             warnings.warn(msg)
 
-        span = sqrt(self.aspect_ratio*self.weight_TO/self.wing_loading)
+        span = sqrt(self.aspect_ratio*self.weight_TO/9.81/self.wing_loading)
         if span >= 80 or span <= 36:
             msg = "The wing span resulting from the Input File might be outside of bounds for the typical transportation aircraft. " \
                   "Suggested options:" \
@@ -180,13 +180,13 @@ class AircraftGeometry(Base):
             warnings.warn(msg)
 
         range_average = 0.0174 * self.weight_TO / 9.81 + 1522.4
-        if self.n_pax <= range_average * 0.60 or self.n_pax >= pax_average * 1.40:
+        if self.range <= range_average * 0.60 or self.range >= pax_average * 1.40:
             msg = "The range on the Input File might be outside of bounds for the selected MTOW " \
                   "Suggested options:" \
                   "     - Change range using the following approximation" \
                   "     - range = 0.0174 * MTOW [kg] + 1522.4"
             warnings.warn(msg)
-        finish = True
+        finish = 'Look in terminal for warnings'
         return finish
 
     @Attribute
