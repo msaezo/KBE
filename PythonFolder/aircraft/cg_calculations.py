@@ -32,9 +32,9 @@ class CG_calculations(GeomBase):
     def cg_forward(self):
         oew_and_payload = (self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
                     self.mass_oew + self.mass_payload)
-        oew_and_payload_and_fuel = (
-                                               self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
-                                               self.mass_fuel + self.mass_oew + self.mass_payload)
+        oew_and_payload_and_fuel = (self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew
+                                    + self.x_payload * self.mass_payload) \
+                                   /  (self.mass_fuel + self.mass_oew + self.mass_payload)
         oew_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (self.mass_fuel + self.mass_oew)
         return min(oew_and_fuel, oew_and_payload_and_fuel, oew_and_payload)
 
@@ -42,9 +42,10 @@ class CG_calculations(GeomBase):
     def cg_aft(self):
         oew_and_payload = (self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
                     self.mass_oew + self.mass_payload)
-        oew_and_payload_and_fuel = (
-                                              self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
-                                              self.mass_fuel + self.mass_oew + self.mass_payload)
+        oew_and_payload_and_fuel = ( self.x_fuel * self.mass_fuel
+                                     + self.x_oew * self.mass_oew
+                                     + self.x_payload * self.mass_payload) \
+                                   / (self.mass_fuel + self.mass_oew + self.mass_payload)
         oew_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (self.mass_fuel + self.mass_oew)
         return max(oew_and_fuel, oew_and_payload_and_fuel, oew_and_payload)
 

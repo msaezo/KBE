@@ -7,36 +7,38 @@ import aircraft.Import_Input as I
 
 class Fuselage(GeomBase):
     # imported parameters from input file
-    n_pax = Input(I.Number_of_passengers)
-    width_aisle = Input(I.Width_aisle)
-    width_seat = Input(I.Width_seat)
-    width_armrest = Input(I.Width_armrest)
-    clearance_seat = Input(I.Seat_clearance)
-    length_cockpit = Input(I.Length_cockpit)
+    n_pax                     = Input(I.Number_of_passengers)
+    width_aisle               = Input(I.Width_aisle)
+    width_seat                = Input(I.Width_seat)
+    width_armrest             = Input(I.Width_armrest)
+    clearance_seat            = Input(I.Seat_clearance)
+    length_cockpit            = Input(I.Length_cockpit)
     length_tailcone_over_diam = Input(I.Length_tailcone_over_Diameter_Fuselage)
     length_nosecone_over_diam = Input(I.Length_nosecone_over_Diameter_Fuselage)
-    length_tail_over_diam = Input(I.Length_Tail_over_Diameter_Fuselage)
-    height_floor = Input(I.Height_floor)
-    height_shoulder = Input(I.Height_shoulder)
-    luggage_per_pax = Input(I.Luggage_per_pax)
-    weight_cargo = Input(I.Cargo)
-    kcc = Input(I.Kcc) #cargo compartment factor
+    length_tail_over_diam     = Input(I.Length_Tail_over_Diameter_Fuselage)
+    height_floor              = Input(I.Height_floor)
+    height_shoulder           = Input(I.Height_shoulder)
+    luggage_per_pax           = Input(I.Luggage_per_pax)
+    weight_cargo              = Input(I.Cargo)
+    kcc                       = Input(I.Kcc) #cargo compartment factor
 
-    fuselage_mass_fraction = Input(I.Fuselage_mass_fraction)
-    empennage_mass_fraction = Input(I.Empennage_mass_fraction)
+    fuselage_mass_fraction        = Input(I.Fuselage_mass_fraction)
+    empennage_mass_fraction       = Input(I.Empennage_mass_fraction)
     fixed_equipment_mass_fraction = Input(I.Fixed_equipment_mass_fraction)
-    fuselage_cg_loc = Input(I.Fuselage_cg_loc)
-    empennage_cg_loc = Input(I.Empennage_cg_loc)
-    fixed_equipment_cg_loc = Input(I.Fixed_equipment_cg_loc)
+    fuselage_cg_loc               = Input(I.Fuselage_cg_loc)
+    empennage_cg_loc              = Input(I.Empennage_cg_loc)
+    fixed_equipment_cg_loc        = Input(I.Fixed_equipment_cg_loc)
 
-    density_luggage = Input(170)
-    density_cargo = Input(160)
-    kos = Input(0.74) # overhead storage factor
-    area_os_lat = Input(0.2) # overhead storage area lat
-    area_os_centre = Input(0.24)  # overhead storage area centre
+    density_luggage    = Input(170)
+    density_cargo      = Input(160)
+    kos                = Input(0.74) # overhead storage factor
+    area_os_lat        = Input(0.2) # overhead storage area lat
+    area_os_centre     = Input(0.24)  # overhead storage area centre
     n_compartments_lat = Input(2)
 
-    fuselage_sections = Input([1,10, 90, 100, 100, 100, 100, 100, 80, 10,1])
+    # percentage of calculated fuselage diameter for each section
+    fuselage_sections   = Input([1,10, 90, 100, 100, 100, 100, 100, 80, 10,1])
+    # z-shift of each fuselage section
     fuselage_sections_z = Input([-0.3,-0.3, -0.08, 0, 0, 0, 0, 0, 0.2, 0.62, 0.65])
 
     @Attribute
@@ -44,8 +46,6 @@ class Fuselage(GeomBase):
         seats = 0.45*np.sqrt(self.n_pax)
         seatsmax = 9
         return min(np.ceil(seats),seatsmax)
-
-
 
     @Attribute
     def n_aisles(self):
@@ -105,105 +105,76 @@ class Fuselage(GeomBase):
     def position_floor_lower(self):
         return self.position_floor_upper - self.height_floor
 
-    @Attribute
-    def angle_lower(self):
-        return 2*np.rad2deg(np.arccos(1-(self.position_floor_lower)/(self.diameter_fuselage_inner/2)))
-
-    @Attribute
-    def area_available_cargo(self):
-        return 0.5 * (self.diameter_fuselage_inner/2)**2 *(np.deg2rad(self.angle_lower) - np.sin(np.deg2rad(self.angle_lower)))
-
-    @Attribute
-    def volume_available_cargo(self):
-        return self.area_available_cargo * self.kcc * self.length_cabin
-
-    @Attribute
-    def weight_luggage(self):
-        return self.n_pax * self.luggage_per_pax
-
-    @Attribute
-    def volume_required_luggage(self):
-        return self.weight_luggage/self.density_luggage
-
-    @Attribute
-    def volume_required_cargo(self):
-        return self.weight_cargo / self.density_cargo
-
-    @Attribute
-    def volume_overhead_storage(self):
-        if self.n_aisles ==1:
-            n_compartments_centre = 0
-        else:
-            n_compartments_centre = 1
-        return (self.n_compartments_lat*self.area_os_lat + n_compartments_centre*self.area_os_centre)*self.length_cabin*self.kos
-
-
-
+    #calculate the radius for each section
     @Attribute
     def section_radius_outer(self):
         return [i * self.diameter_fuselage_outer/2 / 100. for i in self.fuselage_sections]
 
+    # calculate the inner radius for each section
+    #first and last are different as thats where the fuselage converges
     @Attribute
     def section_radius_inner(self):
-        radius_0 = 0.01
-        radius_1 = self.fuselage_sections[1] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
-        radius_2 = self.fuselage_sections[2] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
-        radius_3 = self.fuselage_sections[3] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
-        radius_4 = self.fuselage_sections[4] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
-        radius_5 = self.fuselage_sections[5] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
-        radius_6 = self.fuselage_sections[6] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
-        radius_7 = self.fuselage_sections[7] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
-        radius_8 = self.fuselage_sections[8] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
-        radius_9 = self.fuselage_sections[9] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
-        radius_10 = 0.01
-        return radius_0, radius_1, radius_2, radius_3, radius_4, radius_5, radius_6, radius_7, radius_8, radius_9, radius_10
+        rad_0 = 0.01
+        rad_1 = self.fuselage_sections[1] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
+        rad_2 = self.fuselage_sections[2] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
+        rad_3 = self.fuselage_sections[3] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
+        rad_4 = self.fuselage_sections[4] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
+        rad_5 = self.fuselage_sections[5] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
+        rad_6 = self.fuselage_sections[6] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
+        rad_7 = self.fuselage_sections[7] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
+        rad_8 = self.fuselage_sections[8] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
+        rad_9 = self.fuselage_sections[9] * self.diameter_fuselage_outer / 2 / 100 - self.thickness_fuselage
+        rad_10 = 0.01
+        return rad_0, rad_1, rad_2, rad_3, rad_4, rad_5, rad_6, rad_7, rad_8, rad_9, rad_10
 
+    #Calculate length of every section that gets used to shift the profiles in x direction for the outer profiles
     @Attribute
     def section_length_outer(self):
-        section_0 = 0
-        section_1 = 0.001
-        section_2 = self.length_cockpit/self.length_fuselage
-        section_3 = self.length_nosecone/self.length_fuselage
+        sec_0 = 0
+        sec_1 = 0.001
+        sec_2 = self.length_cockpit/self.length_fuselage
+        sec_3 = self.length_nosecone/self.length_fuselage
         cylindrical_part = self.length_fuselage-self.length_nosecone-self.length_tailcone
-        section_4 = (self.length_nosecone + 1/4 *cylindrical_part) / self.length_fuselage
-        section_5 = (self.length_nosecone + 2/4 *cylindrical_part) / self.length_fuselage
-        section_6 = (self.length_nosecone + 3/4 * cylindrical_part) / self.length_fuselage
-        section_7 = (self.length_nosecone + 4/4 * cylindrical_part) / self.length_fuselage
-        section_8 = (self.length_fuselage-self.length_tail)/self.length_fuselage
-        section_9 = 0.996
-        section_10 = 1
-        return section_0, section_1, section_2, section_3, section_4, section_5, section_6, section_7, section_8, section_9, section_10
+        sec_4 = (self.length_nosecone + 1/4 *cylindrical_part) / self.length_fuselage
+        sec_5 = (self.length_nosecone + 2/4 *cylindrical_part) / self.length_fuselage
+        sec_6 = (self.length_nosecone + 3/4 * cylindrical_part) / self.length_fuselage
+        sec_7 = (self.length_nosecone + 4/4 * cylindrical_part) / self.length_fuselage
+        sec_8 = (self.length_fuselage-self.length_tail)/self.length_fuselage
+        sec_9 = 0.996
+        sec_10 = 1
+        return sec_0, sec_1, sec_2, sec_3, sec_4, sec_5, sec_6, sec_7, sec_8, sec_9, sec_10
 
+    # calculate length of every inner section used to shift the profiles (SECTION 0 AND SECTION 10 are different)
     @Attribute
     def section_length_inner(self):
-        section_0 = 0.0005
-        section_1 = 0.001
-        section_2 = self.length_cockpit / self.length_fuselage
-        section_3 = self.length_nosecone / self.length_fuselage
+        sec_0 = 0.0005
+        sec_1 = 0.001
+        sec_2 = self.length_cockpit / self.length_fuselage
+        sec_3 = self.length_nosecone / self.length_fuselage
         cylindrical_part = self.length_fuselage - self.length_nosecone - self.length_tailcone
-        section_4 = (self.length_nosecone + 1 / 4 * cylindrical_part) / self.length_fuselage
-        section_5 = (self.length_nosecone + 2 / 4 * cylindrical_part) / self.length_fuselage
-        section_6 = (self.length_nosecone + 3 / 4 * cylindrical_part) / self.length_fuselage
-        section_7 = (self.length_nosecone + 4 / 4 * cylindrical_part) / self.length_fuselage
-        section_8 = (self.length_fuselage - self.length_tail) / self.length_fuselage
-        section_9 = 0.996
-        section_10 = 0.999
-        return section_0, section_1, section_2, section_3, section_4, section_5, section_6, section_7, section_8, section_9, section_10
+        sec_4 = (self.length_nosecone + 1 / 4 * cylindrical_part) / self.length_fuselage
+        sec_5 = (self.length_nosecone + 2 / 4 * cylindrical_part) / self.length_fuselage
+        sec_6 = (self.length_nosecone + 3 / 4 * cylindrical_part) / self.length_fuselage
+        sec_7 = (self.length_nosecone + 4 / 4 * cylindrical_part) / self.length_fuselage
+        sec_8 = (self.length_fuselage - self.length_tail) / self.length_fuselage
+        sec_9 = 0.996
+        sec_10 = 0.999
+        return sec_0, sec_1, sec_2, sec_3, sec_4, sec_5, sec_6, sec_7, sec_8, sec_9, sec_10
 
-    @Attribute  # used by the superclass LoftedSolid. It could be removed if the @Part profile_set /
-    # would be renamed "profiles" and LoftedSolid specified as superclass for Fuselage
-    def profiles(self):
-        return self.profile_set  # collect the elements of the sequence profile_set
+    # @Attribute
+    # def profiles(self):
+    #     return self.profile_set  # collect the elements of the sequence profile_set
 
+    # Find cg of fuselage group
     @Attribute
     def x_fuselage_cg(self):
         fuselage_sum = self.fuselage_cg_loc * self.fuselage_mass_fraction
         empennage_sum = self.empennage_cg_loc * self.empennage_mass_fraction
         fixed_equip_sum = self.fixed_equipment_cg_loc * self.fixed_equipment_mass_fraction
         mass_sum = self.fuselage_mass_fraction + self.empennage_mass_fraction + self.fixed_equipment_mass_fraction
-        return self.length_fuselage * (fuselage_sum + empennage_sum + fixed_equip_sum) / (
-            mass_sum)
+        return self.length_fuselage * (fuselage_sum + empennage_sum + fixed_equip_sum) / (mass_sum)
 
+    # creating fuselage sections and placing them at desired location
     @Part
     def outer_profile_set(self):
         return Circle(quantify=len(self.fuselage_sections), color="Black",
@@ -214,6 +185,7 @@ class Fuselage(GeomBase):
                           "z", self.section_length_outer[child.index]*self.length_fuselage,
                           "-x", self.fuselage_sections_z[child.index] * self.diameter_fuselage_outer/2))
 
+    # creating fuselage sections and placing them at desired location
     @Part
     def inner_profile_set(self):
         return Circle(quantify=len(self.fuselage_sections), color="Black",
@@ -224,6 +196,7 @@ class Fuselage(GeomBase):
                           "z", self.section_length_inner[child.index] * self.length_fuselage,
                           "-x",self.fuselage_sections_z[child.index] * self.diameter_fuselage_outer / 2 ))
 
+    # create solid for outer profiles
     @Part
     def fuselage_lofted_solid_outer(self):
         return LoftedSolid(profiles=self.outer_profile_set,
@@ -231,6 +204,7 @@ class Fuselage(GeomBase):
                            mesh_deflection=0.00001,
                            hidden=True)
 
+    # create solid for inner profiles
     @Part
     def fuselage_lofted_solid_inner(self):
         return LoftedSolid(profiles=self.inner_profile_set,
@@ -238,6 +212,7 @@ class Fuselage(GeomBase):
                            mesh_deflection=0.00001,
                            hidden=True)
 
+    # subtracting inside from outside
     @Part
     def fuselage_subtracted(self):
         return SubtractedSolid(shape_in=self.fuselage_lofted_solid_outer,
@@ -246,6 +221,7 @@ class Fuselage(GeomBase):
                                mesh_deflection=0.00005,
                                transparency=0.5)
 
+    # create floor by placing a box at relevant location
     @Part
     def floor(self):
         return Box(length=self.diameter_fuselage_outer,
@@ -257,6 +233,7 @@ class Fuselage(GeomBase):
                                       "x", self.length_fuselage/2-0.1),
                    hidden=True)
 
+    # create ceiling by placing a box at relevant location
     @Part
     def ceiling(self):
         return Box(length=self.diameter_fuselage_outer,
@@ -268,6 +245,7 @@ class Fuselage(GeomBase):
                                       "x", self.length_fuselage / 2 + 0.1),
                    hidden=True)
 
+    # cut floor box with fuselage
     @Part
     def floor_cut(self):
         return CommonSolid(shape_in=self.floor,
@@ -275,6 +253,7 @@ class Fuselage(GeomBase):
                            hidden = False,
                            mesh_deflection=0.00001)
 
+    # cut ceiling box with fuselage
     @Part
     def ceiling_cut(self):
         return CommonSolid(shape_in=self.ceiling,
@@ -283,6 +262,8 @@ class Fuselage(GeomBase):
                            mesh_deflection=0.00001,
                            transparency = 0.5)
 
+    #Place seats in front part (less seats abreast as fuselage is slimming down)
+    # Uses seat row class
     @Part
     def seats_front(self):
         return Seat_row(seats_abreast = self.seats_abreast-2,
@@ -291,31 +272,38 @@ class Fuselage(GeomBase):
                                        'x', self.length_cockpit + child.index*0.8*Seat().k_cabin),
                         hidden=False)
 
+    # Place seats in middle part until length is full
+    # Uses seat row class
     @Part
     def seats_middle(self):
         return Seat_row(seats_abreast=self.seats_abreast,
-                        quantify=int(np.floor((self.length_fuselage - self.length_nosecone - self.length_tailcone) / ( 0.9*Seat().k_cabin))),
+                        quantify=int(np.floor((self.length_fuselage - self.length_nosecone - self.length_tailcone)
+                                              / ( 0.9*Seat().k_cabin))),
                         position=translate(self.position,
                                            'x', self.length_nosecone  + child.index *0.9* Seat().k_cabin),
                         hidden=False)
 
+    # Place remaining seats in rear part with les seats abreast to not clash with fuselage
+    # Uses seat row class
     @Part
     def seats_rear(self):
         return Seat_row(seats_abreast=self.seats_abreast - 2,
                         quantify=int((self.n_pax
-                                      - self.seats_abreast*int(np.floor((self.length_fuselage
-                                                                         - self.length_nosecone
-                                                                         - self.length_tailcone) / (0.9*Seat().k_cabin)))
-                                      - (self.seats_abreast-2)*int(np.floor((self.length_nosecone
-                                                                             -self.length_cockpit)/(0.8*Seat().k_cabin))))
+                                      - self.seats_abreast*int(np.floor((self.length_fuselage - self.length_nosecone
+                                                                         - self.length_tailcone)
+                                                                        / (0.9*Seat().k_cabin)))
+                                      - (self.seats_abreast-2)*int(np.floor((self.length_nosecone-self.length_cockpit)
+                                                                            /(0.8*Seat().k_cabin))))
                                      /(self.seats_abreast - 2)),
                         position=translate(self.position,
-                                           'x', self.length_fuselage - self.length_tailcone +child.index * 0.8 * Seat().k_cabin),
+                                           'x', self.length_fuselage
+                                                - self.length_tailcone
+                                                + child.index * 0.8 * Seat().k_cabin),
                         hidden=False)
 
 
 
-
+# class that creates a model of a seat with several boxes that cut away from each other and a nice fillet
 class Seat(GeomBase):
 
     @Attribute
@@ -420,11 +408,12 @@ class Seat(GeomBase):
                                tool=(self.feetspace,self.leg1, self.leg2, self.seatspace),
                                mesh_deflection=0.00005)
 
+#class that creates one row of seats dependent on seats-abreast
+#uses the seat class
 class Seat_row(GeomBase):
     width_aisle   = Input(Fuselage().width_aisle)
     width_seat    = Input(Fuselage().width_seat)
     width_armrest = Input(Fuselage().width_armrest)
-
     seats_abreast = Input(Fuselage().seats_abreast)
 
     @Attribute
@@ -435,6 +424,7 @@ class Seat_row(GeomBase):
             n_aisle = 2
         return n_aisle
 
+    # creates a list of position of each seat relative to the first on in its row, dependent on amopunt seats and aisles
     @Attribute
     def seat_spacing(self):
         if self.seats_abreast==3:#2 seats, aisle, 1 seats
@@ -488,6 +478,7 @@ class Seat_row(GeomBase):
                         8 * self.width_seat + 10* self.width_armrest + 2 * self.width_aisle])
         return spacing
 
+    # dependen ton the number of seats and ailses determine the total with of a row (centre of seat to centre of seat)
     @Attribute
     def row_width(self):
         if self.seats_abreast == 3:
@@ -506,6 +497,7 @@ class Seat_row(GeomBase):
             width = 8 * self.width_seat + 10 * self.width_armrest + 2 * self.width_aisle
         return width
 
+    #place every seat of a row
     @Part
     def seat_row(self):
         return Seat(quantify=int(self.seats_abreast),

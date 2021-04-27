@@ -14,6 +14,13 @@ from aircraft.propulsion import Fan_engine
 from aircraft.wing import Wing
 from aircraft.runQ3D import Q3D
 
+# This class actually makes the tanks,
+# uses drag as input and based on the range and efficiency calculates the required energy storage
+# designs tanks to fit that amount of liquid hydrogen and placed it below the fuselage floor
+
+# Drag class estimates the drag of the fuselage and empennage
+# energy class calculates energy needed based on drag and sizes the tanks
+# Tanks class only places the tanks
 
 class Tanks(GeomBase):
     range            = Input(I.Range)
@@ -63,6 +70,8 @@ class Tanks(GeomBase):
                       hidden=False)
 
 
+# Calculates drag of fuselage, nacelles and empennage through wetter surface and form factors
+# adds all drag coeffieinct together in the end
 class Drag(GeomBase):
 
     lift_coefficient            = Input(Tanks().lift_coefficient)
@@ -234,7 +243,9 @@ class Drag(GeomBase):
     def drag(self):
         return self.drag_coefficient_total*self.dynamic_pressure*self.surface
 
-
+# calculates energy needed through drag  and transfers it to required volume of tanks
+# the required volume is then divided over the number of tanks that fit the best
+#
 class Energy(GeomBase):
 
     range            = Input(Tanks().range)

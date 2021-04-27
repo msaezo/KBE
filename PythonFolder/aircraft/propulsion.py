@@ -4,12 +4,12 @@ from parapy.geom import *
 from math import *
 
 import aircraft.Import_Input as I
-from aircraft.airfoil import Airfoil
 from aircraft.fuselage import Fuselage
 from aircraft.wing import Wing
 from aircraft.empennage import  Vertical_Tail
-from aircraft.cg_calculations import CG_calculations
 
+
+# Class that defines location of engines and places them
 class Propulsion_System(GeomBase):
 
     n_engines          = Input(I.N_engines)
@@ -82,6 +82,7 @@ class Propulsion_System(GeomBase):
                         hidden=False)
 
 
+# class that creates one engine
 class Fan_engine(GeomBase):
     thrust_to          = Input(Propulsion_System().thrust_to)
     n_engines          = Input(Propulsion_System().n_engines)
@@ -230,13 +231,17 @@ class Fan_engine(GeomBase):
 
     @Part
     def fused_bypass_inner(self):
-        return FusedSolid(shape_in=self.bypass_cowling_cut_1, tool=self.bypass_cowling_cut_2,
+        return FusedSolid(shape_in=self.bypass_cowling_cut_1,
+                          tool=self.bypass_cowling_cut_2,
                           color="Orange",
                           hidden=True)
 
     @Part
     def bypass(self):
-        return SubtractedSolid(shape_in=self.fused_bypass_outer, tool=self.fused_bypass_inner,color="yellow", transparency = 0.5)
+        return SubtractedSolid(shape_in=self.fused_bypass_outer,
+                               tool=self.fused_bypass_inner,
+                               color="yellow",
+                               transparency = 0.5)
 
 
 

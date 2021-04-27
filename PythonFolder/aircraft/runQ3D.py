@@ -113,8 +113,9 @@ class Q3D(GeomBase):
                   "Suggested options:" \
                   "     - Change to thinner airfoil" \
                   "     - Increase wing area" \
+                  "     - Increase sweep" \
                   "     - Decrease flight altitude"
-            warnings.warn(msg)
+            warnings.warn(msg, source=None)
         return cddes
 
     @Attribute
@@ -123,27 +124,3 @@ class Q3D(GeomBase):
         return alphaa
 
 
-
-# span=30.0
-# root_chord = 5.0
-# tip_chord = 1.0
-# twist_chord =0.0
-# twist_tip = -5.0
-# dihedral = 2.0
-# sweep = 30.0
-# airSpeed = 60.0
-# airDensity =1.225
-# altitude = 11000.0
-# Reynolds = 20000000.
-# Mach = 0.8
-# AoA = 2.0
-# Cl = 0.8
-#
-# eng = matlab.engine.start_matlab()
-#
-#
-#
-# # run Q3D function
-# [CLdes, CDdes] = eng.Q3Drunner(span, root_chord, tip_chord, twist_chord, twist_tip, dihedral, sweep, airSpeed,
-#                               airDensity, altitude, Reynolds, Mach, AoA,Cl, nargout=2)
-# eng.quit()

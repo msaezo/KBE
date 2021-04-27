@@ -53,7 +53,9 @@ class Horizontal_Tail(GeomBase):
 
     @Attribute
     def sweep_leading_edge_horizontal_tail(self): #self.sweep_three_quarter_horizontal
-        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_three_quarter_horizontal)) - 4 / self.aspect_ratio_horizontal * (-3 / 4) * (1 - self.taper_ratio_horizontal) / (1 + self.taper_ratio_horizontal)))
+        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_three_quarter_horizontal)) - 4
+                                    / self.aspect_ratio_horizontal * (-3 / 4)
+                                    * (1 - self.taper_ratio_horizontal) / (1 + self.taper_ratio_horizontal)))
 
     @Attribute
     def sweep_cuarter_chord_horizontal_tail(self):  # self.sweep_three_quarter_horizontal
@@ -63,7 +65,9 @@ class Horizontal_Tail(GeomBase):
 
     @Attribute
     def sweep_mid_chord_horizontal_tail(self):  # self.sweep_three_quarter_horizontal
-        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_three_quarter_horizontal)) - 4 / self.aspect_ratio_horizontal * (-1 / 4) * (1 - self.taper_ratio_horizontal) / (1 + self.taper_ratio_horizontal)))
+        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_three_quarter_horizontal)) - 4
+                                    / self.aspect_ratio_horizontal * (-1 / 4)
+                                    * (1 - self.taper_ratio_horizontal) / (1 + self.taper_ratio_horizontal)))
 
     @Attribute #Hard Coded, relate it to the Xcg
     def ht_x_shift(self):
@@ -81,11 +85,12 @@ class Horizontal_Tail(GeomBase):
     def mach_drag_divergence(self):
         return self.mach_cruise + 0.03
 
+    # minimum T/c = 0.1, max is 0.18
     @Attribute
     def thickness_to_chord(self):
         cos_halfsweep = np.cos(np.deg2rad(self.sweep_mid_chord_horizontal_tail))
-        option_one = (cos_halfsweep**3 * (0.935 - self.mach_drag_divergence * cos_halfsweep) - 0.115 *self.lift_coefficient**1.5)/(cos_halfsweep**2)
-
+        option_one = (cos_halfsweep**3 * (0.935 - self.mach_drag_divergence * cos_halfsweep)
+                      - 0.115 *self.lift_coefficient**1.5)/(cos_halfsweep**2)
         if option_one > 0.18:
             toverc = 0.18
         elif option_one <0.1:
@@ -188,7 +193,6 @@ class Vertical_Tail(GeomBase):
     @Attribute #Hard Coded, relate it to the Xcg
     def vt_z_shift(self):
         return Fuselage().diameter_fuselage_outer*0.9/2
-
 
     @Attribute
     def sweep_mid_chord_vertical_tail(self):

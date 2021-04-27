@@ -82,7 +82,7 @@ class new_fuselage2(GeomBase):
 
 
 
-
+# creates new profile sections that fit around the fuselage and the tanks
 class new_fuselage_profile(GeomBase):
 
     Fuselage_diameter= Input(Fuselage().diameter_fuselage_outer)
@@ -99,7 +99,7 @@ class new_fuselage_profile(GeomBase):
 
     @Attribute
     def straight_length_outer(self):
-        return np.sqrt(self.straight_length_midpoints**2 - self.delta_radius**2)
+        return np.sqrt(abs(self.straight_length_midpoints**2 - self.delta_radius**2))
 
     @Attribute
     def angle_1(self):

@@ -27,21 +27,21 @@ class Wing(GeomBase):
 
     # airfoil profiles
     airfoil_root = Input("aircraft\whitcomb")
-    airfoil_tip = Input("aircraft\simm_airfoil")
+    airfoil_tip  = Input("aircraft\simm_airfoil")
 
-    mach_cruise = Input(I.Mach_cruise)#I.Mach_cruise)
-    altitude_cruise = Input(I.Altitude_cruise)
-    weight_TO = Input(I.Weight_TO)
-    wing_loading = Input(I.Wing_loading)
-    aspect_ratio = Input(I.Aspect_ratio)
-    wing_highlow = Input("low")
-    wing_mass_fraction = Input(I.Wing_mass_fraction)
-    propulsion_mass_fraction = Input(I.Propulsion_system_mass_fraction)
-    wing_cg_loc = Input(I.Wing_cg_loc)
-    propulsion_cg_loc = Input(I.Propulsion_system_cg_loc)
-    oew_cg_loc = Input(I.OEW_cg_loc)
-    fuselage_mass_fraction = Input(I.Fuselage_mass_fraction)
-    empennage_mass_fraction = Input(I.Empennage_mass_fraction)
+    mach_cruise                   = Input(I.Mach_cruise)#I.Mach_cruise)
+    altitude_cruise               = Input(I.Altitude_cruise)
+    weight_TO                     = Input(I.Weight_TO)
+    wing_loading                  = Input(I.Wing_loading)
+    aspect_ratio                  = Input(I.Aspect_ratio)
+    wing_highlow                  = Input("low")
+    wing_mass_fraction            = Input(I.Wing_mass_fraction)
+    propulsion_mass_fraction      = Input(I.Propulsion_system_mass_fraction)
+    wing_cg_loc                   = Input(I.Wing_cg_loc)
+    propulsion_cg_loc             = Input(I.Propulsion_system_cg_loc)
+    oew_cg_loc                    = Input(I.OEW_cg_loc)
+    fuselage_mass_fraction        = Input(I.Fuselage_mass_fraction)
+    empennage_mass_fraction       = Input(I.Empennage_mass_fraction)
     fixed_equipment_mass_fraction = Input(I.Fixed_equipment_mass_fraction)
 
     # some other parameters
@@ -81,7 +81,6 @@ class Wing(GeomBase):
     def airDensity(self):
         return self.pressure_static / (287 * self.temperature)
 
-
     @Attribute
     def dynamic_pressure(self):
         return 0.7*self.pressure_static*self.mach_cruise**2
@@ -116,11 +115,13 @@ class Wing(GeomBase):
 
     @Attribute
     def sweep_leading_edge(self):
-        return np.rad2deg(np.arctan(np.tan( np.deg2rad(self.sweep_quarter_chord) ) - 4/self.aspect_ratio *(-1/4) *(1-self.taper_ratio)/(1+self.taper_ratio)))
+        return np.rad2deg(np.arctan(np.tan( np.deg2rad(self.sweep_quarter_chord) )
+                                    - 4/self.aspect_ratio *(-1/4) *(1-self.taper_ratio)/(1+self.taper_ratio)))
 
     @Attribute
     def sweep_mid_chord(self):
-        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_quarter_chord)) - 4 / self.aspect_ratio * (1 / 4) * (1 - self.taper_ratio) / (1 + self.taper_ratio)))
+        return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_quarter_chord))
+                                    - 4 / self.aspect_ratio * (1 / 4) * (1 - self.taper_ratio) / (1 + self.taper_ratio)))
 
     @Attribute
     def mean_aerodynamic_chord(self):
@@ -147,8 +148,6 @@ class Wing(GeomBase):
     @Attribute  # required input for the superclass LoftedSolid
     def profiles(self):
         return [self.root_airfoil, self.tip_airfoil]
-
-
 
     @Attribute
     def x_wing_cg(self):
