@@ -53,13 +53,14 @@ class CG_calculations(GeomBase):
     def cg_front(self):
         return LineSegment(start=Point(self.cg_forward, -4, 0),
                            end=Point(self.cg_forward, 4, 0),
+                           color='blue',
                            line_thickness=2)
 
     @Part
     def cg_rear(self):
         return LineSegment(start=Point(self.cg_aft, -4, 0),
                            end=Point(self.cg_aft, 4, 0),
-                           color='green',
+                           color='blue',
                            line_thickness=2)
 
 

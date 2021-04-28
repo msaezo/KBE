@@ -53,7 +53,7 @@ vt_z_shift = 2.70882
 sweep_mid_chord_vertical_tail = 29.054604099077146
 sweep_cuarter_chord_vertical_tail = 37.8749836510982
 mach_drag_divergence = 0.9500000000000001
-thickness_to_chord = 0.06666499777689684
+thickness_to_chord = 0.026768514286582383
 
 Outputs Wing class 
 
