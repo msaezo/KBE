@@ -19,7 +19,7 @@ the python engine on matlab:
     - you have completed the installation!
 
 To run your files:
-Once all the packages are installed you can use aircraft\KBE_Input.xls to enter the chosen configuration details. Do not forget to safe before running!
+Once all the packages are installed you can use aircraft\KBE_Input.xls to enter the chosen configuration details in column C. Do not forget to safe before running!
 After that you should be able to open the AircraftGeometry.py file and run it.
 Once done some potential warnings might pop up depending on the chosen configuration and the ParaPy GUI will open with the final result.
 
