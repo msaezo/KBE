@@ -29,13 +29,6 @@ class Fuselage(GeomBase):
     empennage_cg_loc              = Input(I.Empennage_cg_loc)
     fixed_equipment_cg_loc        = Input(I.Fixed_equipment_cg_loc)
 
-    density_luggage    = Input(170)
-    density_cargo      = Input(160)
-    kos                = Input(0.74) # overhead storage factor
-    area_os_lat        = Input(0.2) # overhead storage area lat
-    area_os_centre     = Input(0.24)  # overhead storage area centre
-    n_compartments_lat = Input(2)
-
     # percentage of calculated fuselage diameter for each section
     fuselage_sections   = Input([1,10, 90, 100, 100, 100, 100, 100, 80, 10,1])
     # z-shift of each fuselage section

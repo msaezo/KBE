@@ -1,4 +1,5 @@
 import xlrd
+from parapy.core import *
 
 workbook = xlrd.open_workbook('aircraft\KBE_Input.xls')
 worksheet = workbook.sheet_by_name('Input')
@@ -52,4 +53,6 @@ for i in range(67, 72):
     Name = worksheet.cell(i, 1).value
     Value = worksheet.cell(i, 2).value
     exec(Name + "=Value")
+
+
 

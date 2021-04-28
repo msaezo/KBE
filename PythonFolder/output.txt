@@ -1,0 +1,180 @@
+Outputs Fuselage class 
+
+seats_abreast = 9
+n_aisles width = 2
+n_rows = 58.0
+length_cabin = 77.4
+diameter_fuselage_inner = 5.680000000000001
+diameter_fuselage_outer = 6.0196
+length_tailcone = 21.0686
+length_nosecone = 12.0392
+length_tail = 9.63136
+length_fuselage = 91.03136
+thickness_fuselage = 0.1697999999999995
+position_floor_upper = -0.7
+position_floor_lower = -0.95
+section_radius_outer = [0.030098, 0.30097999999999997, 2.7088200000000002, 3.0098, 3.0098, 3.0098, 3.0098, 3.0098, 2.4078399999999998, 0.30097999999999997, 0.030098]
+section_radius_inner = (0.01, 0.13118000000000046, 2.5390200000000007, 2.8400000000000003, 2.8400000000000003, 2.8400000000000003, 2.8400000000000003, 2.8400000000000003, 2.2380400000000003, 0.13118000000000046, 0.01)
+section_length_outer = (0, 0.001, 0.0439409012454609, 0.1322533245685882, 0.2913291639276838, 0.45040500328677946, 0.6094808426458751, 0.7685566820049706, 0.8941973403451294, 0.996, 1)
+section_length_inner = (0.0005, 0.001, 0.0439409012454609, 0.1322533245685882, 0.2913291639276838, 0.45040500328677946, 0.6094808426458751, 0.7685566820049706, 0.8941973403451294, 0.996, 0.999)
+x_fuselage_cg = 41.03255663157895
+
+Outputs Seat_row class 
+
+seat_spacing = [0, 0.5, 1.0, 2.05, 2.55, 3.05, 4.1, 4.6, 5.1]
+row_width = 5.1
+
+Outputs Horizontal_tail class 
+
+x_tail_horizontal = 77.376656
+cg_arm_horizontal = 36.79495596283366
+surface_horizontal_tail = 106.52924632849181
+span_horizontal_tail = 20.64260122450577
+root_chord_horizontal_tail = 6.450812882658054
+tip_chord_horizontal_tail = 3.8704877295948323
+sweep_leading_edge_horizontal_tail = 28.87542784479033
+sweep_cuarter_chord_horizontal_tail = 26.05725685267437
+sweep_mid_chord_horizontal_tail = 23.096804758223865
+ht_x_shift = 77.376656
+ht_z_shift = 2.40784
+mach_drag_divergence = 0.9500000000000001
+thickness_to_chord = 0.1
+
+Outputs Vertical_tail class 
+
+x_tail_vertical = 72.82508800000001
+cg_arm_vertical = 32.24338796283367
+surface_vertical_tail = 66.1596716498834
+span_vertical_tail = 9.961902803923811
+root_chord_vertical_tail = 8.855024714598946
+tip_chord_vertical_tail = 4.427512357299473
+vt_x_shift = 72.82508800000001
+vt_z_shift = 2.70882
+sweep_mid_chord_vertical_tail = 29.054604099077146
+sweep_cuarter_chord_vertical_tail = 37.8749836510982
+mach_drag_divergence = 0.9500000000000001
+thickness_to_chord = 0.06666499777689684
+
+Outputs Wing class 
+
+area_wing = 511.00000000000006
+temperature = 219.10000000000002
+pressure_static = 19366.320734457277
+sound_speed = 296.70588130335403
+air_speed = 272.9694107990857
+airDensity = 0.3079802348609735
+dynamic_pressure = 11474.157708751247
+mach_drag_divergence = 0.9500000000000001
+sweep_quarter_chord = 42.425268011019064
+span = 59.636901327952984
+taper_ratio = 0.25190787743333826
+chord_root = 13.688739339682968
+chord_tip = 3.4483012717977726
+sweep_leading_edge = 44.99401444983708
+sweep_mid_chord = 39.62740691066409
+mean_aerodynamic_chord = 9.588402464311924
+y_mean_aerodynamic_chord = 11.939498292301542
+lift_coefficient = 0.5691873228002605
+dihedral = 0.7574731988980936
+x_wing_cg = 2.1397277078253976
+x_le_mac = 38.45161822389198
+wing_x_shift = 26.514614251481966
+wing_z_shift = -2.40784
+
+Outputs Tanks class 
+
+y_pos = 1.8149639319387745
+z_pos = -2.7649639319387744
+tank_max_dim = 4.957401204021092
+new_fuselage = False
+
+Outputs Drag class 
+
+wet_area_fus = 1669.7289644256307
+wet_area_ht = 180.67360177312213
+wet_area_vt = 126.23265350797755
+wet_area_nacelle = 42.94785582736074
+wet_area_total = 2019.5830755340912
+skin_friction = 0.000249292356554413
+form_factor_ht = 2.4438778561434256
+form_factor_vt = 2.3569470263249763
+form_factor_fus = 1.055155497052896
+form_factor_nacelle = 1.1372322932133736
+drag_coeff_fus = 0.0008595091601960953
+drag_coeff_ht = 0.00022402454340946185
+drag_coeff_vt = 0.0001509534125116046
+drag_coeff_nacelle = 3.097576816946635e-05
+drag_coeff_wing = 0.0284595
+drag_coefficient_total = 0.029724962884286627
+drag = 174286.21404277303
+
+Outputs Energy class 
+
+work = 1613890342036.0781
+energy_req = 5379634473453.594
+vol_needed = 672.4543091816993
+length_tank = 62.664622
+diameter_tank = [6.396312432119395, 3.2999344217068622, 2.224543444243033, 1.6779394305552262]
+number_of_tanks = 2
+diameter_tank_final = 3.2999344217068622
+
+Outputs Q3D class 
+
+q_three_d = [0.56919, nan, 6.23217]
+cldes = 0.56919
+cddes = nan
+alpha = 6.23217
+
+Outputs CG_calculations class 
+
+x_oew = 40.848718839969955
+x_payload = 31.860976
+x_fuel = 39.88987859353877
+cg_forward = 37.553213131980975
+cg_aft = 40.581700037166335
+
+Outputs CG_calculations_hyd class 
+
+mtom = 340195.0
+mass_oew = 193911.15
+mass_payload = 112264.35
+x_fuel = 35.332311000000004
+tank_cg_loc = 35.332311000000004
+mass_fuel = 47744.255951900646
+mass_tank = 47744.255951900646
+x_oew = 39.758833071393276
+x_payload = 31.860976
+cg_forward = 36.65646657503011
+cg_aft = 38.88427782641191
+
+Outputs Propulsion_System class 
+
+y_pos = [-20.872915464783542, -11.927380265590598, 11.927380265590598, 20.872915464783542]
+z_pos = [-3.587250446927824, -3.7055209027290603, -3.7055209027290603, -3.587250446927824]
+x_pos = [46.88316908678482, 37.93950272879788, 37.93950272879788, 46.88316908678482]
+
+Outputs Fan_engine class 
+
+massflow = 865.7029216740681
+ratio_inlet_to_spinner = 0.18663731147199225
+inlet_diameter = 2.4136733196970064
+nacelle_length = 6.748758664486132
+fan_length = 3.374379332243066
+loc_max_diameter = 0.4783281572999748
+max_diameter = 2.64613607963159
+exit_diameter = 2.425624739662291
+length_gas_generator = 3.374379332243066
+diameter_gas_generator = 1.8310081566586618
+exit_diameter_gas_generator = 1.0070544861622641
+
+Outputs New_Fuselage_Profile class 
+
+delta_radius = 1.1948360680612253
+straight_length_midpoints = 3.3074339931676615
+straight_length_outer = 3.084069777035042
+angle_1 = 77.89595971738821
+angle_2 = 0.2112553557256007
+y_lower = 3.5895784075872
+y_upper = 2.9428874892852748
+z_lower = -2.384388660727256
+z_upper = 0.6311174735405533

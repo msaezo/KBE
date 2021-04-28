@@ -13,13 +13,19 @@ from aircraft import Q3D
 from aircraft import Drag
 from aircraft import Energy
 from aircraft import Tanks
-from aircraft import new_fuselage1
-from aircraft import new_fuselage2
+from aircraft import New_Fuselage1
+from aircraft import New_Fuselage2
+from aircraft import Seat_row
+from aircraft import Fan_engine
+from aircraft import New_Fuselage_Profile
+from parapy.exchange.step import STEPWriter
 
+import os
 import xlrd
 import warnings
 from math import *
 
+DIR = os.path.dirname(__file__)
 
 class AircraftGeometry(Base):
 
@@ -102,7 +108,7 @@ class AircraftGeometry(Base):
 
     mach_cruise     = Input(Mach_cruise)
     altitude_cruise = Input(Altitude_cruise)
-    weight_TO       = Input(Weight_TO)
+    weight_to       = Input(Weight_TO)
     wing_loading    = Input(Wing_loading)
     aspect_ratio    = Input(Aspect_ratio)
     wing_highlow    = Input("low")
@@ -162,7 +168,7 @@ class AircraftGeometry(Base):
             warnings.warn(msg)
 
 
-        pax_average = 0.0012*self.weight_TO/9.81 + 86.01
+        pax_average = 0.0012*self.weight_to/9.81 + 86.01
         if self.n_pax <= pax_average*0.75 or self.n_pax >= pax_average*1.25:
             msg = "The number of passengers on the Input File might be outside of bounds for the selected MTOW " \
                   "Suggested options:" \
@@ -170,7 +176,7 @@ class AircraftGeometry(Base):
                   "     - n_pax = 0.0012 * MTOW [kg] + 86.01"
             warnings.warn(msg)
 
-        wing_loading_average = 0.0005*self.weight_TO/9.81 + 547.52
+        wing_loading_average = 0.0005*self.weight_to/9.81 + 547.52
         if self.wing_loading <= wing_loading_average*0.77 or self.wing_loading >= wing_loading_average*1.23:
             msg = "The wing loading on the Input File might be outside of bounds for the selected MTOW " \
                   "Suggested options:" \
@@ -185,7 +191,7 @@ class AircraftGeometry(Base):
                   "     - 7.73 to 9.44"
             warnings.warn(msg)
 
-        span = sqrt(self.aspect_ratio*self.weight_TO/9.81/self.wing_loading)
+        span = sqrt(self.aspect_ratio*self.weight_to/9.81/self.wing_loading)
         if span >= 80 or span <= 22:
             msg = "The wing span resulting from the Input File might be outside of bounds for the typical transportation aircraft. " \
                   "Suggested options:" \
@@ -193,7 +199,7 @@ class AircraftGeometry(Base):
                   "     - Change the wing loading"
             warnings.warn(msg)
 
-        range_average = 0.0323 * self.weight_TO / 9.81 + 2819.4
+        range_average = 0.0323 * self.weight_to / 9.81 + 2819.4
         if self.range < range_average * 0.60 or self.range > range_average * 1.40:
             msg = "The range on the Input File might be outside of bounds for the selected MTOW " \
                   "Suggested options:" \
@@ -244,12 +250,12 @@ class AircraftGeometry(Base):
         if Tanks().tank_max_dim > Fuselage().diameter_fuselage_inner / 2:
             input = [Fuselage().outer_profile_set[0],
                      Fuselage().outer_profile_set[1],
-                     new_fuselage1().new_profile_first.composed_crv,
-                     new_fuselage1().new_profile_set[0].composed_crv,
-                     new_fuselage1().new_profile_set[1].composed_crv,
-                     new_fuselage1().new_profile_set[2].composed_crv,
-                     new_fuselage1().new_profile_set[3].composed_crv,
-                     new_fuselage1().new_profile_set[4].composed_crv,
+                     New_Fuselage1().new_profile_first.composed_crv,
+                     New_Fuselage1().new_profile_set[0].composed_crv,
+                     New_Fuselage1().new_profile_set[1].composed_crv,
+                     New_Fuselage1().new_profile_set[2].composed_crv,
+                     New_Fuselage1().new_profile_set[3].composed_crv,
+                     New_Fuselage1().new_profile_set[4].composed_crv,
                      Fuselage().outer_profile_set[8],
                      Fuselage().outer_profile_set[9],
                      Fuselage().outer_profile_set[10]]
@@ -307,7 +313,7 @@ class AircraftGeometry(Base):
     def main_wing(self):
         return Wing(mach_cruise       = self.mach_cruise,
                     altitude_cruise   = self.altitude_cruise,
-                    weight_TO         = self.weight_TO,
+                    weight_to         = self.weight_to,
                     wing_loading      = self.wing_loading,
                     aspect_ratio      = self.aspect_ratio,
                     wing_highlow      = self.wing_highlow,
@@ -364,15 +370,230 @@ class AircraftGeometry(Base):
 
     @Part
     def newprofile(self):
-        return new_fuselage2(input_profile_set = self.new_fuselage_input)
+        return New_Fuselage2(input_profile_set = self.new_fuselage_input)
 
     @Part
     def testprofile(self):
-        return new_fuselage1()
+        return New_Fuselage1()
 
+    @Part
+    def step_writer_components(self):
+        return STEPWriter(default_directory=DIR,
+                          nodes=[self.tanks.tank[0].tank,
+                                 self.tanks.tank[1].tank,
+                                 self.fuselage.fuselage_subtracted,
+                                 self.fuselage.floor_cut,
+                                 self.fuselage.ceiling_cut,
+                                 self.main_wing.right_wing_surface,
+                                 self.main_wing.left_wing_surface,
+                                 self.vertical_tail.vertical_wing_surface,
+                                 self.horizontal_tail.right_wing_surface_ht,
+                                 self.horizontal_tail.left_wing_surface_ht,
+                                 self.prop_system.propulsion_system[0].spinner,
+                                 self.prop_system.propulsion_system[0].fan,
+                                 self.prop_system.propulsion_system[0].core,
+                                 self.prop_system.propulsion_system[0].nozzle,
+                                 self.prop_system.propulsion_system[0].bypass,
+                                 self.prop_system.propulsion_system[1].spinner,
+                                 self.prop_system.propulsion_system[1].fan,
+                                 self.prop_system.propulsion_system[1].core,
+                                 self.prop_system.propulsion_system[1].nozzle,
+                                 self.prop_system.propulsion_system[1].bypass,
+                                 self.prop_system.propulsion_system[2].spinner,
+                                 self.prop_system.propulsion_system[2].fan,
+                                 self.prop_system.propulsion_system[2].core,
+                                 self.prop_system.propulsion_system[2].nozzle,
+                                 self.prop_system.propulsion_system[2].bypass,
+                                 self.prop_system.propulsion_system[3].spinner,
+                                 self.prop_system.propulsion_system[3].fan,
+                                 self.prop_system.propulsion_system[3].core,
+                                 self.prop_system.propulsion_system[3].nozzle,
+                                 self.prop_system.propulsion_system[3].bypass,
+                                 self.cg_range.cg_front,
+                                 self.cg_range.cg_rear,
+                                 self.cg_range_hyd.cg_front,
+                                 self.cg_range_hyd.cg_rear,
+                                 self.newprofile.fuselage_lofted_solid_outer])
+
+
+    ##########################################
+    #####                                #####
+    #####    Creating Output.txt file    #####
+    #####                                #####
+    ##########################################
+
+    f = open("output.txt", "w+")
+    f.write("Outputs Fuselage class \n\n")
+
+    f.write("seats_abreast = " + str(Fuselage().seats_abreast) + "\n")
+    f.write("n_aisles width = " + str(Fuselage().n_aisles) + "\n")
+    f.write("n_rows = " + str(Fuselage().n_rows) + "\n")
+    f.write("length_cabin = " + str(Fuselage().length_cabin) + "\n")
+    f.write("diameter_fuselage_inner = " + str(Fuselage().diameter_fuselage_inner) + "\n")
+    f.write("diameter_fuselage_outer = " + str(Fuselage().diameter_fuselage_outer) + "\n")
+    f.write("length_tailcone = " + str(Fuselage().length_tailcone) + "\n")
+    f.write("length_nosecone = " + str(Fuselage().length_nosecone) + "\n")
+    f.write("length_tail = " + str(Fuselage().length_tail) + "\n")
+    f.write("length_fuselage = " + str(Fuselage().length_fuselage) + "\n")
+    f.write("thickness_fuselage = " + str(Fuselage().thickness_fuselage) + "\n")
+    f.write("position_floor_upper = " + str(Fuselage().position_floor_upper) + "\n")
+    f.write("position_floor_lower = " + str(Fuselage().position_floor_lower) + "\n")
+    f.write("section_radius_outer = " + str(Fuselage().section_radius_outer) + "\n")
+    f.write("section_radius_inner = " + str(Fuselage().section_radius_inner) + "\n")
+    f.write("section_length_outer = " + str(Fuselage().section_length_outer) + "\n")
+    f.write("section_length_inner = " + str(Fuselage().section_length_inner) + "\n")
+    f.write("x_fuselage_cg = " + str(Fuselage().x_fuselage_cg) + "\n\n")
+
+    f.write("Outputs Seat_row class \n\n")
+    f.write("seat_spacing = " + str(Seat_row().seat_spacing) + "\n")
+    f.write("row_width = " + str(Seat_row().row_width) + "\n\n")
+
+    f.write("Outputs Horizontal_tail class \n\n")
+    f.write("x_tail_horizontal = " + str(Horizontal_Tail().x_tail_horizontal) + "\n")
+    f.write("cg_arm_horizontal = " + str(Horizontal_Tail().cg_arm_horizontal) + "\n")
+    f.write("surface_horizontal_tail = " + str(Horizontal_Tail().surface_horizontal_tail) + "\n")
+    f.write("span_horizontal_tail = " + str(Horizontal_Tail().span_horizontal_tail) + "\n")
+    f.write("root_chord_horizontal_tail = " + str(Horizontal_Tail().root_chord_horizontal_tail) + "\n")
+    f.write("tip_chord_horizontal_tail = " + str(Horizontal_Tail().tip_chord_horizontal_tail) + "\n")
+    f.write("sweep_leading_edge_horizontal_tail = " + str(Horizontal_Tail().sweep_leading_edge_horizontal_tail) + "\n")
+    f.write(
+        "sweep_cuarter_chord_horizontal_tail = " + str(Horizontal_Tail().sweep_cuarter_chord_horizontal_tail) + "\n")
+    f.write("sweep_mid_chord_horizontal_tail = " + str(Horizontal_Tail().sweep_mid_chord_horizontal_tail) + "\n")
+    f.write("ht_x_shift = " + str(Horizontal_Tail().ht_x_shift) + "\n")
+    f.write("ht_z_shift = " + str(Horizontal_Tail().ht_z_shift) + "\n")
+    f.write("mach_drag_divergence = " + str(Horizontal_Tail().mach_drag_divergence) + "\n")
+    f.write("thickness_to_chord = " + str(Horizontal_Tail().thickness_to_chord) + "\n\n")
+
+    f.write("Outputs Vertical_tail class \n\n")
+    f.write("x_tail_vertical = " + str(Vertical_Tail().x_tail_vertical) + "\n")
+    f.write("cg_arm_vertical = " + str(Vertical_Tail().cg_arm_vertical) + "\n")
+    f.write("surface_vertical_tail = " + str(Vertical_Tail().surface_vertical_tail) + "\n")
+    f.write("span_vertical_tail = " + str(Vertical_Tail().span_vertical_tail) + "\n")
+    f.write("root_chord_vertical_tail = " + str(Vertical_Tail().root_chord_vertical_tail) + "\n")
+    f.write("tip_chord_vertical_tail = " + str(Vertical_Tail().tip_chord_vertical_tail) + "\n")
+    f.write("vt_x_shift = " + str(Vertical_Tail().vt_x_shift) + "\n")
+    f.write("vt_z_shift = " + str(Vertical_Tail().vt_z_shift) + "\n")
+    f.write("sweep_mid_chord_vertical_tail = " + str(Vertical_Tail().sweep_mid_chord_vertical_tail) + "\n")
+    f.write("sweep_cuarter_chord_vertical_tail = " + str(Vertical_Tail().sweep_cuarter_chord_vertical_tail) + "\n")
+    f.write("mach_drag_divergence = " + str(Vertical_Tail().mach_drag_divergence) + "\n")
+    f.write("thickness_to_chord = " + str(Vertical_Tail().thickness_to_chord) + "\n\n")
+
+    f.write("Outputs Wing class \n\n")
+    f.write("area_wing = " + str(Wing().area_wing) + "\n")
+    f.write("temperature = " + str(Wing().temperature) + "\n")
+    f.write("pressure_static = " + str(Wing().pressure_static) + "\n")
+    f.write("sound_speed = " + str(Wing().sound_speed) + "\n")
+    f.write("air_speed = " + str(Wing().air_speed) + "\n")
+    f.write("airDensity = " + str(Wing().airDensity) + "\n")
+    f.write("dynamic_pressure = " + str(Wing().dynamic_pressure) + "\n")
+    f.write("mach_drag_divergence = " + str(Wing().mach_drag_divergence) + "\n")
+    f.write("sweep_quarter_chord = " + str(Wing().sweep_quarter_chord) + "\n")
+    f.write("span = " + str(Wing().span) + "\n")
+    f.write("taper_ratio = " + str(Wing().taper_ratio) + "\n")
+    f.write("chord_root = " + str(Wing().chord_root) + "\n")
+    f.write("chord_tip = " + str(Wing().chord_tip) + "\n")
+    f.write("sweep_leading_edge = " + str(Wing().sweep_leading_edge) + "\n")
+    f.write("sweep_mid_chord = " + str(Wing().sweep_mid_chord) + "\n")
+    f.write("mean_aerodynamic_chord = " + str(Wing().mean_aerodynamic_chord) + "\n")
+    f.write("y_mean_aerodynamic_chord = " + str(Wing().y_mean_aerodynamic_chord) + "\n")
+    f.write("lift_coefficient = " + str(Wing().lift_coefficient) + "\n")
+    f.write("dihedral = " + str(Wing().dihedral) + "\n")
+    f.write("x_wing_cg = " + str(Wing().x_wing_cg) + "\n")
+    f.write("x_le_mac = " + str(Wing().x_le_mac) + "\n")
+    f.write("wing_x_shift = " + str(Wing().wing_x_shift) + "\n")
+    f.write("wing_z_shift = " + str(Wing().wing_z_shift) + "\n\n")
+
+    f.write("Outputs Tanks class \n\n")
+    f.write("y_pos = " + str(Tanks().y_pos) + "\n")
+    f.write("z_pos = " + str(Tanks().z_pos) + "\n")
+    f.write("tank_max_dim = " + str(Tanks().tank_max_dim) + "\n")
+    f.write("new_fuselage = " + str(Tanks().new_fuselage) + "\n\n")
+
+    f.write("Outputs Drag class \n\n")
+    f.write("wet_area_fus = " + str(Drag().wet_area_fus) + "\n")
+    f.write("wet_area_ht = " + str(Drag().wet_area_ht) + "\n")
+    f.write("wet_area_vt = " + str(Drag().wet_area_vt) + "\n")
+    f.write("wet_area_nacelle = " + str(Drag().wet_area_nacelle) + "\n")
+    f.write("wet_area_total = " + str(Drag().wet_area_total) + "\n")
+    f.write("skin_friction = " + str(Drag().skin_friction) + "\n")
+    f.write("form_factor_ht = " + str(Drag().form_factor_ht) + "\n")
+    f.write("form_factor_vt = " + str(Drag().form_factor_vt) + "\n")
+    f.write("form_factor_fus = " + str(Drag().form_factor_fus) + "\n")
+    f.write("form_factor_nacelle = " + str(Drag().form_factor_nacelle) + "\n")
+    f.write("drag_coeff_fus = " + str(Drag().drag_coeff_fus) + "\n")
+    f.write("drag_coeff_ht = " + str(Drag().drag_coeff_ht) + "\n")
+    f.write("drag_coeff_vt = " + str(Drag().drag_coeff_vt) + "\n")
+    f.write("drag_coeff_nacelle = " + str(Drag().drag_coeff_nacelle) + "\n")
+    f.write("drag_coeff_wing = " + str(Drag().drag_coeff_wing) + "\n")
+    f.write("drag_coefficient_total = " + str(Drag().drag_coefficient_total) + "\n")
+    f.write("drag = " + str(Drag().drag) + "\n\n")
+
+    f.write("Outputs Energy class \n\n")
+    f.write("work = " + str(Energy().work) + "\n")
+    f.write("energy_req = " + str(Energy().energy_req) + "\n")
+    f.write("vol_needed = " + str(Energy().vol_needed) + "\n")
+    f.write("length_tank = " + str(Energy().length_tank) + "\n")
+    f.write("diameter_tank = " + str(Energy().diameter_tank) + "\n")
+    f.write("number_of_tanks = " + str(Energy().number_of_tanks) + "\n")
+    f.write("diameter_tank_final = " + str(Energy().diameter_tank_final) + "\n\n")
+
+    f.write("Outputs Q3D class \n\n")
+    f.write("q_three_d = " + str(Q3D().q_three_d) + "\n")
+    f.write("cldes = " + str(Q3D().cldes) + "\n")
+    f.write("cddes = " + str(Q3D().cddes) + "\n")
+    f.write("alpha = " + str(Q3D().alpha) + "\n\n")
+
+    f.write("Outputs CG_calculations class \n\n")
+    f.write("x_oew = " + str(CG_calculations().x_oew) + "\n")
+    f.write("x_payload = " + str(CG_calculations().x_payload) + "\n")
+    f.write("x_fuel = " + str(CG_calculations().x_fuel) + "\n")
+    f.write("cg_forward = " + str(CG_calculations().cg_forward) + "\n")
+    f.write("cg_aft = " + str(CG_calculations().cg_aft) + "\n\n")
+
+    f.write("Outputs CG_calculations_hyd class \n\n")
+    f.write("mtom = " + str(CG_calculations_hyd().mtom) + "\n")
+    f.write("mass_oew = " + str(CG_calculations_hyd().mass_oew) + "\n")
+    f.write("mass_payload = " + str(CG_calculations_hyd().mass_payload) + "\n")
+    f.write("x_fuel = " + str(CG_calculations_hyd().x_fuel) + "\n")
+    f.write("tank_cg_loc = " + str(CG_calculations_hyd().tank_cg_loc) + "\n")
+    f.write("mass_fuel = " + str(CG_calculations_hyd().mass_fuel) + "\n")
+    f.write("mass_tank = " + str(CG_calculations_hyd().mass_tank) + "\n")
+    f.write("x_oew = " + str(CG_calculations_hyd().x_oew) + "\n")
+    f.write("x_payload = " + str(CG_calculations_hyd().x_payload) + "\n")
+    f.write("cg_forward = " + str(CG_calculations_hyd().cg_forward) + "\n")
+    f.write("cg_aft = " + str(CG_calculations_hyd().cg_aft) + "\n\n")
+
+    f.write("Outputs Propulsion_System class \n\n")
+    f.write("y_pos = " + str(Propulsion_System().y_pos) + "\n")
+    f.write("z_pos = " + str(Propulsion_System().z_pos) + "\n")
+    f.write("x_pos = " + str(Propulsion_System().x_pos) + "\n\n")
+
+    f.write("Outputs Fan_engine class \n\n")
+    f.write("massflow = " + str(Fan_engine().massflow) + "\n")
+    f.write("ratio_inlet_to_spinner = " + str(Fan_engine().ratio_inlet_to_spinner) + "\n")
+    f.write("inlet_diameter = " + str(Fan_engine().inlet_diameter) + "\n")
+    f.write("nacelle_length = " + str(Fan_engine().nacelle_length) + "\n")
+    f.write("fan_length = " + str(Fan_engine().fan_length) + "\n")
+    f.write("loc_max_diameter = " + str(Fan_engine().loc_max_diameter) + "\n")
+    f.write("max_diameter = " + str(Fan_engine().max_diameter) + "\n")
+    f.write("exit_diameter = " + str(Fan_engine().exit_diameter) + "\n")
+    f.write("length_gas_generator = " + str(Fan_engine().length_gas_generator) + "\n")
+    f.write("diameter_gas_generator = " + str(Fan_engine().diameter_gas_generator) + "\n")
+    f.write("exit_diameter_gas_generator = " + str(Fan_engine().exit_diameter_gas_generator) + "\n\n")
+
+    f.write("Outputs New_Fuselage_Profile class \n\n")
+    f.write("delta_radius = " + str(New_Fuselage_Profile().delta_radius) + "\n")
+    f.write("straight_length_midpoints = " + str(New_Fuselage_Profile().straight_length_midpoints) + "\n")
+    f.write("straight_length_outer = " + str(New_Fuselage_Profile().straight_length_outer) + "\n")
+    f.write("angle_1 = " + str(New_Fuselage_Profile().angle_1) + "\n")
+    f.write("angle_2 = " + str(New_Fuselage_Profile().angle_2) + "\n")
+    f.write("y_lower = " + str(New_Fuselage_Profile().y_lower) + "\n")
+    f.write("y_upper = " + str(New_Fuselage_Profile().y_upper) + "\n")
+    f.write("z_lower = " + str(New_Fuselage_Profile().z_lower) + "\n")
+    f.write("z_upper = " + str(New_Fuselage_Profile().z_upper) + "\n")
+    f.close()
 
 if __name__ == '__main__':
     from parapy.gui import display
-
     obj1 = AircraftGeometry(label="totalgeometry")
     display(obj1)

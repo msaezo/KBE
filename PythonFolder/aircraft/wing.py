@@ -28,10 +28,10 @@ class Wing(GeomBase):
     # airfoil profiles
     airfoil_root = Input("aircraft\whitcomb")
     airfoil_tip  = Input("aircraft\simm_airfoil")
-
+    #
     mach_cruise                   = Input(I.Mach_cruise)#I.Mach_cruise)
     altitude_cruise               = Input(I.Altitude_cruise)
-    weight_TO                     = Input(I.Weight_TO)
+    weight_to                     = Input(I.Weight_TO)
     wing_loading                  = Input(I.Wing_loading)
     aspect_ratio                  = Input(I.Aspect_ratio)
     wing_highlow                  = Input("low")
@@ -44,13 +44,15 @@ class Wing(GeomBase):
     empennage_mass_fraction       = Input(I.Empennage_mass_fraction)
     fixed_equipment_mass_fraction = Input(I.Fixed_equipment_mass_fraction)
 
+
+
     # some other parameters
     twist = Input(-5)
     is_mirrored = Input(True)
 
     @Attribute
     def area_wing(self):
-        return self.weight_TO/(9.81*self.wing_loading)
+        return self.weight_to/(9.81*self.wing_loading)
 
     @Attribute
     def temperature(self):
@@ -74,7 +76,6 @@ class Wing(GeomBase):
 
     @Attribute
     def air_speed(self):
-        print(self.mach_cruise * self.sound_speed)
         return self.mach_cruise * self.sound_speed
 
     @Attribute
@@ -133,7 +134,7 @@ class Wing(GeomBase):
 
     @Attribute
     def lift_coefficient(self):
-        return self.weight_TO/(self.dynamic_pressure*self.area_wing)
+        return self.weight_to/(self.dynamic_pressure*self.area_wing)
 
     @Attribute
     def dihedral(self):

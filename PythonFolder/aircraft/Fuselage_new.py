@@ -11,42 +11,42 @@ from aircraft.fuselage import Fuselage
 from aircraft.energy import Tanks
 from aircraft.energy import Energy
 
-class old_fuselage(GeomBase):
+# class old_fuselage(GeomBase):
+#
+#
+#
+#     @Part
+#     def fuselage_lofted_solid_outer2(self):
+#         return LoftedSolid(profiles=[Fuselage().outer_profile_set[0],
+#                                      Fuselage().outer_profile_set[1],
+#                                      Fuselage().outer_profile_set[2],
+#                                      Fuselage().outer_profile_set[3],
+#                                      Fuselage().outer_profile_set[4],
+#                                      Fuselage().outer_profile_set[5],
+#                                      Fuselage().outer_profile_set[6],
+#                                      Fuselage().outer_profile_set[7],
+#                                      Fuselage().outer_profile_set[8],
+#                                      Fuselage().outer_profile_set[9],
+#                                      Fuselage().outer_profile_set[10]],
+#                            color="blue",
+#                            mesh_deflection=0.00001,
+#                            transparency=0.8)
 
-
-
-    @Part
-    def fuselage_lofted_solid_outer2(self):
-        return LoftedSolid(profiles=[Fuselage().outer_profile_set[0],
-                                     Fuselage().outer_profile_set[1],
-                                     Fuselage().outer_profile_set[2],
-                                     Fuselage().outer_profile_set[3],
-                                     Fuselage().outer_profile_set[4],
-                                     Fuselage().outer_profile_set[5],
-                                     Fuselage().outer_profile_set[6],
-                                     Fuselage().outer_profile_set[7],
-                                     Fuselage().outer_profile_set[8],
-                                     Fuselage().outer_profile_set[9],
-                                     Fuselage().outer_profile_set[10]],
-                           color="blue",
-                           mesh_deflection=0.00001,
-                           transparency=0.8)
-
-class new_fuselage1(GeomBase):
+class New_Fuselage1(GeomBase):
 
 
 
 
     @Part
     def new_profile_first(self):
-        return new_fuselage_profile(Fuselage_diameter=0.9*Fuselage().diameter_fuselage_outer,
+        return New_Fuselage_Profile(Fuselage_diameter=0.9*Fuselage().diameter_fuselage_outer,
                                     x_pos = Fuselage().section_length_outer[2]*Fuselage().length_fuselage,
                                     zzpos = 0.04*Fuselage().diameter_fuselage_outer,
                                     hidden=False)
 
     @Part
     def new_profile_set(self):
-        return new_fuselage_profile(quantify=5,
+        return New_Fuselage_Profile(quantify=5,
                                     Fuselage_diameter=Fuselage().diameter_fuselage_outer,
                                     x_pos=Fuselage().section_length_outer[child.index+3]*Fuselage().length_fuselage,
                                     hidden=False)
@@ -54,7 +54,7 @@ class new_fuselage1(GeomBase):
 
 
 
-class new_fuselage2(GeomBase):
+class New_Fuselage2(GeomBase):
 
     input_profile_set = Input([Fuselage().outer_profile_set[0],
                                      Fuselage().outer_profile_set[1],
@@ -83,7 +83,7 @@ class new_fuselage2(GeomBase):
 
 
 # creates new profile sections that fit around the fuselage and the tanks
-class new_fuselage_profile(GeomBase):
+class New_Fuselage_Profile(GeomBase):
 
     Fuselage_diameter= Input(Fuselage().diameter_fuselage_outer)
     x_pos = Input(0)
