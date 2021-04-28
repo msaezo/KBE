@@ -13,9 +13,9 @@ from .runQ3D import Q3D
 from .energy import Drag
 from .energy import Energy
 from .energy import Tanks
-from .Fuselage_new import New_Fuselage1
-from .Fuselage_new import New_Fuselage_Profile
-from .Fuselage_new import New_Fuselage2
+from .fuselage_new import New_Fuselage1
+from .fuselage_new import New_Fuselage_Profile
+from .fuselage_new import New_Fuselage2
 from .cg_calculations_hyd import CG_calculations_hyd
 
 

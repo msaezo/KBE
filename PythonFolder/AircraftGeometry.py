@@ -376,12 +376,96 @@ class AircraftGeometry(Base):
     def testprofile(self):
         return New_Fuselage1()
 
+    @Attribute
+    def tanks_step(self):
+        if Energy().number_of_tanks ==1:
+            tanks_stp = [self.tanks.tank[0].tank]
+        elif Energy().number_of_tanks == 2:
+            tanks_stp = [self.tanks.tank[0].tank,
+                         self.tanks.tank[1].tank]
+        elif Energy().number_of_tanks == 3:
+            tanks_stp = [self.tanks.tank[0].tank,
+                         self.tanks.tank[1].tank,
+                         self.tanks.tank[2].tank]
+        elif Energy().number_of_tanks == 4:
+            tanks_stp = [self.tanks.tank[0].tank,
+                         self.tanks.tank[1].tank,
+                         self.tanks.tank[2].tank,
+                         self.tanks.tank[3].tank]
+        return tanks_stp
+
+    @Attribute
+    def engines_step(self):
+        if Propulsion_System().n_engines ==1:
+            engines_stp = [self.prop_system.propulsion_system[0].spinner,
+                           self.prop_system.propulsion_system[0].fan,
+                           self.prop_system.propulsion_system[0].core,
+                           self.prop_system.propulsion_system[0].nozzle,
+                           self.prop_system.propulsion_system[0].bypass]
+        elif Propulsion_System().n_engines ==2:
+            engines_stp = [self.prop_system.propulsion_system[0].spinner,
+                           self.prop_system.propulsion_system[0].fan,
+                           self.prop_system.propulsion_system[0].core,
+                           self.prop_system.propulsion_system[0].nozzle,
+                           self.prop_system.propulsion_system[0].bypass,
+                           self.prop_system.propulsion_system[1].spinner,
+                           self.prop_system.propulsion_system[1].fan,
+                           self.prop_system.propulsion_system[1].core,
+                           self.prop_system.propulsion_system[1].nozzle,
+                           self.prop_system.propulsion_system[1].bypass]
+        elif Propulsion_System().n_engines == 3:
+            engines_stp = [self.prop_system.propulsion_system[0].spinner,
+                           self.prop_system.propulsion_system[0].fan,
+                           self.prop_system.propulsion_system[0].core,
+                           self.prop_system.propulsion_system[0].nozzle,
+                           self.prop_system.propulsion_system[0].bypass,
+                           self.prop_system.propulsion_system[1].spinner,
+                           self.prop_system.propulsion_system[1].fan,
+                           self.prop_system.propulsion_system[1].core,
+                           self.prop_system.propulsion_system[1].nozzle,
+                           self.prop_system.propulsion_system[1].bypass,
+                           self.prop_system.propulsion_system[2].spinner,
+                           self.prop_system.propulsion_system[2].fan,
+                           self.prop_system.propulsion_system[2].core,
+                           self.prop_system.propulsion_system[2].nozzle,
+                           self.prop_system.propulsion_system[2].bypass]
+        elif Propulsion_System().n_engines == 4:
+            engines_stp = [self.prop_system.propulsion_system[0].spinner,
+                           self.prop_system.propulsion_system[0].fan,
+                           self.prop_system.propulsion_system[0].core,
+                           self.prop_system.propulsion_system[0].nozzle,
+                           self.prop_system.propulsion_system[0].bypass,
+                           self.prop_system.propulsion_system[1].spinner,
+                           self.prop_system.propulsion_system[1].fan,
+                           self.prop_system.propulsion_system[1].core,
+                           self.prop_system.propulsion_system[1].nozzle,
+                           self.prop_system.propulsion_system[1].bypass,
+                           self.prop_system.propulsion_system[2].spinner,
+                           self.prop_system.propulsion_system[2].fan,
+                           self.prop_system.propulsion_system[2].core,
+                           self.prop_system.propulsion_system[2].nozzle,
+                           self.prop_system.propulsion_system[2].bypass,
+                           self.prop_system.propulsion_system[3].spinner,
+                           self.prop_system.propulsion_system[3].fan,
+                           self.prop_system.propulsion_system[3].core,
+                           self.prop_system.propulsion_system[3].nozzle,
+                           self.prop_system.propulsion_system[3].bypass]
+        return engines_stp
+
     @Part
-    def step_writer_components(self):
+    def step_writer_tanks(self):
         return STEPWriter(default_directory=DIR,
-                          nodes=[self.tanks.tank[0].tank,
-                                 self.tanks.tank[1].tank,
-                                 self.fuselage.fuselage_subtracted,
+                          nodes=self.tanks_step)
+
+    @Part
+    def step_writer_engines(self):
+        return STEPWriter(default_directory=DIR,
+                          nodes=self.engines_step)
+
+    @Part
+    def step_writer_fuselage_wing_empennage(self):
+        return STEPWriter(default_directory=DIR,
+                          nodes=[self.fuselage.fuselage_subtracted,
                                  self.fuselage.floor_cut,
                                  self.fuselage.ceiling_cut,
                                  self.main_wing.right_wing_surface,
@@ -389,26 +473,6 @@ class AircraftGeometry(Base):
                                  self.vertical_tail.vertical_wing_surface,
                                  self.horizontal_tail.right_wing_surface_ht,
                                  self.horizontal_tail.left_wing_surface_ht,
-                                 self.prop_system.propulsion_system[0].spinner,
-                                 self.prop_system.propulsion_system[0].fan,
-                                 self.prop_system.propulsion_system[0].core,
-                                 self.prop_system.propulsion_system[0].nozzle,
-                                 self.prop_system.propulsion_system[0].bypass,
-                                 self.prop_system.propulsion_system[1].spinner,
-                                 self.prop_system.propulsion_system[1].fan,
-                                 self.prop_system.propulsion_system[1].core,
-                                 self.prop_system.propulsion_system[1].nozzle,
-                                 self.prop_system.propulsion_system[1].bypass,
-                                 self.prop_system.propulsion_system[2].spinner,
-                                 self.prop_system.propulsion_system[2].fan,
-                                 self.prop_system.propulsion_system[2].core,
-                                 self.prop_system.propulsion_system[2].nozzle,
-                                 self.prop_system.propulsion_system[2].bypass,
-                                 self.prop_system.propulsion_system[3].spinner,
-                                 self.prop_system.propulsion_system[3].fan,
-                                 self.prop_system.propulsion_system[3].core,
-                                 self.prop_system.propulsion_system[3].nozzle,
-                                 self.prop_system.propulsion_system[3].bypass,
                                  self.cg_range.cg_front,
                                  self.cg_range.cg_rear,
                                  self.cg_range_hyd.cg_front,
