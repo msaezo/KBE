@@ -156,7 +156,7 @@ class Vertical_Tail(GeomBase):
 
     twist_VT         = Input(0)  # Hard Coded
     dihedral_VT      = Input(0)  # Hard Coded
-    lift_coefficient = Input(0.3) #Hard Coded
+    lift_coefficient = Input(Wing().lift_coefficient)
 
     @Attribute
     def x_tail_vertical(self):
