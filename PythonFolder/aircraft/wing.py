@@ -10,7 +10,7 @@ from parapy.geom import *
 
 from aircraft.airfoil import Airfoil
 from aircraft.fuselage import Fuselage
-
+from aircraft.lifting_surface import Lifting_Surface
 
 # this file makes use of the following files:
 # airfoil.py
@@ -43,7 +43,7 @@ class Wing(GeomBase):
     fuselage_mass_fraction        = Input(I.Fuselage_mass_fraction)
     empennage_mass_fraction       = Input(I.Empennage_mass_fraction)
     fixed_equipment_mass_fraction = Input(I.Fixed_equipment_mass_fraction)
-
+    x_fuselage_cg                 = Input(Fuselage().x_fuselage_cg)
 
 
     # some other parameters
@@ -162,7 +162,7 @@ class Wing(GeomBase):
         mass_fuselage = self.fuselage_mass_fraction + self.empennage_mass_fraction + self.fixed_equipment_mass_fraction
         mass_wing = self.wing_mass_fraction + self.propulsion_mass_fraction
         mass_wing_over_mass_fuse = mass_wing / mass_fuselage
-        return Fuselage().x_fuselage_cg + self.mean_aerodynamic_chord * (
+        return self.x_fuselage_cg + self.mean_aerodynamic_chord * (
                     (self.x_wing_cg / self.mean_aerodynamic_chord) * mass_wing_over_mass_fuse - self.oew_cg_loc * (
                     1 + mass_wing_over_mass_fuse))
 
@@ -179,45 +179,56 @@ class Wing(GeomBase):
             pos = -Fuselage().diameter_fuselage_outer * 0.8 / 2
         return pos
 
+    @Attribute
+    def wing_x_shift_tip(self):
+        return self.wing_x_shift + self.span/2 * np.tan(np.deg2rad(self.sweep_leading_edge))
 
-    @Part
-    def root_airfoil(self):  # root airfoil will receive self.position as default
-        return Airfoil(airfoil_name=self.airfoil_root,
-                       chord=self.chord_root,
-                       thickness_factor=0.14,
-                       position=translate(self.position,
-                                          "x", self.wing_x_shift,
-                                          "Z", self.wing_z_shift),
-                       factor=0.14,
-                       mesh_deflection=0.0001)
+    @Attribute
+    def wing_y_shift_tip(self):
+        return self.span/2
 
-    @Part
-    def tip_airfoil(self):
-        return Airfoil(airfoil_name=self.airfoil_tip,
-                       chord=self.chord_tip,
-                       thickness_factor=0.1,
-                       factor=0.24,
-                       position=translate(
-                           rotate(self.position, "y", np.deg2rad(self.twist)),  # apply twist angle
-                           "y", self.span/2,
-                           "x", self.wing_x_shift + self.span/2 * np.tan(np.deg2rad(self.sweep_leading_edge)),
-                           "Z", self.wing_z_shift + self.span/2 * np.tan(np.deg2rad(self.dihedral))),
-                       mesh_deflection=0.0001)
+    @Attribute
+    def wing_z_shift_tip(self):
+        return self.wing_z_shift + self.span/2 * np.tan(np.deg2rad(self.dihedral))
 
     @Part
     def right_wing_surface(self):
-        return LoftedSurface(profiles=self.profiles,
-
-                             mesh_deflection=0.0001)
+        return Lifting_Surface(airfoil_root=self.airfoil_root,
+                               airfoil_tip=self.airfoil_tip,
+                               root_chord=self.chord_root,
+                               thickness_to_chord_root=0.14,
+                               factor_root=0.14,
+                               tip_chord=self.chord_tip,
+                               thickness_to_chord_tip=0.1,
+                               factor_tip=0.24,
+                               x_shift_root=self.wing_x_shift,
+                               y_shift_root=0,
+                               z_shift_root=self.wing_z_shift,
+                               x_shift_tip=self.wing_x_shift_tip,
+                               y_shift_tip=self.wing_y_shift_tip,
+                               z_shift_tip=self.wing_z_shift_tip,
+                               rotate=0,
+                               twist=self.twist)
 
     @Part
     def left_wing_surface(self):
-        return MirroredShape(shape_in=self.right_wing_surface,
-                             reference_point=self.position,
-                             # Two vectors to define the mirror plane
-                             vector1=self.position.Vz,
-                             vector2=self.position.Vx,
-                             mesh_deflection=0.0001)
+        return Lifting_Surface(airfoil_root=self.airfoil_root,
+                               airfoil_tip=self.airfoil_tip,
+                               root_chord=self.chord_root,
+                               thickness_to_chord_root=0.14,
+                               factor_root=0.14,
+                               tip_chord=self.chord_tip,
+                               thickness_to_chord_tip=0.1,
+                               factor_tip=0.24,
+                               x_shift_root=self.wing_x_shift,
+                               y_shift_root=0,
+                               z_shift_root=self.wing_z_shift,
+                               x_shift_tip=self.wing_x_shift_tip,
+                               y_shift_tip=-self.wing_y_shift_tip,
+                               z_shift_tip=self.wing_z_shift_tip,
+                               rotate=0,
+                               twist=self.twist)
+
 
 if __name__ == '__main__':
     from parapy.gui import display

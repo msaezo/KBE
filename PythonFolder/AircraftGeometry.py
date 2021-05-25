@@ -279,12 +279,6 @@ class AircraftGeometry(Base):
     #####                                #####
     ##########################################
 
-    @Part
-    def tanks(self):
-        return Tanks(range          = self.range,
-                     efficiency     = self.efficiency,
-                     energy_density = self.energy_density,
-                     surface = Wing().area_wing)
 
     @Part
     def fuselage(self):
@@ -311,20 +305,67 @@ class AircraftGeometry(Base):
 
     @Part
     def main_wing(self):
-        return Wing(mach_cruise       = self.mach_cruise,
-                    altitude_cruise   = self.altitude_cruise,
-                    weight_to         = self.weight_to,
-                    wing_loading      = self.wing_loading,
-                    aspect_ratio      = self.aspect_ratio,
-                    wing_highlow      = self.wing_highlow,
-                    wing_cg_loc       = self.wing_cg_loc,
-                    propulsion_cg_loc = self.propulsion_cg_loc,
-                    oew_cg_loc        = self.oew_cg_loc,
-                    wing_mass_fraction            =self.wing_mass_fraction,
-                    propulsion_mass_fraction      =self.propulsion_mass_fraction,
-                    fuselage_mass_fraction        =self.fuselage_mass_fraction,
-                    empennage_mass_fraction       =self.empennage_mass_fraction,
-                    fixed_equipment_mass_fraction =self.fixed_equipment_mass_fraction)
+        return Wing(mach_cruise=self.mach_cruise,
+                    altitude_cruise=self.altitude_cruise,
+                    weight_to=self.weight_to,
+                    wing_loading=self.wing_loading,
+                    aspect_ratio=self.aspect_ratio,
+                    wing_highlow=self.wing_highlow,
+                    wing_cg_loc=self.wing_cg_loc,
+                    propulsion_cg_loc=self.propulsion_cg_loc,
+                    oew_cg_loc=self.oew_cg_loc,
+                    wing_mass_fraction=self.wing_mass_fraction,
+                    propulsion_mass_fraction=self.propulsion_mass_fraction,
+                    fuselage_mass_fraction=self.fuselage_mass_fraction,
+                    empennage_mass_fraction=self.empennage_mass_fraction,
+                    fixed_equipment_mass_fraction=self.fixed_equipment_mass_fraction,
+                    x_fuselage_cg=Fuselage().x_fuselage_cg)
+
+    @Part
+    def tanks(self):
+        return Tanks(quantify=Energy().number_of_tanks,
+                     # drag = self.drag,
+                     # diameter_tank_final = self.diameter_tank_final,
+                     # number_of_tanks = self.number_of_tanks,
+                     range          = self.range,
+                     efficiency     = self.efficiency,
+                     energy_density = self.energy_density,
+                     surface = Wing().area_wing,
+                     lift_coefficient = Q3D().cldes,
+                     drag_coefficient = Q3D().cddes,
+                     density = Q3D().air_density,
+                     velocity = Q3D().air_speed,
+                     position_floor_lower = Fuselage().position_floor_lower,
+                     diameter_fuselage_inner = Fuselage().diameter_fuselage_inner,
+                     length_cockpit = Fuselage().length_cockpit,
+                     length_fuselage=Fuselage().length_fuselage,
+                     length_tailcone = Fuselage().length_tailcone,
+                     fus_diam = Fuselage().diameter_fuselage_outer,
+                     fus_len = Fuselage().length_fuselage,
+                     ht_surface=Horizontal_Tail().surface_horizontal_tail,
+                     ht_sweep=Horizontal_Tail().sweep_cuarter_chord_horizontal_tail,
+                     vt_surface=Vertical_Tail().surface_vertical_tail,
+                     vt_sweep=Vertical_Tail().sweep_cuarter_chord_vertical_tail,
+                     len_nacelle=Fan_engine().nacelle_length,
+                     cowling_length=Fan_engine().fan_length,
+                     cowling_length_1=Fan_engine().loc_max_diameter,
+                     cowling_diam=Fan_engine().max_diameter,
+                     cowling_fan=Fan_engine().inlet_diameter,
+                     cowling_ef=Fan_engine().exit_diameter,
+                     gg_length=Fan_engine().length_gas_generator,
+                     gg_diam=Fan_engine().diameter_gas_generator,
+                     gg_diam_exit=Fan_engine().exit_diameter_gas_generator,
+                     span=Wing().span,
+                     root_chord=Wing().chord_root,
+                     tip_chord=Wing().chord_tip,
+                     mac=Wing().mean_aerodynamic_chord,
+                     altitude=Wing().altitude_cruise,
+                     mach=Wing().mach_cruise,
+                     cl=Wing().lift_coefficient)
+
+
+
+
 
     @Part
     def vertical_tail(self):
@@ -485,177 +526,177 @@ class AircraftGeometry(Base):
     #####    Creating Output.txt file    #####
     #####                                #####
     ##########################################
-
-    f = open("output.txt", "w+")
-    f.write("Outputs Fuselage class \n\n")
-
-    f.write("seats_abreast = " + str(Fuselage().seats_abreast) + "\n")
-    f.write("n_aisles width = " + str(Fuselage().n_aisles) + "\n")
-    f.write("n_rows = " + str(Fuselage().n_rows) + "\n")
-    f.write("length_cabin = " + str(Fuselage().length_cabin) + "\n")
-    f.write("diameter_fuselage_inner = " + str(Fuselage().diameter_fuselage_inner) + "\n")
-    f.write("diameter_fuselage_outer = " + str(Fuselage().diameter_fuselage_outer) + "\n")
-    f.write("length_tailcone = " + str(Fuselage().length_tailcone) + "\n")
-    f.write("length_nosecone = " + str(Fuselage().length_nosecone) + "\n")
-    f.write("length_tail = " + str(Fuselage().length_tail) + "\n")
-    f.write("length_fuselage = " + str(Fuselage().length_fuselage) + "\n")
-    f.write("thickness_fuselage = " + str(Fuselage().thickness_fuselage) + "\n")
-    f.write("position_floor_upper = " + str(Fuselage().position_floor_upper) + "\n")
-    f.write("position_floor_lower = " + str(Fuselage().position_floor_lower) + "\n")
-    f.write("section_radius_outer = " + str(Fuselage().section_radius_outer) + "\n")
-    f.write("section_radius_inner = " + str(Fuselage().section_radius_inner) + "\n")
-    f.write("section_length_outer = " + str(Fuselage().section_length_outer) + "\n")
-    f.write("section_length_inner = " + str(Fuselage().section_length_inner) + "\n")
-    f.write("x_fuselage_cg = " + str(Fuselage().x_fuselage_cg) + "\n\n")
-
-    f.write("Outputs Seat_row class \n\n")
-    f.write("seat_spacing = " + str(Seat_row().seat_spacing) + "\n")
-    f.write("row_width = " + str(Seat_row().row_width) + "\n\n")
-
-    f.write("Outputs Horizontal_tail class \n\n")
-    f.write("x_tail_horizontal = " + str(Horizontal_Tail().x_tail_horizontal) + "\n")
-    f.write("cg_arm_horizontal = " + str(Horizontal_Tail().cg_arm_horizontal) + "\n")
-    f.write("surface_horizontal_tail = " + str(Horizontal_Tail().surface_horizontal_tail) + "\n")
-    f.write("span_horizontal_tail = " + str(Horizontal_Tail().span_horizontal_tail) + "\n")
-    f.write("root_chord_horizontal_tail = " + str(Horizontal_Tail().root_chord_horizontal_tail) + "\n")
-    f.write("tip_chord_horizontal_tail = " + str(Horizontal_Tail().tip_chord_horizontal_tail) + "\n")
-    f.write("sweep_leading_edge_horizontal_tail = " + str(Horizontal_Tail().sweep_leading_edge_horizontal_tail) + "\n")
-    f.write(
-        "sweep_cuarter_chord_horizontal_tail = " + str(Horizontal_Tail().sweep_cuarter_chord_horizontal_tail) + "\n")
-    f.write("sweep_mid_chord_horizontal_tail = " + str(Horizontal_Tail().sweep_mid_chord_horizontal_tail) + "\n")
-    f.write("ht_x_shift = " + str(Horizontal_Tail().ht_x_shift) + "\n")
-    f.write("ht_z_shift = " + str(Horizontal_Tail().ht_z_shift) + "\n")
-    f.write("mach_drag_divergence = " + str(Horizontal_Tail().mach_drag_divergence) + "\n")
-    f.write("thickness_to_chord = " + str(Horizontal_Tail().thickness_to_chord) + "\n\n")
-
-    f.write("Outputs Vertical_tail class \n\n")
-    f.write("x_tail_vertical = " + str(Vertical_Tail().x_tail_vertical) + "\n")
-    f.write("cg_arm_vertical = " + str(Vertical_Tail().cg_arm_vertical) + "\n")
-    f.write("surface_vertical_tail = " + str(Vertical_Tail().surface_vertical_tail) + "\n")
-    f.write("span_vertical_tail = " + str(Vertical_Tail().span_vertical_tail) + "\n")
-    f.write("root_chord_vertical_tail = " + str(Vertical_Tail().root_chord_vertical_tail) + "\n")
-    f.write("tip_chord_vertical_tail = " + str(Vertical_Tail().tip_chord_vertical_tail) + "\n")
-    f.write("vt_x_shift = " + str(Vertical_Tail().vt_x_shift) + "\n")
-    f.write("vt_z_shift = " + str(Vertical_Tail().vt_z_shift) + "\n")
-    f.write("sweep_mid_chord_vertical_tail = " + str(Vertical_Tail().sweep_mid_chord_vertical_tail) + "\n")
-    f.write("sweep_cuarter_chord_vertical_tail = " + str(Vertical_Tail().sweep_cuarter_chord_vertical_tail) + "\n")
-    f.write("mach_drag_divergence = " + str(Vertical_Tail().mach_drag_divergence) + "\n")
-    f.write("thickness_to_chord = " + str(Vertical_Tail().thickness_to_chord) + "\n\n")
-
-    f.write("Outputs Wing class \n\n")
-    f.write("area_wing = " + str(Wing().area_wing) + "\n")
-    f.write("temperature = " + str(Wing().temperature) + "\n")
-    f.write("pressure_static = " + str(Wing().pressure_static) + "\n")
-    f.write("sound_speed = " + str(Wing().sound_speed) + "\n")
-    f.write("air_speed = " + str(Wing().air_speed) + "\n")
-    f.write("airDensity = " + str(Wing().airDensity) + "\n")
-    f.write("dynamic_pressure = " + str(Wing().dynamic_pressure) + "\n")
-    f.write("mach_drag_divergence = " + str(Wing().mach_drag_divergence) + "\n")
-    f.write("sweep_quarter_chord = " + str(Wing().sweep_quarter_chord) + "\n")
-    f.write("span = " + str(Wing().span) + "\n")
-    f.write("taper_ratio = " + str(Wing().taper_ratio) + "\n")
-    f.write("chord_root = " + str(Wing().chord_root) + "\n")
-    f.write("chord_tip = " + str(Wing().chord_tip) + "\n")
-    f.write("sweep_leading_edge = " + str(Wing().sweep_leading_edge) + "\n")
-    f.write("sweep_mid_chord = " + str(Wing().sweep_mid_chord) + "\n")
-    f.write("mean_aerodynamic_chord = " + str(Wing().mean_aerodynamic_chord) + "\n")
-    f.write("y_mean_aerodynamic_chord = " + str(Wing().y_mean_aerodynamic_chord) + "\n")
-    f.write("lift_coefficient = " + str(Wing().lift_coefficient) + "\n")
-    f.write("dihedral = " + str(Wing().dihedral) + "\n")
-    f.write("x_wing_cg = " + str(Wing().x_wing_cg) + "\n")
-    f.write("x_le_mac = " + str(Wing().x_le_mac) + "\n")
-    f.write("wing_x_shift = " + str(Wing().wing_x_shift) + "\n")
-    f.write("wing_z_shift = " + str(Wing().wing_z_shift) + "\n\n")
-
-    f.write("Outputs Tanks class \n\n")
-    f.write("y_pos = " + str(Tanks().y_pos) + "\n")
-    f.write("z_pos = " + str(Tanks().z_pos) + "\n")
-    f.write("tank_max_dim = " + str(Tanks().tank_max_dim) + "\n")
-    f.write("new_fuselage = " + str(Tanks().new_fuselage) + "\n\n")
-
-    f.write("Outputs Drag class \n\n")
-    f.write("wet_area_fus = " + str(Drag().wet_area_fus) + "\n")
-    f.write("wet_area_ht = " + str(Drag().wet_area_ht) + "\n")
-    f.write("wet_area_vt = " + str(Drag().wet_area_vt) + "\n")
-    f.write("wet_area_nacelle = " + str(Drag().wet_area_nacelle) + "\n")
-    f.write("wet_area_total = " + str(Drag().wet_area_total) + "\n")
-    f.write("skin_friction = " + str(Drag().skin_friction) + "\n")
-    f.write("form_factor_ht = " + str(Drag().form_factor_ht) + "\n")
-    f.write("form_factor_vt = " + str(Drag().form_factor_vt) + "\n")
-    f.write("form_factor_fus = " + str(Drag().form_factor_fus) + "\n")
-    f.write("form_factor_nacelle = " + str(Drag().form_factor_nacelle) + "\n")
-    f.write("drag_coeff_fus = " + str(Drag().drag_coeff_fus) + "\n")
-    f.write("drag_coeff_ht = " + str(Drag().drag_coeff_ht) + "\n")
-    f.write("drag_coeff_vt = " + str(Drag().drag_coeff_vt) + "\n")
-    f.write("drag_coeff_nacelle = " + str(Drag().drag_coeff_nacelle) + "\n")
-    f.write("drag_coeff_wing = " + str(Drag().drag_coeff_wing) + "\n")
-    f.write("drag_coefficient_total = " + str(Drag().drag_coefficient_total) + "\n")
-    f.write("drag = " + str(Drag().drag) + "\n\n")
-
-    f.write("Outputs Energy class \n\n")
-    f.write("work = " + str(Energy().work) + "\n")
-    f.write("energy_req = " + str(Energy().energy_req) + "\n")
-    f.write("vol_needed = " + str(Energy().vol_needed) + "\n")
-    f.write("length_tank = " + str(Energy().length_tank) + "\n")
-    f.write("diameter_tank = " + str(Energy().diameter_tank) + "\n")
-    f.write("number_of_tanks = " + str(Energy().number_of_tanks) + "\n")
-    f.write("diameter_tank_final = " + str(Energy().diameter_tank_final) + "\n\n")
-
-    f.write("Outputs Q3D class \n\n")
-    f.write("q_three_d = " + str(Q3D().q_three_d) + "\n")
-    f.write("cldes = " + str(Q3D().cldes) + "\n")
-    f.write("cddes = " + str(Q3D().cddes) + "\n")
-    f.write("alpha = " + str(Q3D().alpha) + "\n\n")
-
-    f.write("Outputs CG_calculations class \n\n")
-    f.write("x_oew = " + str(CG_calculations().x_oew) + "\n")
-    f.write("x_payload = " + str(CG_calculations().x_payload) + "\n")
-    f.write("x_fuel = " + str(CG_calculations().x_fuel) + "\n")
-    f.write("cg_forward = " + str(CG_calculations().cg_forward) + "\n")
-    f.write("cg_aft = " + str(CG_calculations().cg_aft) + "\n\n")
-
-    f.write("Outputs CG_calculations_hyd class \n\n")
-    f.write("mtom = " + str(CG_calculations_hyd().mtom) + "\n")
-    f.write("mass_oew = " + str(CG_calculations_hyd().mass_oew) + "\n")
-    f.write("mass_payload = " + str(CG_calculations_hyd().mass_payload) + "\n")
-    f.write("x_fuel = " + str(CG_calculations_hyd().x_fuel) + "\n")
-    f.write("tank_cg_loc = " + str(CG_calculations_hyd().tank_cg_loc) + "\n")
-    f.write("mass_fuel = " + str(CG_calculations_hyd().mass_fuel) + "\n")
-    f.write("mass_tank = " + str(CG_calculations_hyd().mass_tank) + "\n")
-    f.write("x_oew = " + str(CG_calculations_hyd().x_oew) + "\n")
-    f.write("x_payload = " + str(CG_calculations_hyd().x_payload) + "\n")
-    f.write("cg_forward = " + str(CG_calculations_hyd().cg_forward) + "\n")
-    f.write("cg_aft = " + str(CG_calculations_hyd().cg_aft) + "\n\n")
-
-    f.write("Outputs Propulsion_System class \n\n")
-    f.write("y_pos = " + str(Propulsion_System().y_pos) + "\n")
-    f.write("z_pos = " + str(Propulsion_System().z_pos) + "\n")
-    f.write("x_pos = " + str(Propulsion_System().x_pos) + "\n\n")
-
-    f.write("Outputs Fan_engine class \n\n")
-    f.write("massflow = " + str(Fan_engine().massflow) + "\n")
-    f.write("ratio_inlet_to_spinner = " + str(Fan_engine().ratio_inlet_to_spinner) + "\n")
-    f.write("inlet_diameter = " + str(Fan_engine().inlet_diameter) + "\n")
-    f.write("nacelle_length = " + str(Fan_engine().nacelle_length) + "\n")
-    f.write("fan_length = " + str(Fan_engine().fan_length) + "\n")
-    f.write("loc_max_diameter = " + str(Fan_engine().loc_max_diameter) + "\n")
-    f.write("max_diameter = " + str(Fan_engine().max_diameter) + "\n")
-    f.write("exit_diameter = " + str(Fan_engine().exit_diameter) + "\n")
-    f.write("length_gas_generator = " + str(Fan_engine().length_gas_generator) + "\n")
-    f.write("diameter_gas_generator = " + str(Fan_engine().diameter_gas_generator) + "\n")
-    f.write("exit_diameter_gas_generator = " + str(Fan_engine().exit_diameter_gas_generator) + "\n\n")
-
-    f.write("Outputs New_Fuselage_Profile class \n\n")
-    f.write("delta_radius = " + str(New_Fuselage_Profile().delta_radius) + "\n")
-    f.write("straight_length_midpoints = " + str(New_Fuselage_Profile().straight_length_midpoints) + "\n")
-    f.write("straight_length_outer = " + str(New_Fuselage_Profile().straight_length_outer) + "\n")
-    f.write("angle_1 = " + str(New_Fuselage_Profile().angle_1) + "\n")
-    f.write("angle_2 = " + str(New_Fuselage_Profile().angle_2) + "\n")
-    f.write("y_lower = " + str(New_Fuselage_Profile().y_lower) + "\n")
-    f.write("y_upper = " + str(New_Fuselage_Profile().y_upper) + "\n")
-    f.write("z_lower = " + str(New_Fuselage_Profile().z_lower) + "\n")
-    f.write("z_upper = " + str(New_Fuselage_Profile().z_upper) + "\n")
-    f.close()
+    #
+    # f = open("output.txt", "w+")
+    # f.write("Outputs Fuselage class \n\n")
+    #
+    # f.write("seats_abreast = " + str(Fuselage().seats_abreast) + "\n")
+    # f.write("n_aisles width = " + str(Fuselage().n_aisles) + "\n")
+    # f.write("n_rows = " + str(Fuselage().n_rows) + "\n")
+    # f.write("length_cabin = " + str(Fuselage().length_cabin) + "\n")
+    # f.write("diameter_fuselage_inner = " + str(Fuselage().diameter_fuselage_inner) + "\n")
+    # f.write("diameter_fuselage_outer = " + str(Fuselage().diameter_fuselage_outer) + "\n")
+    # f.write("length_tailcone = " + str(Fuselage().length_tailcone) + "\n")
+    # f.write("length_nosecone = " + str(Fuselage().length_nosecone) + "\n")
+    # f.write("length_tail = " + str(Fuselage().length_tail) + "\n")
+    # f.write("length_fuselage = " + str(Fuselage().length_fuselage) + "\n")
+    # f.write("thickness_fuselage = " + str(Fuselage().thickness_fuselage) + "\n")
+    # f.write("position_floor_upper = " + str(Fuselage().position_floor_upper) + "\n")
+    # f.write("position_floor_lower = " + str(Fuselage().position_floor_lower) + "\n")
+    # f.write("section_radius_outer = " + str(Fuselage().section_radius_outer) + "\n")
+    # f.write("section_radius_inner = " + str(Fuselage().section_radius_inner) + "\n")
+    # f.write("section_length_outer = " + str(Fuselage().section_length_outer) + "\n")
+    # f.write("section_length_inner = " + str(Fuselage().section_length_inner) + "\n")
+    # f.write("x_fuselage_cg = " + str(Fuselage().x_fuselage_cg) + "\n\n")
+    #
+    # f.write("Outputs Seat_row class \n\n")
+    # f.write("seat_spacing = " + str(Seat_row().seat_spacing) + "\n")
+    # f.write("row_width = " + str(Seat_row().row_width) + "\n\n")
+    #
+    # f.write("Outputs Horizontal_tail class \n\n")
+    # f.write("x_tail_horizontal = " + str(Horizontal_Tail().x_tail_horizontal) + "\n")
+    # f.write("cg_arm_horizontal = " + str(Horizontal_Tail().cg_arm_horizontal) + "\n")
+    # f.write("surface_horizontal_tail = " + str(Horizontal_Tail().surface_horizontal_tail) + "\n")
+    # f.write("span_horizontal_tail = " + str(Horizontal_Tail().span_horizontal_tail) + "\n")
+    # f.write("root_chord_horizontal_tail = " + str(Horizontal_Tail().root_chord_horizontal_tail) + "\n")
+    # f.write("tip_chord_horizontal_tail = " + str(Horizontal_Tail().tip_chord_horizontal_tail) + "\n")
+    # f.write("sweep_leading_edge_horizontal_tail = " + str(Horizontal_Tail().sweep_leading_edge_horizontal_tail) + "\n")
+    # f.write(
+    #     "sweep_cuarter_chord_horizontal_tail = " + str(Horizontal_Tail().sweep_cuarter_chord_horizontal_tail) + "\n")
+    # f.write("sweep_mid_chord_horizontal_tail = " + str(Horizontal_Tail().sweep_mid_chord_horizontal_tail) + "\n")
+    # f.write("ht_x_shift = " + str(Horizontal_Tail().ht_x_shift) + "\n")
+    # f.write("ht_z_shift = " + str(Horizontal_Tail().ht_z_shift) + "\n")
+    # f.write("mach_drag_divergence = " + str(Horizontal_Tail().mach_drag_divergence) + "\n")
+    # f.write("thickness_to_chord = " + str(Horizontal_Tail().thickness_to_chord) + "\n\n")
+    #
+    # f.write("Outputs Vertical_tail class \n\n")
+    # f.write("x_tail_vertical = " + str(Vertical_Tail().x_tail_vertical) + "\n")
+    # f.write("cg_arm_vertical = " + str(Vertical_Tail().cg_arm_vertical) + "\n")
+    # f.write("surface_vertical_tail = " + str(Vertical_Tail().surface_vertical_tail) + "\n")
+    # f.write("span_vertical_tail = " + str(Vertical_Tail().span_vertical_tail) + "\n")
+    # f.write("root_chord_vertical_tail = " + str(Vertical_Tail().root_chord_vertical_tail) + "\n")
+    # f.write("tip_chord_vertical_tail = " + str(Vertical_Tail().tip_chord_vertical_tail) + "\n")
+    # f.write("vt_x_shift = " + str(Vertical_Tail().vt_x_shift) + "\n")
+    # f.write("vt_z_shift = " + str(Vertical_Tail().vt_z_shift) + "\n")
+    # f.write("sweep_mid_chord_vertical_tail = " + str(Vertical_Tail().sweep_mid_chord_vertical_tail) + "\n")
+    # f.write("sweep_cuarter_chord_vertical_tail = " + str(Vertical_Tail().sweep_cuarter_chord_vertical_tail) + "\n")
+    # f.write("mach_drag_divergence = " + str(Vertical_Tail().mach_drag_divergence) + "\n")
+    # f.write("thickness_to_chord = " + str(Vertical_Tail().thickness_to_chord) + "\n\n")
+    #
+    # f.write("Outputs Wing class \n\n")
+    # f.write("area_wing = " + str(Wing().area_wing) + "\n")
+    # f.write("temperature = " + str(Wing().temperature) + "\n")
+    # f.write("pressure_static = " + str(Wing().pressure_static) + "\n")
+    # f.write("sound_speed = " + str(Wing().sound_speed) + "\n")
+    # f.write("air_speed = " + str(Wing().air_speed) + "\n")
+    # f.write("airDensity = " + str(Wing().airDensity) + "\n")
+    # f.write("dynamic_pressure = " + str(Wing().dynamic_pressure) + "\n")
+    # f.write("mach_drag_divergence = " + str(Wing().mach_drag_divergence) + "\n")
+    # f.write("sweep_quarter_chord = " + str(Wing().sweep_quarter_chord) + "\n")
+    # f.write("span = " + str(Wing().span) + "\n")
+    # f.write("taper_ratio = " + str(Wing().taper_ratio) + "\n")
+    # f.write("chord_root = " + str(Wing().chord_root) + "\n")
+    # f.write("chord_tip = " + str(Wing().chord_tip) + "\n")
+    # f.write("sweep_leading_edge = " + str(Wing().sweep_leading_edge) + "\n")
+    # f.write("sweep_mid_chord = " + str(Wing().sweep_mid_chord) + "\n")
+    # f.write("mean_aerodynamic_chord = " + str(Wing().mean_aerodynamic_chord) + "\n")
+    # f.write("y_mean_aerodynamic_chord = " + str(Wing().y_mean_aerodynamic_chord) + "\n")
+    # f.write("lift_coefficient = " + str(Wing().lift_coefficient) + "\n")
+    # f.write("dihedral = " + str(Wing().dihedral) + "\n")
+    # f.write("x_wing_cg = " + str(Wing().x_wing_cg) + "\n")
+    # f.write("x_le_mac = " + str(Wing().x_le_mac) + "\n")
+    # f.write("wing_x_shift = " + str(Wing().wing_x_shift) + "\n")
+    # f.write("wing_z_shift = " + str(Wing().wing_z_shift) + "\n\n")
+    #
+    # f.write("Outputs Tanks class \n\n")
+    # f.write("y_pos = " + str(Tanks().y_pos) + "\n")
+    # f.write("z_pos = " + str(Tanks().z_pos) + "\n")
+    # f.write("tank_max_dim = " + str(Tanks().tank_max_dim) + "\n")
+    # f.write("new_fuselage = " + str(Tanks().new_fuselage) + "\n\n")
+    #
+    # f.write("Outputs Drag class \n\n")
+    # f.write("wet_area_fus = " + str(Drag().wet_area_fus) + "\n")
+    # f.write("wet_area_ht = " + str(Drag().wet_area_ht) + "\n")
+    # f.write("wet_area_vt = " + str(Drag().wet_area_vt) + "\n")
+    # f.write("wet_area_nacelle = " + str(Drag().wet_area_nacelle) + "\n")
+    # f.write("wet_area_total = " + str(Drag().wet_area_total) + "\n")
+    # f.write("skin_friction = " + str(Drag().skin_friction) + "\n")
+    # f.write("form_factor_ht = " + str(Drag().form_factor_ht) + "\n")
+    # f.write("form_factor_vt = " + str(Drag().form_factor_vt) + "\n")
+    # f.write("form_factor_fus = " + str(Drag().form_factor_fus) + "\n")
+    # f.write("form_factor_nacelle = " + str(Drag().form_factor_nacelle) + "\n")
+    # f.write("drag_coeff_fus = " + str(Drag().drag_coeff_fus) + "\n")
+    # f.write("drag_coeff_ht = " + str(Drag().drag_coeff_ht) + "\n")
+    # f.write("drag_coeff_vt = " + str(Drag().drag_coeff_vt) + "\n")
+    # f.write("drag_coeff_nacelle = " + str(Drag().drag_coeff_nacelle) + "\n")
+    # f.write("drag_coeff_wing = " + str(Drag().drag_coeff_wing) + "\n")
+    # f.write("drag_coefficient_total = " + str(Drag().drag_coefficient_total) + "\n")
+    # f.write("drag = " + str(Drag().drag) + "\n\n")
+    #
+    # f.write("Outputs Energy class \n\n")
+    # f.write("work = " + str(Energy().work) + "\n")
+    # f.write("energy_req = " + str(Energy().energy_req) + "\n")
+    # f.write("vol_needed = " + str(Energy().vol_needed) + "\n")
+    # f.write("length_tank = " + str(Energy().length_tank) + "\n")
+    # f.write("diameter_tank = " + str(Energy().diameter_tank) + "\n")
+    # f.write("number_of_tanks = " + str(Energy().number_of_tanks) + "\n")
+    # f.write("diameter_tank_final = " + str(Energy().diameter_tank_final) + "\n\n")
+    #
+    # f.write("Outputs Q3D class \n\n")
+    # f.write("q_three_d = " + str(Q3D().q_three_d) + "\n")
+    # f.write("cldes = " + str(Q3D().cldes) + "\n")
+    # f.write("cddes = " + str(Q3D().cddes) + "\n")
+    # f.write("alpha = " + str(Q3D().alpha) + "\n\n")
+    #
+    # f.write("Outputs CG_calculations class \n\n")
+    # f.write("x_oew = " + str(CG_calculations().x_oew) + "\n")
+    # f.write("x_payload = " + str(CG_calculations().x_payload) + "\n")
+    # f.write("x_fuel = " + str(CG_calculations().x_fuel) + "\n")
+    # f.write("cg_forward = " + str(CG_calculations().cg_forward) + "\n")
+    # f.write("cg_aft = " + str(CG_calculations().cg_aft) + "\n\n")
+    #
+    # f.write("Outputs CG_calculations_hyd class \n\n")
+    # f.write("mtom = " + str(CG_calculations_hyd().mtom) + "\n")
+    # f.write("mass_oew = " + str(CG_calculations_hyd().mass_oew) + "\n")
+    # f.write("mass_payload = " + str(CG_calculations_hyd().mass_payload) + "\n")
+    # f.write("x_fuel = " + str(CG_calculations_hyd().x_fuel) + "\n")
+    # f.write("tank_cg_loc = " + str(CG_calculations_hyd().tank_cg_loc) + "\n")
+    # f.write("mass_fuel = " + str(CG_calculations_hyd().mass_fuel) + "\n")
+    # f.write("mass_tank = " + str(CG_calculations_hyd().mass_tank) + "\n")
+    # f.write("x_oew = " + str(CG_calculations_hyd().x_oew) + "\n")
+    # f.write("x_payload = " + str(CG_calculations_hyd().x_payload) + "\n")
+    # f.write("cg_forward = " + str(CG_calculations_hyd().cg_forward) + "\n")
+    # f.write("cg_aft = " + str(CG_calculations_hyd().cg_aft) + "\n\n")
+    #
+    # f.write("Outputs Propulsion_System class \n\n")
+    # f.write("y_pos = " + str(Propulsion_System().y_pos) + "\n")
+    # f.write("z_pos = " + str(Propulsion_System().z_pos) + "\n")
+    # f.write("x_pos = " + str(Propulsion_System().x_pos) + "\n\n")
+    #
+    # f.write("Outputs Fan_engine class \n\n")
+    # f.write("massflow = " + str(Fan_engine().massflow) + "\n")
+    # f.write("ratio_inlet_to_spinner = " + str(Fan_engine().ratio_inlet_to_spinner) + "\n")
+    # f.write("inlet_diameter = " + str(Fan_engine().inlet_diameter) + "\n")
+    # f.write("nacelle_length = " + str(Fan_engine().nacelle_length) + "\n")
+    # f.write("fan_length = " + str(Fan_engine().fan_length) + "\n")
+    # f.write("loc_max_diameter = " + str(Fan_engine().loc_max_diameter) + "\n")
+    # f.write("max_diameter = " + str(Fan_engine().max_diameter) + "\n")
+    # f.write("exit_diameter = " + str(Fan_engine().exit_diameter) + "\n")
+    # f.write("length_gas_generator = " + str(Fan_engine().length_gas_generator) + "\n")
+    # f.write("diameter_gas_generator = " + str(Fan_engine().diameter_gas_generator) + "\n")
+    # f.write("exit_diameter_gas_generator = " + str(Fan_engine().exit_diameter_gas_generator) + "\n\n")
+    #
+    # f.write("Outputs New_Fuselage_Profile class \n\n")
+    # f.write("delta_radius = " + str(New_Fuselage_Profile().delta_radius) + "\n")
+    # f.write("straight_length_midpoints = " + str(New_Fuselage_Profile().straight_length_midpoints) + "\n")
+    # f.write("straight_length_outer = " + str(New_Fuselage_Profile().straight_length_outer) + "\n")
+    # f.write("angle_1 = " + str(New_Fuselage_Profile().angle_1) + "\n")
+    # f.write("angle_2 = " + str(New_Fuselage_Profile().angle_2) + "\n")
+    # f.write("y_lower = " + str(New_Fuselage_Profile().y_lower) + "\n")
+    # f.write("y_upper = " + str(New_Fuselage_Profile().y_upper) + "\n")
+    # f.write("z_lower = " + str(New_Fuselage_Profile().z_lower) + "\n")
+    # f.write("z_upper = " + str(New_Fuselage_Profile().z_upper) + "\n")
+    # f.close()
 
 if __name__ == '__main__':
     from parapy.gui import display

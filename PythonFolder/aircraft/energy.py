@@ -23,26 +23,82 @@ from aircraft.runQ3D import Q3D
 # Tanks class only places the tanks
 
 class Tanks(GeomBase):
-    range            = Input(I.Range)
+    drag=Input()
+    range = Input(I.Range)
     lift_coefficient = Input(Q3D().cldes)
     drag_coefficient = Input(Q3D().cddes)
-    surface          = Input(Wing().area_wing)
-    density          = Input(Q3D().air_density)
-    velocity         = Input(Q3D().air_speed)
-    efficiency       = Input(I.total_efficiency)
-    energy_density   = Input(I.energy_density)
+    surface = Input(Wing().area_wing)
+    density = Input(Q3D().air_density)
+    velocity = Input(Q3D().air_speed)
+    efficiency = Input(I.total_efficiency)
+    energy_density = Input(I.energy_density)
+    position_floor_lower = Input(Fuselage().position_floor_lower)
+    diameter_fuselage_inner = Input(Fuselage().diameter_fuselage_inner)
+    length_cockpit = Input(Fuselage().length_cockpit)
+    length_fuselage = Input(Fuselage().length_fuselage)
+    length_tailcone = Input(Fuselage().length_tailcone)
+    fus_diam = Input(Fuselage().diameter_fuselage_outer)
+    fus_len = Input(Fuselage().length_fuselage)
+    ht_surface = Input(Horizontal_Tail().surface_horizontal_tail)
+    ht_sweep = Input(Horizontal_Tail().sweep_cuarter_chord_horizontal_tail)
+    vt_surface = Input(Vertical_Tail().surface_vertical_tail)
+    vt_sweep = Input(Vertical_Tail().sweep_cuarter_chord_vertical_tail)
+    len_nacelle = Input(Fan_engine().nacelle_length)
+    cowling_length = Input(Fan_engine().fan_length)
+    cowling_length_1 = Input(Fan_engine().loc_max_diameter)
+    cowling_diam = Input(Fan_engine().max_diameter)
+    cowling_fan = Input(Fan_engine().inlet_diameter)
+    cowling_ef = Input(Fan_engine().exit_diameter)
+    gg_length = Input(Fan_engine().length_gas_generator)
+    gg_diam = Input(Fan_engine().diameter_gas_generator)
+    gg_diam_exit = Input(Fan_engine().exit_diameter_gas_generator)
+    span = Input(Wing().span) # m input total, Q3D puts half of it already
+    root_chord = Input(Wing().chord_root) # m
+    tip_chord = Input(Wing().chord_tip) # m
+    mac = Input(Wing().mean_aerodynamic_chord)  # m
+    altitude = Input(Wing().altitude_cruise)  # m
+    mach = Input(Wing().mach_cruise)  # make it in accordance with the flight speed and altitude
+    cl = Input(Wing().lift_coefficient)
+    eq_skinfriction_coefficient = Input(I.eq_skinfriction_coefficient)
+    diameter_tank_final = Input()
+    number_of_tanks = Input()
+
+    @Attribute
+    def diameter_tank_final(self):
+        return Energy(range=self.range,
+                      efficiency = self.efficiency,
+                      energy_density = self.energy_density,
+                      drag = self.drag,
+                      fus_diam = self.diameter_fuselage_inner,
+                      length_fuselage = self.length_fuselage,
+                      length_cockpit = self.length_cockpit,
+                      length_tailcone = self.length_tailcone,
+                      position_floor_lower = self.position_floor_lower).diameter_tank_final
+
+    @Attribute
+    def number_of_tanks(self):
+        return Energy(range=self.range,
+                      efficiency = self.efficiency,
+                      energy_density = self.energy_density,
+                      drag = self.drag,
+                      fus_diam = self.diameter_fuselage_inner,
+                      length_fuselage = self.length_fuselage,
+                      length_cockpit = self.length_cockpit,
+                      length_tailcone = self.length_tailcone,
+                      position_floor_lower = self.position_floor_lower).number_of_tanks
+
 
     @Attribute
     def y_pos(self):
-        return (1.1 * Energy().diameter_tank_final * (Energy().number_of_tanks - 1)) / 2
+        return (1.1 * self.diameter_tank_final * (self.number_of_tanks - 1)) / 2
 
     @Attribute
     def z_pos(self):
-        return Fuselage().position_floor_lower - 1.1 * Energy().diameter_tank_final / 2
+        return self.position_floor_lower - 1.1 * self.diameter_tank_final / 2
 
     @Attribute
     def tank_max_dim(self):
-        if 1.1 * Energy().diameter_tank_final / 2 >= Fuselage().diameter_fuselage_inner/2:
+        if 1.1 * self.diameter_tank_final / 2 >= self.diameter_fuselage_inner/2:
             msg = "The diameter of the hydrogen tanks is too big to be realistic, a lower ratio compared to the " \
                   "fuselage diameter is expected. " \
                   "Suggested options:" \
@@ -50,23 +106,62 @@ class Tanks(GeomBase):
             warnings.warn(msg)
             if self.popup_gui:  # invoke pop-up dialogue box using Tk"""
                 generate_warning("Warning: Value changed", msg)
-        return np.sqrt(self.y_pos**2 + self.z_pos**2)+Energy().diameter_tank_final/2
+        return np.sqrt(self.y_pos**2 + self.z_pos**2)+self.diameter_tank_final/2
 
     @Attribute
     def new_fuselage(self):
-        if self.tank_max_dim < Fuselage().diameter_fuselage_inner:
+        if self.tank_max_dim < self.diameter_fuselage_inner:
             result = 'False'
         else:
             result = 'True'
         return result
 
+    @Attribute
+    def drag(self):
+        return Drag(lift_coefficient            = self.lift_coefficient,
+                    drag_coefficient            = self.drag_coefficient,
+                    surface                     = self.surface,
+                    density                     = self.density,
+                    velocity                    = self.velocity,
+                    fus_diam                    = self.fus_diam,
+                    fus_len                     = self.fus_len,
+                    ht_surface                  = self.ht_surface,
+                    ht_sweep                    = self.ht_sweep,
+                    vt_surface                  = self.vt_surface,
+                    vt_sweep                    = self.vt_sweep,
+                    len_nacelle                 = self.len_nacelle,
+                    cowling_length              = self.cowling_length,
+                    cowling_length_1            = self.cowling_length_1,
+                    cowling_diam                = self.cowling_diam,
+                    cowling_fan                 = self.cowling_fan ,
+                    cowling_ef                  = self.cowling_ef,
+                    gg_length                   = self.gg_length,
+                    gg_diam                     = self.gg_diam,
+                    gg_diam_exit                = self.gg_diam_exit,
+                    span                        = self.span,  # m input total, Q3D puts half of it already
+                    root_chord                  = self.root_chord , # m
+                    tip_chord                   = self.tip_chord, # m
+                    mac                         = self.mac, # m
+                    altitude                    = self.altitude , # m
+                    mach                        = self.mach , # make it in accordance with the flight speed and altitude
+                    cl                          = self.cl).drag
+
     @Part
     def tank(self):
-        return Energy(quantify=Energy().number_of_tanks,
+        return Energy(quantify=self.number_of_tanks,
+                      range=self.range,
+                      efficiency = self.efficiency,
+                      energy_density = self.energy_density,
+                      drag = self.drag,
+                      fus_diam = self.diameter_fuselage_inner,
+                      length_fuselage = self.length_fuselage,
+                      length_cockpit = self.length_cockpit,
+                      length_tailcone = self.length_tailcone,
+                      position_floor_lower = self.position_floor_lower,
                       position=translate(self.position,
-                                         'x', Fuselage().length_cockpit,
-                                         'y', self.y_pos - 1.1 * Energy().diameter_tank_final * child.index,
-                                         'z', self.z_pos),
+                                        'x', self.length_cockpit,
+                                        'y', self.y_pos - 1.1 * self.diameter_tank_final * child.index,
+                                        'z', self.z_pos),
                       hidden=False)
 
 
@@ -254,6 +349,12 @@ class Energy(GeomBase):
     n_tanks          = Input([1,2,3,4])
     drag             = Input(Drag().drag)
     fus_diam         = Input(Fuselage().diameter_fuselage_inner)
+    length_fuselage = Input(Fuselage().length_fuselage)
+    length_cockpit = Input(Fuselage().length_cockpit)
+    length_tailcone = Input(Fuselage().length_tailcone)
+    position_floor_lower = Input(Fuselage().position_floor_lower)
+
+
 
     popup_gui = Input(False)
 
@@ -271,7 +372,7 @@ class Energy(GeomBase):
 
     @Attribute
     def length_tank(self):
-        return (Fuselage().length_fuselage-Fuselage().length_cockpit-Fuselage().length_tailcone)*0.95
+        return (self.length_fuselage-self.length_cockpit-self.length_tailcone)*0.95
 
     @Attribute
     def diameter_tank(self):
@@ -297,7 +398,7 @@ class Energy(GeomBase):
     def number_of_tanks(self):
         max_distance = []
         for i in range(0, len(self.n_tanks)):
-            z_pos = Fuselage().position_floor_lower -1.1*self.diameter_tank[i]/2
+            z_pos = self.position_floor_lower -1.1*self.diameter_tank[i]/2
             y_pos = (1.1*self.diameter_tank[i]*(self.n_tanks[i]-1))/2
             tot_pos = np.sqrt(z_pos**2 + y_pos**2)
             max_distance.append(tot_pos)

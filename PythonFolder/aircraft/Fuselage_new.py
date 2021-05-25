@@ -11,26 +11,6 @@ from aircraft.fuselage import Fuselage
 from aircraft.energy import Tanks
 from aircraft.energy import Energy
 
-# class old_fuselage(GeomBase):
-#
-#
-#
-#     @Part
-#     def fuselage_lofted_solid_outer2(self):
-#         return LoftedSolid(profiles=[Fuselage().outer_profile_set[0],
-#                                      Fuselage().outer_profile_set[1],
-#                                      Fuselage().outer_profile_set[2],
-#                                      Fuselage().outer_profile_set[3],
-#                                      Fuselage().outer_profile_set[4],
-#                                      Fuselage().outer_profile_set[5],
-#                                      Fuselage().outer_profile_set[6],
-#                                      Fuselage().outer_profile_set[7],
-#                                      Fuselage().outer_profile_set[8],
-#                                      Fuselage().outer_profile_set[9],
-#                                      Fuselage().outer_profile_set[10]],
-#                            color="blue",
-#                            mesh_deflection=0.00001,
-#                            transparency=0.8)
 
 class New_Fuselage1(GeomBase):
 

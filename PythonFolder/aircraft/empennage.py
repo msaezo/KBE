@@ -8,6 +8,7 @@ from aircraft.airfoil import Airfoil
 from aircraft.fuselage import Fuselage
 from aircraft.wing import Wing
 from aircraft.cg_calculations import CG_calculations
+from aircraft.lifting_surface import Lifting_Surface
 
 class Horizontal_Tail(GeomBase):
 
@@ -77,6 +78,22 @@ class Horizontal_Tail(GeomBase):
     def ht_z_shift(self):
         return Fuselage().diameter_fuselage_outer*0.8/2
 
+    @Attribute
+    def ht_x_shift(self):
+        return CG_calculations().cg_aft + self.cg_arm_horizontal
+
+    @Attribute
+    def ht_z_shift_tip(self):
+        return self.ht_z_shift + self.span_horizontal_tail/2 * np.tan(np.deg2rad(self.dihedral))
+
+    @Attribute
+    def ht_x_shift_tip(self):
+        return self.ht_x_shift + self.span_horizontal_tail / 2 * np.tan(np.deg2rad(self.sweep_leading_edge_horizontal_tail))
+
+    @Attribute
+    def ht_y_shift_tip(self):
+        return self.span_horizontal_tail/2
+
     @Attribute  # required input for the superclass LoftedSolid
     def profiles(self):
         return [self.root_airfoil_ht, self.tip_airfoil_ht]
@@ -100,44 +117,81 @@ class Horizontal_Tail(GeomBase):
 
         return toverc
 
-    @Part
-    def root_airfoil_ht(self):  # root airfoil will receive self.position as default
-        return Airfoil(airfoil_name=self.airfoil_root,
-                       chord=self.root_chord_horizontal_tail,
-                       thickness_factor=self.thickness_to_chord,
-                       position=translate(self.position,
-                                          "x", self.ht_x_shift,
-                                          "Z", self.ht_z_shift),
-                       factor=0.24,
-                       mesh_deflection=0.0001)
-
-    @Part
-    def tip_airfoil_ht(self):
-        return Airfoil(airfoil_name=self.airfoil_tip,
-                       chord=self.tip_chord_horizontal_tail,
-                       thickness_factor=self.thickness_to_chord,
-                       factor=0.24,
-                       position=translate(
-                           rotate(self.position, "y", np.deg2rad(self.twist)),  # apply twist angle
-                           "y", self.span_horizontal_tail/2,
-                           "x", self.ht_x_shift + self.span_horizontal_tail/2 * np.tan(np.deg2rad(self.sweep_leading_edge_horizontal_tail)),
-                           "Z", self.ht_z_shift + self.span_horizontal_tail/2 * np.tan(np.deg2rad(self.dihedral))),
-                       mesh_deflection=0.0001)
+    # @Part
+    # def root_airfoil_ht(self):  # root airfoil will receive self.position as default
+    #     return Airfoil(airfoil_name=self.airfoil_root,
+    #                    chord=self.root_chord_horizontal_tail,
+    #                    thickness_factor=self.thickness_to_chord,
+    #                    position=translate(self.position,
+    #                                       "x", self.ht_x_shift,
+    #                                       "Z", self.ht_z_shift),
+    #                    factor=0.24,
+    #                    mesh_deflection=0.0001)
+    #
+    # @Part
+    # def tip_airfoil_ht(self):
+    #     return Airfoil(airfoil_name=self.airfoil_tip,
+    #                    chord=self.tip_chord_horizontal_tail,
+    #                    thickness_factor=self.thickness_to_chord,
+    #                    factor=0.24,
+    #                    position=translate(
+    #                        rotate(self.position, "y", np.deg2rad(self.twist)),  # apply twist angle
+    #                        "y", self.span_horizontal_tail/2,
+    #                        "x", self.ht_x_shift + self.span_horizontal_tail/2 * np.tan(np.deg2rad(self.sweep_leading_edge_horizontal_tail)),
+    #                        "Z", self.ht_z_shift + self.span_horizontal_tail/2 * np.tan(np.deg2rad(self.dihedral))),
+    #                    mesh_deflection=0.0001)
+    #
+    # @Part
+    # def right_wing_surface_ht(self):
+    #     return LoftedSurface(profiles=self.profiles,
+    #                          mesh_deflection=0.0001)
+    #
+    # @Part
+    # def left_wing_surface_ht(self):
+    #     return MirroredShape(shape_in=self.right_wing_surface_ht,
+    #                          reference_point=self.position,
+    #                          # Two vectors to define the mirror plane
+    #                          vector1=self.position.Vz,
+    #                          vector2=self.position.Vx,
+    #                          mesh_deflection=0.0001)
 
     @Part
     def right_wing_surface_ht(self):
-        return LoftedSurface(profiles=self.profiles,
-                             mesh_deflection=0.0001)
+        return Lifting_Surface(airfoil_root="aircraft\simm_airfoil",
+                               airfoil_tip="aircraft\simm_airfoil",
+                               root_chord=self.root_chord_horizontal_tail,
+                               thickness_to_chord_root=self.thickness_to_chord,
+                               factor_root=0.24,
+                               tip_chord=self.tip_chord_horizontal_tail,
+                               thickness_to_chord_tip=self.thickness_to_chord,
+                               factor_tip=0.24,
+                               x_shift_root=self.ht_x_shift,
+                               y_shift_root=0,
+                               z_shift_root=self.ht_z_shift,
+                               x_shift_tip=self.ht_x_shift_tip,
+                               y_shift_tip=self.ht_y_shift_tip,
+                               z_shift_tip=self.ht_z_shift_tip,
+                               rotate=0,
+                               twist=self.twist)
 
     @Part
     def left_wing_surface_ht(self):
-        return MirroredShape(shape_in=self.right_wing_surface_ht,
-                             reference_point=self.position,
-                             # Two vectors to define the mirror plane
-                             vector1=self.position.Vz,
-                             vector2=self.position.Vx,
-                             mesh_deflection=0.0001)
-
+        return Lifting_Surface(airfoil_root="aircraft\simm_airfoil",
+                               airfoil_tip="aircraft\simm_airfoil",
+                               root_chord=self.root_chord_horizontal_tail,
+                               thickness_to_chord_root=self.thickness_to_chord,
+                               factor_root=0.24,
+                               tip_chord=self.tip_chord_horizontal_tail,
+                               thickness_to_chord_tip=self.thickness_to_chord,
+                               factor_tip=0.24,
+                               x_shift_root=self.ht_x_shift,
+                               y_shift_root=0,
+                               z_shift_root=self.ht_z_shift,
+                               x_shift_tip=self.ht_x_shift_tip,
+                               y_shift_tip=-self.ht_y_shift_tip,
+                               z_shift_tip=self.ht_z_shift_tip,
+                               rotate=0,
+                               twist=self.twist)
 
 
 class Vertical_Tail(GeomBase):
@@ -194,6 +248,14 @@ class Vertical_Tail(GeomBase):
     def vt_z_shift(self):
         return Fuselage().diameter_fuselage_outer*0.9/2
 
+    @Attribute  # Hard Coded, relate it to the Xcg
+    def vt_x_shift_tip(self):
+        return self.vt_x_shift + self.span_vertical_tail * np.tan(np.deg2rad(self.sweep_leading_edge_vertical))
+
+    @Attribute  # Hard Coded, relate it to the Xcg
+    def vt_z_shift_tip(self):
+        return self.vt_z_shift + self.span_vertical_tail
+
     @Attribute
     def sweep_mid_chord_vertical_tail(self):
         return np.rad2deg(np.arctan(np.tan(np.deg2rad(self.sweep_leading_edge_vertical)) - 4 / self.aspect_ratio_vertical * (1 / 2) * (1 - self.taper_ratio_vertical) / (1 + self.taper_ratio_vertical)))
@@ -219,34 +281,53 @@ class Vertical_Tail(GeomBase):
         return toverc
 
 
-    @Part
-    def root_airfoil_vt(self):  # root airfoil will receive self.position as default
-        return Airfoil(airfoil_name=self.airfoil_root,
-                       chord=self.root_chord_vertical_tail,
-                       thickness_factor=self.thickness_to_chord,
-                       position=translate(
-                           rotate(self.position, "x", np.deg2rad(90)),
-                                          "x", self.vt_x_shift,
-                                          "Z", self.vt_z_shift),
-                       factor=0.24,
-                       mesh_deflection=0.0001)
+    # @Part
+    # def root_airfoil_vt(self):  # root airfoil will receive self.position as default
+    #     return Airfoil(airfoil_name=self.airfoil_root,
+    #                    chord=self.root_chord_vertical_tail,
+    #                    thickness_factor=self.thickness_to_chord,
+    #                    position=translate(
+    #                        rotate(self.position, "x", np.deg2rad(90)),
+    #                                       "x", self.vt_x_shift,
+    #                                       "Z", self.vt_z_shift),
+    #                    factor=0.24,
+    #                    mesh_deflection=0.0001)
+
+    # @Part
+    # def tip_airfoil_vt(self):
+    #     return Airfoil(airfoil_name=self.airfoil_tip,
+    #                    chord=self.tip_chord_vertical_tail,
+    #                    thickness_factor=self.thickness_to_chord,
+    #                    factor=0.24,
+    #                    position=translate(
+    #                        rotate(self.position, "x", np.deg2rad(90)),  # apply twist angle
+    #
+    #                        "x", self.vt_x_shift + self.span_vertical_tail * np.tan(np.deg2rad(self.sweep_leading_edge_vertical)),
+    #                        "y", self.vt_z_shift + self.span_vertical_tail),
+    #                    mesh_deflection=0.0001)
+    #
+    # @Part
+    # def vertical_wing_surface(self):
+    #     return LoftedSurface(profiles=self.profiles,
+    #
+    #                          mesh_deflection=0.0001)
+
 
     @Part
-    def tip_airfoil_vt(self):
-        return Airfoil(airfoil_name=self.airfoil_tip,
-                       chord=self.tip_chord_vertical_tail,
-                       thickness_factor=self.thickness_to_chord,
-                       factor=0.24,
-                       position=translate(
-                           rotate(self.position, "x", np.deg2rad(90)),  # apply twist angle
-
-                           "x", self.vt_x_shift + self.span_vertical_tail * np.tan(np.deg2rad(self.sweep_leading_edge_vertical)),
-                           "y", self.vt_z_shift + self.span_vertical_tail),
-                       mesh_deflection=0.0001)
-
-    @Part
-    def vertical_wing_surface(self):
-        return LoftedSurface(profiles=self.profiles,
-
-                             mesh_deflection=0.0001)
-
+    def vertical_tail(self):
+        return Lifting_Surface(airfoil_root= "aircraft\simm_airfoil",
+                               airfoil_tip = "aircraft\simm_airfoil",
+                               root_chord= self.root_chord_vertical_tail,
+                               thickness_to_chord_root = self.thickness_to_chord,
+                               factor_root = 0.24,
+                               tip_chord = self.tip_chord_vertical_tail,
+                               thickness_to_chord_tip = self.thickness_to_chord,
+                               factor_tip = 0.24,
+                               x_shift_root = self.vt_x_shift,
+                               y_shift_root=0,
+                               z_shift_root = self.vt_z_shift,
+                               x_shift_tip = self.vt_x_shift_tip,
+                               y_shift_tip = self.vt_z_shift_tip,
+                               z_shift_tip = 0,
+                               rotate = 90,
+                               twist = 0)
