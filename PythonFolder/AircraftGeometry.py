@@ -3,21 +3,22 @@ from parapy.geom import *
 
 from aircraft import Wing
 from aircraft import Fuselage
-from aircraft import Vertical_Tail
-from aircraft import Horizontal_Tail
-from aircraft import CG_calculations
-from aircraft import CG_calculations_hyd
+from aircraft import VerticalTail
+from aircraft import HorizontalTail
+from aircraft import CGCalculations
+from aircraft import CGCalculationsHyd
 
-from aircraft import Propulsion_System
+from aircraft import PropulsionSystem
 from aircraft import Q3D
 from aircraft import Drag
-from aircraft import Energy
+from aircraft import Energy1
+from aircraft import Energy2
 from aircraft import Tanks
-from aircraft import New_Fuselage1
-from aircraft import New_Fuselage2
-from aircraft import Seat_row
-from aircraft import Fan_engine
-from aircraft import New_Fuselage_Profile
+from aircraft import NewFuselage1
+from aircraft import NewFuselage2
+from aircraft import SeatRow
+from aircraft import FanEngine
+from aircraft import NewFuselageProfile
 from parapy.exchange.step import STEPWriter
 
 import os
@@ -27,13 +28,9 @@ from math import *
 
 DIR = os.path.dirname(__file__)
 
-class AircraftGeometry(Base):
 
-    #######################################################################################################
-    #####                                                                                             #####
-    #####   This is where we open the input file and parse the values to variables with the same name #####
-    #####                                                                                             #####
-    #######################################################################################################
+class AircraftGeometry(Base):
+    # This is where we open the input file and parse the values to variables with the same name
 
     workbook = xlrd.open_workbook('aircraft\KBE_Input.xls')
     worksheet = workbook.sheet_by_name('Input')
@@ -73,90 +70,84 @@ class AircraftGeometry(Base):
         exec(Name + "=Value")
 
     # Empenage parameters
-    for i in range(57, 65):
+    for i in range(57, 66):
         Name = worksheet.cell(i, 1).value
         Value = worksheet.cell(i, 2).value
         exec(Name + "=Value")
 
     # Flight parameters
-    for i in range(67, 72):
+    for i in range(68, 73):
         Name = worksheet.cell(i, 1).value
         Value = worksheet.cell(i, 2).value
         exec(Name + "=Value")
 
-    ###############################################################################
-    #####                                                                     #####
-    ##### Inputting the variables to parapy with the proper naming convention #####
-    #####                                                                     #####
-    ###############################################################################
+    # Inputting the variables to parapy with the proper naming convention
 
     # imported parameters from input file
-    n_pax                     = Input(Number_of_passengers)
-    width_aisle               = Input(Width_aisle)
-    width_seat                = Input(Width_seat)
-    width_armrest             = Input(Width_armrest)
-    clearance_seat            = Input(Seat_clearance)
-    length_cockpit            = Input(Length_cockpit)
+    n_pax = Input(Number_of_passengers)
+    width_aisle = Input(Width_aisle)
+    width_seat = Input(Width_seat)
+    width_armrest = Input(Width_armrest)
+    clearance_seat = Input(Seat_clearance)
+    length_cockpit = Input(Length_cockpit)
     length_tailcone_over_diam = Input(Length_tailcone_over_Diameter_Fuselage)
     length_nosecone_over_diam = Input(Length_nosecone_over_Diameter_Fuselage)
-    length_tail_over_diam     = Input(Length_Tail_over_Diameter_Fuselage)
-    height_floor              = Input(Height_floor)
-    height_shoulder           = Input(Height_shoulder)
-    luggage_per_pax           = Input(Luggage_per_pax)
-    weight_cargo              = Input(Cargo)
-    kcc                       = Input(Kcc)
+    length_tail_over_diam = Input(Length_Tail_over_Diameter_Fuselage)
+    height_floor = Input(Height_floor)
+    height_shoulder = Input(Height_shoulder)
+    luggage_per_pax = Input(Luggage_per_pax)
+    weight_cargo = Input(Cargo)
+    kcc = Input(Kcc)
 
-    mach_cruise     = Input(Mach_cruise)
+    mach_cruise = Input(Mach_cruise)
     altitude_cruise = Input(Altitude_cruise)
-    weight_to       = Input(Weight_TO)
-    wing_loading    = Input(Wing_loading)
-    aspect_ratio    = Input(Aspect_ratio)
-    wing_highlow    = Input("low")
+    weight_to = Input(Weight_TO)
+    wing_loading = Input(Wing_loading)
+    aspect_ratio = Input(Aspect_ratio)
+    wing_highlow = Input("low")
 
-    n_engines          = Input(N_engines)
-    thrust_to          = Input(Thrust_TO)
+    n_engines = Input(N_engines)
+    thrust_to = Input(Thrust_TO)
     turbine_inlet_temp = Input(Temp_T_4)
-    phi                = Input(Phi)
-    bypass_ratio       = Input(BPR)
+    phi = Input(Phi)
+    bypass_ratio = Input(BPR)
 
-    wing_mass_fraction            = Input(Wing_mass_fraction)
-    propulsion_mass_fraction      = Input(Propulsion_system_mass_fraction)
-    fuselage_mass_fraction        = Input(Fuselage_mass_fraction)
-    empennage_mass_fraction       = Input(Empennage_mass_fraction)
+    wing_mass_fraction = Input(Wing_mass_fraction)
+    propulsion_mass_fraction = Input(Propulsion_system_mass_fraction)
+    fuselage_mass_fraction = Input(Fuselage_mass_fraction)
+    empennage_mass_fraction = Input(Empennage_mass_fraction)
     fixed_equipment_mass_fraction = Input(Fixed_equipment_mass_fraction)
-    mass_oew                      = Input(OEW_mass_fraction)
-    mass_payload                  = Input(Payload_mass_fraction)
-    mass_fuel                      = Input(Fuel_mass_fraction)
+    mass_oew = Input(OEW_mass_fraction)
+    mass_payload = Input(Payload_mass_fraction)
+    mass_fuel = Input(Fuel_mass_fraction)
 
-    wing_cg_loc            = Input(Wing_cg_loc)
-    propulsion_cg_loc      = Input(Propulsion_system_cg_loc)
-    fuselage_cg_loc        = Input(Fuselage_cg_loc)
-    empennage_cg_loc       = Input(Empennage_cg_loc)
+    wing_cg_loc = Input(Wing_cg_loc)
+    propulsion_cg_loc = Input(Propulsion_system_cg_loc)
+    fuselage_cg_loc = Input(Fuselage_cg_loc)
+    empennage_cg_loc = Input(Empennage_cg_loc)
     fixed_equipment_cg_loc = Input(Fixed_equipment_cg_loc)
-    oew_cg_loc             = Input(OEW_cg_loc)
-    payload_cg_loc         = Input(Payload_cg_loc)
-    fuel_cg_loc            = Input(Fuel_cg_loc)
+    oew_cg_loc = Input(OEW_cg_loc)
+    payload_cg_loc = Input(Payload_cg_loc)
+    fuel_cg_loc = Input(Fuel_cg_loc)
 
-    volume_HT                      = Input(Tail_volume_horizontal)
-    volume_VT                      = Input(Tail_volume_vertical)
-    aspect_Ratio_horizontal        = Input(aspect_Ratio_horizontal)
-    aspect_Ratio_vertical          = Input(aspect_Ratio_vertical)
-    taper_Ratio_horizontal         = Input(taper_Ratio_horizontal)
-    taper_Ratio_vertical           = Input(taper_Ratio_vertical)
+    volume_HT = Input(Tail_volume_horizontal)
+    volume_VT = Input(Tail_volume_vertical)
+    aspect_Ratio_horizontal = Input(aspect_Ratio_horizontal)
+    aspect_Ratio_vertical = Input(aspect_Ratio_vertical)
+    taper_Ratio_horizontal = Input(taper_Ratio_horizontal)
+    taper_Ratio_vertical = Input(taper_Ratio_vertical)
     sweep_three_quarter_horizontal = Input(sweep_three_quarter_horizontal)
-    sweep_leading_edge_vertical    = Input(sweep_leading_edge_vertical)
+    sweep_leading_edge_vertical = Input(sweep_leading_edge_vertical)
+    tail_config = Input(configuration)
 
-    range          = Input(Range)
-    efficiency     = Input(total_efficiency)
+    range = Input(Range)
+    efficiency = Input(total_efficiency)
     energy_density = Input(energy_density)
-    hyd_density    = Input(hyd_density)
+    hyd_density = Input(hyd_density)
     skinfric_coeff = Input(eq_skinfriction_coefficient)
 
-    #######################################################################
-    #####                                                             #####
-    ##### Declaring input warnings if it is out of recommended bounds #####
-    #####                                                             #####
-    #######################################################################
+    # Declaring input warnings if it is out of recommended bounds
+
     @Attribute
     def warnings_inputs(self):
 
@@ -167,17 +158,16 @@ class AircraftGeometry(Base):
                   "     - 0.75 and 0.92"
             warnings.warn(msg)
 
-
-        pax_average = 0.0012*self.weight_to/9.81 + 86.01
-        if self.n_pax <= pax_average*0.75 or self.n_pax >= pax_average*1.25:
+        pax_average = 0.0012 * self.weight_to / 9.81 + 86.01
+        if self.n_pax <= pax_average * 0.75 or self.n_pax >= pax_average * 1.25:
             msg = "The number of passengers on the Input File might be outside of bounds for the selected MTOW " \
                   "Suggested options:" \
                   "     - Change passengers using the following approximation" \
                   "     - n_pax = 0.0012 * MTOW [kg] + 86.01"
             warnings.warn(msg)
 
-        wing_loading_average = 0.0005*self.weight_to/9.81 + 547.52
-        if self.wing_loading <= wing_loading_average*0.77 or self.wing_loading >= wing_loading_average*1.23:
+        wing_loading_average = 0.0005 * self.weight_to / 9.81 + 547.52
+        if self.wing_loading <= wing_loading_average * 0.77 or self.wing_loading >= wing_loading_average * 1.23:
             msg = "The wing loading on the Input File might be outside of bounds for the selected MTOW " \
                   "Suggested options:" \
                   "     - Change wing_loading using the following approximation" \
@@ -185,16 +175,16 @@ class AircraftGeometry(Base):
             warnings.warn(msg)
 
         if self.aspect_ratio < 7.73 or self.aspect_ratio > 9.44:
-            msg = "The aspect ratio on the Input File might be outside of bounds for the typical transportation aircraft. " \
-                  "Suggested options:" \
+            msg = "The aspect ratio on the Input File might be outside of bounds for the typical transportation" \
+                  "aircraft. Suggested options:" \
                   "     - Change to aspect_ratio between the following bounds" \
                   "     - 7.73 to 9.44"
             warnings.warn(msg)
 
-        span = sqrt(self.aspect_ratio*self.weight_to/9.81/self.wing_loading)
+        span = sqrt(self.aspect_ratio * self.weight_to / 9.81 / self.wing_loading)
         if span >= 80 or span <= 22:
-            msg = "The wing span resulting from the Input File might be outside of bounds for the typical transportation aircraft. " \
-                  "Suggested options:" \
+            msg = "The wing span resulting from the Input File might be outside of bounds for the typical " \
+                  "transportation aircraft. Suggested options:" \
                   "     - Change the aspect ratio between the bounds" \
                   "     - Change the wing loading"
             warnings.warn(msg)
@@ -209,99 +199,80 @@ class AircraftGeometry(Base):
         finish = 'Look in terminal for warnings'
         return finish
 
-    #Some attributes to easily check in parapy GUI
-    @Attribute
-    def volume_needed(self):
-        return Energy().vol_needed
+    # Some attributes to easily check in parapy GUI
+
+    # @Attribute
+    # def volume_needed(self):
+    #     return Energy().vol_needed
+    #
+    # @Attribute
+    # def cl_in(self):
+    #     return Wing().lift_coefficient
+    #
+    # @Attribute
+    # def cl_out(self):
+    #     return Q3D().cldes
+    #
+    # @Attribute
+    # def cd_out(self):
+    #     return Q3D().cddes
+    #
+    # @Attribute
+    # def alpha(self):
+    #     return Q3D().alpha
+    #
+    # @Attribute
+    # def reynolds(self):
+    #     return Q3D().reynolds
+    #
+    # @Attribute
+    # def cd_total(self):
+    #     return Drag().drag_coefficient_total
+    #
+    # @Attribute
+    # def drag_total(self):
+    #     return Drag().drag
 
     @Attribute
-    def cl_in(self):
-        return Wing().lift_coefficient
+    def cg_calc(self):
+        return CGCalculations(payload_cg_loc=self.Payload_cg_loc,
+                              fuel_cg_loc=self.Fuel_cg_loc,
+                              mass_oew=self.OEW_mass_fraction,
+                              mass_payload=self.Payload_mass_fraction,
+                              mass_fuel=self.Fuel_mass_fraction)
 
     @Attribute
-    def cl_out(self):
-        return Q3D().cldes
+    def turbofan(self):
+        return FanEngine(thrust_to=self.thrust_to,
+                         n_engines=self.n_engines,
+                         bypass_ratio=self.bypass_ratio,
+                         turbine_inlet_temp=self.turbine_inlet_temp,
+                         phi=self.phi)
 
-    @Attribute
-    def cd_out(self):
-        return Q3D().cddes
-
-    @Attribute
-    def aLpha(self):
-        return Q3D().alpha
-
-    @Attribute
-    def reynolds(self):
-        return Q3D().reynolds
-
-    @Attribute
-    def cd_total(self):
-        return Drag().drag_coefficient_total
-
-    @Attribute
-    def drag_total(self):
-        return Drag().drag
-
-    # Variable input for new fuselage depending on tank size
-    # if tanks dont fit inside fuselage use new profiles that do fit
-    # else reuse old profiles and recreate fuselage as is
-    @Attribute
-    def new_fuselage_input(self):
-        if Tanks().tank_max_dim > Fuselage().diameter_fuselage_inner / 2:
-            input = [Fuselage().outer_profile_set[0],
-                     Fuselage().outer_profile_set[1],
-                     New_Fuselage1().new_profile_first.composed_crv,
-                     New_Fuselage1().new_profile_set[0].composed_crv,
-                     New_Fuselage1().new_profile_set[1].composed_crv,
-                     New_Fuselage1().new_profile_set[2].composed_crv,
-                     New_Fuselage1().new_profile_set[3].composed_crv,
-                     New_Fuselage1().new_profile_set[4].composed_crv,
-                     Fuselage().outer_profile_set[8],
-                     Fuselage().outer_profile_set[9],
-                     Fuselage().outer_profile_set[10]]
-        else:
-            input = [Fuselage().outer_profile_set[0],
-                     Fuselage().outer_profile_set[1],
-                     Fuselage().outer_profile_set[2],
-                     Fuselage().outer_profile_set[3],
-                     Fuselage().outer_profile_set[4],
-                     Fuselage().outer_profile_set[5],
-                     Fuselage().outer_profile_set[6],
-                     Fuselage().outer_profile_set[7],
-                     Fuselage().outer_profile_set[8],
-                     Fuselage().outer_profile_set[9],
-                     Fuselage().outer_profile_set[10]]
-        return input
-
-    ##########################################
-    #####                                #####
-    ##### Creating the parts for the GUI #####
-    #####                                #####
-    ##########################################
-
+    # Creating the parts for the GUI
 
     @Part
     def fuselage(self):
-        return Fuselage(n_pax           = self.n_pax,
-                        width_aisle     = self.width_aisle,
-                        width_seat      = self.width_seat,
-                        width_armrest   = self.width_armrest,
-                        clearance_seat  = self.clearance_seat,
-                        length_cockpit  = self.length_cockpit,
-                        height_floor    = self.height_floor,
-                        height_shoulder = self.height_shoulder,
-                        luggage_per_pax = self.luggage_per_pax,
-                        weight_cargo    = self.weight_cargo,
-                        kcc             = self.kcc,
-                        length_tailcone_over_diam     = self.length_tailcone_over_diam,
-                        length_nosecone_over_diam     = self.length_nosecone_over_diam,
-                        length_tail_over_diam         = self.length_tail_over_diam,
-                        fuselage_mass_fraction        = self.fuselage_mass_fraction,
-                        empennage_mass_fraction       = self.empennage_mass_fraction,
-                        fixed_equipment_mass_fraction = self.fixed_equipment_mass_fraction,
-                        fuselage_cg_loc               = self.fuselage_cg_loc,
-                        empennage_cg_loc              = self.empennage_cg_loc,
-                        fixed_equipment_cg_loc        = self.fixed_equipment_cg_loc)
+        return Fuselage(n_pax=self.n_pax,
+                        width_aisle=self.width_aisle,
+                        width_seat=self.width_seat,
+                        width_armrest=self.width_armrest,
+                        clearance_seat=self.clearance_seat,
+                        length_cockpit=self.length_cockpit,
+                        height_floor=self.height_floor,
+                        height_shoulder=self.height_shoulder,
+                        luggage_per_pax=self.luggage_per_pax,
+                        weight_cargo=self.weight_cargo,
+                        kcc=self.kcc,
+                        length_tailcone_over_diam=self.length_tailcone_over_diam,
+                        length_nosecone_over_diam=self.length_nosecone_over_diam,
+                        length_tail_over_diam=self.length_tail_over_diam,
+                        fuselage_mass_fraction=self.fuselage_mass_fraction,
+                        empennage_mass_fraction=self.empennage_mass_fraction,
+                        fixed_equipment_mass_fraction=self.fixed_equipment_mass_fraction,
+                        fuselage_cg_loc=self.fuselage_cg_loc,
+                        empennage_cg_loc=self.empennage_cg_loc,
+                        fixed_equipment_cg_loc=self.fixed_equipment_cg_loc)
 
     @Part
     def main_wing(self):
@@ -319,131 +290,242 @@ class AircraftGeometry(Base):
                     fuselage_mass_fraction=self.fuselage_mass_fraction,
                     empennage_mass_fraction=self.empennage_mass_fraction,
                     fixed_equipment_mass_fraction=self.fixed_equipment_mass_fraction,
-                    x_fuselage_cg=Fuselage().x_fuselage_cg)
-
-    @Part
-    def tanks(self):
-        return Tanks(quantify=Energy().number_of_tanks,
-                     # drag = self.drag,
-                     # diameter_tank_final = self.diameter_tank_final,
-                     # number_of_tanks = self.number_of_tanks,
-                     range          = self.range,
-                     efficiency     = self.efficiency,
-                     energy_density = self.energy_density,
-                     surface = Wing().area_wing,
-                     lift_coefficient = Q3D().cldes,
-                     drag_coefficient = Q3D().cddes,
-                     density = Q3D().air_density,
-                     velocity = Q3D().air_speed,
-                     position_floor_lower = Fuselage().position_floor_lower,
-                     diameter_fuselage_inner = Fuselage().diameter_fuselage_inner,
-                     length_cockpit = Fuselage().length_cockpit,
-                     length_fuselage=Fuselage().length_fuselage,
-                     length_tailcone = Fuselage().length_tailcone,
-                     fus_diam = Fuselage().diameter_fuselage_outer,
-                     fus_len = Fuselage().length_fuselage,
-                     ht_surface=Horizontal_Tail().surface_horizontal_tail,
-                     ht_sweep=Horizontal_Tail().sweep_cuarter_chord_horizontal_tail,
-                     vt_surface=Vertical_Tail().surface_vertical_tail,
-                     vt_sweep=Vertical_Tail().sweep_cuarter_chord_vertical_tail,
-                     len_nacelle=Fan_engine().nacelle_length,
-                     cowling_length=Fan_engine().fan_length,
-                     cowling_length_1=Fan_engine().loc_max_diameter,
-                     cowling_diam=Fan_engine().max_diameter,
-                     cowling_fan=Fan_engine().inlet_diameter,
-                     cowling_ef=Fan_engine().exit_diameter,
-                     gg_length=Fan_engine().length_gas_generator,
-                     gg_diam=Fan_engine().diameter_gas_generator,
-                     gg_diam_exit=Fan_engine().exit_diameter_gas_generator,
-                     span=Wing().span,
-                     root_chord=Wing().chord_root,
-                     tip_chord=Wing().chord_tip,
-                     mac=Wing().mean_aerodynamic_chord,
-                     altitude=Wing().altitude_cruise,
-                     mach=Wing().mach_cruise,
-                     cl=Wing().lift_coefficient)
-
-
-
-
-
-    @Part
-    def vertical_tail(self):
-        return Vertical_Tail(volume_vt                   = self.volume_VT,
-                             aspect_ratio_vertical       = self.aspect_Ratio_vertical,
-                             taper_ratio_vertical        = self.taper_Ratio_vertical,
-                             sweep_leading_edge_vertical = self.sweep_leading_edge_vertical,
-                             mach_cruise                 = self.mach_cruise,
-                             surface_area = Wing().area_wing,
-                             span         = Wing().span  )
-
-    @Part
-    def horizontal_tail(self):
-        return Horizontal_Tail(volume_ht                      = self.volume_HT,
-                               aspect_ratio_horizontal        = self.aspect_Ratio_horizontal,
-                               taper_ratio_horizontal         = self.taper_Ratio_horizontal,
-                               sweep_three_quarter_horizontal = self.sweep_three_quarter_horizontal,
-                               mach_cruise                    = self.mach_cruise,
-                               surface_area = Wing().area_wing,
-                               mac          = Wing().mean_aerodynamic_chord)
-
-    @Part
-    def prop_system(self):
-        return Propulsion_System(thrust_to          = self.thrust_to,
-                                 n_engines          = self.n_engines,
-                                 bypass_ratio       = self.bypass_ratio,
-                                 turbine_inlet_temp = self.turbine_inlet_temp,
-                                 phi                = self.phi)
+                    x_fuselage_cg=self.fuselage.x_fuselage_cg,
+                    diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer)
 
     @Part
     def cg_range(self):
-        return CG_calculations(payload_cg_loc  = self.payload_cg_loc,
-                               fuel_cg_loc     = self.fuel_cg_loc,
-                               mass_oew        = self.mass_oew,
-                               mass_payload    = self.mass_payload,
-                               mass_fuel       = self.mass_fuel)
+        return CGCalculations(payload_cg_loc=self.payload_cg_loc,
+                              fuel_cg_loc=self.fuel_cg_loc,
+                              mass_oew=self.mass_oew,
+                              mass_payload=self.mass_payload,
+                              mass_fuel=self.mass_fuel,
+                              mean_aerodynamic_chord=self.main_wing.mean_aerodynamic_chord,
+                              x_le_mac=self.main_wing.x_le_mac,
+                              length_fuselage=self.fuselage.length_fuselage)
+
+    @Part
+    def vertical_tail(self):
+        return VerticalTail(volume_vt=self.volume_VT,
+                            aspect_ratio_vertical=self.aspect_Ratio_vertical,
+                            taper_ratio_vertical=self.taper_Ratio_vertical,
+                            sweep_leading_edge_vertical=self.sweep_leading_edge_vertical,
+                            mach_cruise=self.mach_cruise,
+                            surface_area=self.main_wing.area_wing,
+                            span=self.main_wing.span,
+                            lift_coefficient=self.main_wing.lift_coefficient,
+                            length_fuselage=self.fuselage.length_fuselage,
+                            length_tail=self.fuselage.length_tail,
+                            cg_aft=self.cg_range.cg_aft,
+                            diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer)
+
+    @Part
+    def horizontal_tail(self):
+        return HorizontalTail(volume_ht=self.volume_HT,
+                              aspect_ratio_horizontal=self.aspect_Ratio_horizontal,
+                              taper_ratio_horizontal=self.taper_Ratio_horizontal,
+                              sweep_three_quarter_horizontal=self.sweep_three_quarter_horizontal,
+                              mach_cruise=self.mach_cruise,
+                              surface_area=self.main_wing.area_wing,
+                              mac=self.main_wing.mean_aerodynamic_chord,
+                              length_fuselage=self.fuselage.length_fuselage,
+                              cg_aft=self.cg_range.cg_aft,
+                              diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer,
+                              x_tail_vertical=self.vertical_tail.x_tail_vertical,
+                              x_tip_vertical=self.vertical_tail.vt_x_shift_tip,
+                              z_tip_vertical=self.vertical_tail.vt_z_shift_tip,
+                              span_vertical=self.vertical_tail.span_vertical_tail,
+                              root_chord_vertical_tail=self.vertical_tail.root_chord_vertical_tail,
+                              tail_config=self.tail_config,
+                              sweep_vertical = self.vertical_tail.sweep_leading_edge_vertical)
+
+    @Part
+    def prop_system(self):
+        return PropulsionSystem(thrust_to=self.thrust_to,
+                                n_engines=self.n_engines,
+                                bypass_ratio=self.bypass_ratio,
+                                turbine_inlet_temp=self.turbine_inlet_temp,
+                                phi=self.phi,
+                                span=self.main_wing.span,
+                                diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer,
+                                wing_z_shift=self.main_wing.wing_z_shift,
+                                dihedral=self.main_wing.dihedral,
+                                x_tail_vertical=self.vertical_tail.x_tail_vertical,
+                                wing_x_shift=self.main_wing.wing_x_shift,
+                                sweep_leading_edge=self.main_wing.sweep_leading_edge,
+                                max_diameter=self.turbofan.max_diameter)
+
+    @Attribute
+    def q3d(self):
+        return Q3D(span=self.main_wing.span,
+                   root_chord=self.main_wing.chord_root,
+                   tip_chord=self.main_wing.chord_tip,
+                   MAC=self.main_wing.mean_aerodynamic_chord,
+                   twist_tip=self.main_wing.twist,
+                   dihedral=self.main_wing.dihedral,
+                   sweep=self.main_wing.sweep_leading_edge,
+                   altitude=self.main_wing.altitude_cruise,
+                   mach=self.main_wing.mach_cruise,
+                   cl=self.main_wing.lift_coefficient)
+
+    @Attribute
+    def drag(self):
+        return Drag(lift_coefficient=self.q3d.cldes,
+                    drag_coefficient=self.q3d.cddes,
+                    density=self.q3d.air_density,
+                    velocity=self.q3d.air_speed,
+                    surface=self.main_wing.area_wing,
+                    fus_diam=self.fuselage.diameter_fuselage_outer,
+                    ht_surface=self.horizontal_tail.surface_horizontal_tail,
+                    ht_sweep=self.horizontal_tail.sweep_cuarter_chord_horizontal_tail,
+                    vt_surface=self.vertical_tail.surface_vertical_tail,
+                    vt_sweep=self.vertical_tail.sweep_cuarter_chord_vertical_tail,
+                    len_nacelle=self.turbofan.nacelle_length,
+                    cowling_length=self.turbofan.fan_length,
+                    cowling_length_1=self.turbofan.loc_max_diameter,
+                    cowling_diam=self.turbofan.max_diameter,
+                    cowling_fan=self.turbofan.inlet_diameter,
+                    cowling_ef=self.turbofan.exit_diameter,
+                    gg_length=self.turbofan.length_gas_generator,
+                    gg_diam=self.turbofan.diameter_gas_generator,
+                    gg_diam_exit=self.turbofan.exit_diameter_gas_generator,
+                    span=self.main_wing.span,
+                    root_chord=self.main_wing.chord_root,
+                    tip_chord=self.main_wing.chord_tip,
+                    mac=self.main_wing.mean_aerodynamic_chord,
+                    altitude=self.altitude_cruise,
+                    mach=self.mach_cruise,
+                    cl=self.main_wing.lift_coefficient)
+
+    @Attribute
+    def energy(self):
+        return Energy1(range=self.range,
+                       efficiency=self.efficiency,
+                       energy_density=self.energy_density,
+                       fus_diam=self.fuselage.diameter_fuselage_inner,
+                       length_fuselage=self.fuselage.length_fuselage,
+                       length_cockpit=self.fuselage.length_cockpit,
+                       length_tailcone=self.fuselage.length_tailcone,
+                       position_floor_lower=self.fuselage.position_floor_lower,
+                       drag=self.drag.drag_tot)
+
+    @Part
+    def tanks(self):
+        return Tanks(  # range=self.range,
+                     # efficiency=self.efficiency,
+                     # energy_density=self.energy_density,
+                     # fus_diam=self.fuselage.diameter_fuselage_outer,
+                     # length_fuselage=self.fuselage.length_fuselage,
+                     length_cockpit=self.fuselage.length_cockpit,
+                     # length_tailcone=self.fuselage.length_tailcone,
+                     position_floor_lower=self.fuselage.position_floor_lower,
+                     diameter_fuselage_inner=self.fuselage.diameter_fuselage_inner,
+                     # drag=self.drag.drag_tot,
+                     diameter_tank_final=self.energy.diameter_tank_final,
+                     number_of_tanks=self.energy.number_of_tanks,
+                     length_tank=self.energy.length_tank)
 
     @Part
     def cg_range_hyd(self):
-        return CG_calculations_hyd(payload_cg_loc  = self.payload_cg_loc,
-                                   mass_oew_fr     = self.mass_oew,
-                                   mass_payload_fr = self.mass_payload)
+        return CGCalculationsHyd(mtow=self.weight_to,
+                                 payload_cg_loc=self.payload_cg_loc,
+                                 tank_length=self.energy.length_tank,
+                                 tank_front_loc=self.fuselage.length_cockpit,
+                                 vol_needed=self.energy.vol_needed,
+                                 hyd_density=self.hyd_density,
+                                 g_i=0.5,  # gravimetric index taken from report on flying V, cryogenic tank
+                                 mass_oew_fr=self.mass_oew,
+                                 mass_payload_fr=self.mass_payload,
+                                 max_cg_fuel=self.cg_calc.cg_aft,
+                                 min_cg_fuel=self.cg_calc.cg_forward,
+                                 x_le_mac=self.main_wing.x_le_mac,
+                                 mean_aerodynamic_chord=self.main_wing.mean_aerodynamic_chord,
+                                 length_fuselage=self.fuselage.length_fuselage)
+
+        # Variable input for new fuselage depending on tank size
+        # if tanks dont fit inside fuselage use new profiles that do fit
+        # else reuse old profiles and recreate fuselage as is
+
+    @Attribute
+    def new_fuselage_1(self):
+        return NewFuselage1(diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer,
+                            section_length_outer=self.fuselage.section_length_outer,
+                            length_fuselage=self.fuselage.length_fuselage,
+                            diameter_tank_final=self.energy.diameter_tank_final,
+                            y_pos=self.tanks.y_pos,
+                            z_pos=self.tanks.z_pos)
+
+    @Attribute
+    def new_fuselage_input(self):
+        if self.tanks.tank_max_dim > self.fuselage.diameter_fuselage_inner / 2:
+            aaa = [self.fuselage.outer_profile_set[0],
+                   self.fuselage.outer_profile_set[1],
+                   self.new_fuselage_1.new_profile_first.composed_crv,
+                   self.new_fuselage_1.new_profile_set[0].composed_crv,
+                   self.new_fuselage_1.new_profile_set[1].composed_crv,
+                   self.new_fuselage_1.new_profile_set[2].composed_crv,
+                   self.new_fuselage_1.new_profile_set[3].composed_crv,
+                   self.new_fuselage_1.new_profile_set[4].composed_crv,
+                   self.fuselage.outer_profile_set[8],
+                   self.fuselage.outer_profile_set[9],
+                   self.fuselage.outer_profile_set[10]]
+        else:
+            aaa = [self.fuselage.outer_profile_set[0],
+                   self.fuselage.outer_profile_set[1],
+                   self.fuselage.outer_profile_set[2],
+                   self.fuselage.outer_profile_set[3],
+                   self.fuselage.outer_profile_set[4],
+                   self.fuselage.outer_profile_set[5],
+                   self.fuselage.outer_profile_set[6],
+                   self.fuselage.outer_profile_set[7],
+                   self.fuselage.outer_profile_set[8],
+                   self.fuselage.outer_profile_set[9],
+                   self.fuselage.outer_profile_set[10]]
+        return aaa
 
     @Part
-    def newprofile(self):
-        return New_Fuselage2(input_profile_set = self.new_fuselage_input)
+    def new_fuselage(self):
+        return NewFuselage2(input_profile_set=self.new_fuselage_input)
 
     @Part
-    def testprofile(self):
-        return New_Fuselage1()
+    def new_fuselage_profiles(self):
+        return NewFuselage1(diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer,
+                            section_length_outer=self.fuselage.section_length_outer,
+                            length_fuselage=self.fuselage.length_fuselage,
+                            diameter_tank_final=self.energy.diameter_tank_final,
+                            y_pos=self.tanks.y_pos,
+                            z_pos=self.tanks.z_pos)
 
     @Attribute
     def tanks_step(self):
-        if Energy().number_of_tanks ==1:
+        if self.energy.number_of_tanks == 1:
             tanks_stp = [self.tanks.tank[0].tank]
-        elif Energy().number_of_tanks == 2:
+        elif self.energy.number_of_tanks == 2:
             tanks_stp = [self.tanks.tank[0].tank,
                          self.tanks.tank[1].tank]
-        elif Energy().number_of_tanks == 3:
+        elif self.energy.number_of_tanks == 3:
             tanks_stp = [self.tanks.tank[0].tank,
                          self.tanks.tank[1].tank,
                          self.tanks.tank[2].tank]
-        elif Energy().number_of_tanks == 4:
+        elif self.energy.number_of_tanks == 4:
             tanks_stp = [self.tanks.tank[0].tank,
                          self.tanks.tank[1].tank,
                          self.tanks.tank[2].tank,
                          self.tanks.tank[3].tank]
+        else:
+            tanks_stp = [self.tanks.tank[0].tank,
+                         self.tanks.tank[1].tank]
         return tanks_stp
 
     @Attribute
     def engines_step(self):
-        if Propulsion_System().n_engines ==1:
+        if self.prop_system.n_engines == 1:
             engines_stp = [self.prop_system.propulsion_system[0].spinner,
                            self.prop_system.propulsion_system[0].fan,
                            self.prop_system.propulsion_system[0].core,
                            self.prop_system.propulsion_system[0].nozzle,
                            self.prop_system.propulsion_system[0].bypass]
-        elif Propulsion_System().n_engines ==2:
+        elif self.prop_system.n_engines == 2:
             engines_stp = [self.prop_system.propulsion_system[0].spinner,
                            self.prop_system.propulsion_system[0].fan,
                            self.prop_system.propulsion_system[0].core,
@@ -454,7 +536,7 @@ class AircraftGeometry(Base):
                            self.prop_system.propulsion_system[1].core,
                            self.prop_system.propulsion_system[1].nozzle,
                            self.prop_system.propulsion_system[1].bypass]
-        elif Propulsion_System().n_engines == 3:
+        elif self.prop_system.n_engines == 3:
             engines_stp = [self.prop_system.propulsion_system[0].spinner,
                            self.prop_system.propulsion_system[0].fan,
                            self.prop_system.propulsion_system[0].core,
@@ -470,7 +552,7 @@ class AircraftGeometry(Base):
                            self.prop_system.propulsion_system[2].core,
                            self.prop_system.propulsion_system[2].nozzle,
                            self.prop_system.propulsion_system[2].bypass]
-        elif Propulsion_System().n_engines == 4:
+        elif self.prop_system.n_engines == 4:
             engines_stp = [self.prop_system.propulsion_system[0].spinner,
                            self.prop_system.propulsion_system[0].fan,
                            self.prop_system.propulsion_system[0].core,
@@ -520,13 +602,8 @@ class AircraftGeometry(Base):
                                  self.cg_range_hyd.cg_rear,
                                  self.newprofile.fuselage_lofted_solid_outer])
 
+    # Creating Output.txt file
 
-    ##########################################
-    #####                                #####
-    #####    Creating Output.txt file    #####
-    #####                                #####
-    ##########################################
-    #
     # f = open("output.txt", "w+")
     # f.write("Outputs Fuselage class \n\n")
     #
@@ -560,7 +637,7 @@ class AircraftGeometry(Base):
     # f.write("span_horizontal_tail = " + str(Horizontal_Tail().span_horizontal_tail) + "\n")
     # f.write("root_chord_horizontal_tail = " + str(Horizontal_Tail().root_chord_horizontal_tail) + "\n")
     # f.write("tip_chord_horizontal_tail = " + str(Horizontal_Tail().tip_chord_horizontal_tail) + "\n")
-    # f.write("sweep_leading_edge_horizontal_tail = " + str(Horizontal_Tail().sweep_leading_edge_horizontal_tail) + "\n")
+    # f.write("sweep_leading_edge_horizontal_tail = " +str(Horizontal_Tail().sweep_leading_edge_horizontal_tail) + "\n")
     # f.write(
     #     "sweep_cuarter_chord_horizontal_tail = " + str(Horizontal_Tail().sweep_cuarter_chord_horizontal_tail) + "\n")
     # f.write("sweep_mid_chord_horizontal_tail = " + str(Horizontal_Tail().sweep_mid_chord_horizontal_tail) + "\n")
@@ -698,7 +775,9 @@ class AircraftGeometry(Base):
     # f.write("z_upper = " + str(New_Fuselage_Profile().z_upper) + "\n")
     # f.close()
 
+
 if __name__ == '__main__':
     from parapy.gui import display
+
     obj1 = AircraftGeometry(label="totalgeometry")
     display(obj1)

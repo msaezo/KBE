@@ -2,23 +2,20 @@ from .wing import Wing
 from .fuselage import Fuselage
 from .ref_frame import Frame
 from .airfoil import Airfoil
-from .empennage import Vertical_Tail
-from .empennage import Horizontal_Tail
-from .cg_calculations import CG_calculations
-from .propulsion import Fan_engine
+from .empennage import VerticalTail
+from .empennage import HorizontalTail
+from .cg_calculations import CGCalculations
+from .propulsion import FanEngine
 from .fuselage import Seat
-from .fuselage import Seat_row
-from .propulsion import Propulsion_System
+from .fuselage import SeatRow
+from .propulsion import PropulsionSystem
 from .runQ3D import Q3D
 from .energy import Drag
-from .energy import Energy
+from .energy import Energy1
+from .energy import Energy2
 from .energy import Tanks
-from .fuselage_new import New_Fuselage1
-from .fuselage_new import New_Fuselage_Profile
-from .fuselage_new import New_Fuselage2
-from .cg_calculations_hyd import CG_calculations_hyd
-from .lifting_surface import Lifting_Surface
-
-
-
-
+from .fuselage_new import NewFuselage1
+from .fuselage_new import NewFuselageProfile
+from .fuselage_new import NewFuselage2
+from .cg_calculations_hyd import CGCalculationsHyd
+from .lifting_surface import LiftingSurface

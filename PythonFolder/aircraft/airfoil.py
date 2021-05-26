@@ -1,5 +1,5 @@
 
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2016 ParaPy Holding B.V.
@@ -25,8 +25,6 @@ class Airfoil(FittedCurve):  # note the use of FittedCurve as superclass
     mesh_deflection = Input(0.0001)
     factor = Input()
 
-
-
     @Attribute
     def points(self):  # required input to the FittedCurve superclass
         with open(self.airfoil_name + ".dat", 'r') as f:
@@ -35,8 +33,8 @@ class Airfoil(FittedCurve):  # note the use of FittedCurve as superclass
                 x, z = line.split(' ', 1)  # the cartesian coordinates are directly interpreted as X and Z coordinates
                 point_lst.append(self.position.translate(
                    "x", float(x)*self.chord,  # the x points are scaled according to the airfoil chord length
-                   "z", float(z)*self.chord*self.thickness_factor/self.factor)) # the y points are scaled according to the /
-                # thickness factor
+                   "z", float(z)*self.chord*self.thickness_factor/self.factor))
+                # the y points are scaled according to the thickness factor
         return point_lst
 
     @Part

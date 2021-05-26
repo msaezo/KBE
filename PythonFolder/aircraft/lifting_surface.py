@@ -3,20 +3,16 @@ from parapy.core import *
 from parapy.geom import *
 from math import *
 
-import aircraft.Import_Input as I
+import aircraft.Import_Input as In
 from aircraft.airfoil import Airfoil
 
 
-
-
-class Lifting_Surface(GeomBase):
-
-
+class LiftingSurface(GeomBase):
     # airfoil profiles
     airfoil_root = Input("aircraft\simm_airfoil")
-    airfoil_tip  = Input("aircraft\simm_airfoil")
+    airfoil_tip = Input("aircraft\simm_airfoil")
 
-    root_chord  = Input(5)
+    root_chord = Input(5)
     thickness_to_chord_root = Input(0.1)
     factor_root = Input(0.24)
 
@@ -32,7 +28,6 @@ class Lifting_Surface(GeomBase):
     z_shift_tip = Input(2)
     rotate = Input(0)
     twist = Input(0)
-
 
     @Part
     def root_airfoil(self):  # root airfoil will receive self.position as default
@@ -67,4 +62,3 @@ class Lifting_Surface(GeomBase):
     def right_wing_surface(self):
         return LoftedSurface(profiles=self.profiles,
                              mesh_deflection=0.0001)
-

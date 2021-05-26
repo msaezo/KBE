@@ -1,40 +1,44 @@
-import aircraft.Import_Input as I
+import aircraft.Import_Input as In
 import warnings
 
 from parapy.core import *
 from parapy.geom import *
 
-from aircraft.energy import Energy
+from aircraft.energy import Energy1
 from aircraft.fuselage import Fuselage
 from aircraft.wing import Wing
-from aircraft.cg_calculations import CG_calculations
+from aircraft.cg_calculations import CGCalculations
+
 
 # Hydrogen Based CG  ---- Not sure if imports are correct (hardcoded obviously not) but calculations are.
 # Maybe place in a different file so we only run it if necessary.
-class CG_calculations_hyd(GeomBase):
-    mtow = Input(I.Weight_TO)
-    payload_cg_loc = Input(I.Payload_cg_loc)
-    tank_length = Input(Energy().length_tank)  #
+class CGCalculationsHyd(GeomBase):
+    mtow = Input(In.Weight_TO)
+    payload_cg_loc = Input(In.Payload_cg_loc)
+    tank_length = Input(Energy1().length_tank)  #
     tank_front_loc = Input(Fuselage().length_cockpit)
-    vol_needed = Input(Energy().vol_needed)
-    hyd_density = Input(I.hyd_density)
+    vol_needed = Input(Energy1().vol_needed)
+    hyd_density = Input(In.hyd_density)
     g_i = Input(0.5)  # gravimetric index taken from report on flying V, cryogenic tank
-    mass_oew_fr = Input(I.OEW_mass_fraction)
-    mass_payload_fr = Input(I.Payload_mass_fraction)
-    max_cg_fuel = Input(CG_calculations().cg_aft)
-    min_cg_fuel = Input(CG_calculations().cg_forward)
+    mass_oew_fr = Input(In.OEW_mass_fraction)
+    mass_payload_fr = Input(In.Payload_mass_fraction)
+    max_cg_fuel = Input(CGCalculations().cg_aft)
+    min_cg_fuel = Input(CGCalculations().cg_forward)
+    x_le_mac = Input(Wing().x_le_mac)
+    mean_aerodynamic_chord = Input(Wing().mean_aerodynamic_chord)
+    length_fuselage = Input(Fuselage().length_fuselage)
 
     @Attribute
     def mtom(self):
-        return self.mtow/9.81
+        return self.mtow / 9.81
 
     @Attribute
     def mass_oew(self):
-        return self.mtom*self.mass_oew_fr
+        return self.mtom * self.mass_oew_fr
 
     @Attribute
     def mass_payload(self):
-        return self.mtom*self.mass_payload_fr
+        return self.mtom * self.mass_payload_fr
 
     @Attribute
     def x_fuel(self):
@@ -54,23 +58,20 @@ class CG_calculations_hyd(GeomBase):
 
     @Attribute  # Are we missing in this function the weight of the fuselage? or it is included?
     def x_oew(self):  # HERE I ADD THE CENTER OF GRAVITY CONTRIBUTION OF THE TANK WEIGHT
-        return ((Wing().x_le_mac + 0.25 * Wing().mean_aerodynamic_chord) * self.mass_oew + self.mass_tank * \
-                self.tank_cg_loc) / (self.mass_oew + self.mass_tank)
+        return ((self.x_le_mac + 0.25 * self.mean_aerodynamic_chord) * self.mass_oew + self.mass_tank
+                * self.tank_cg_loc) / (self.mass_oew + self.mass_tank)
 
     @Attribute
     def x_payload(self):
-        return self.payload_cg_loc * Fuselage().length_fuselage
-
+        return self.payload_cg_loc * self.length_fuselage
 
     @Attribute
     def cg_forward(self):
-        oew_and_payload = (self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
-                self.mass_oew + self.mass_payload)
-        oew_and_payload_and_fuel = (
-                                           self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
-                                           self.mass_fuel + self.mass_oew + self.mass_payload)
-        oew_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (
-                self.mass_fuel + self.mass_oew)
+        oew_and_payload = (self.x_oew * self.mass_oew
+                           + self.x_payload * self.mass_payload) / (self.mass_oew + self.mass_payload)
+        oew_and_payload_and_fuel = (self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew + self.x_payload
+                                    * self.mass_payload) / (self.mass_fuel + self.mass_oew + self.mass_payload)
+        oew_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (self.mass_fuel + self.mass_oew)
         min_cg_hyd = min(oew_and_fuel, oew_and_payload_and_fuel, oew_and_payload)
         if min_cg_hyd > self.max_cg_fuel:
             msg = "The most forward center of gravity location for the hydrogen aircraft is less stable than " \
@@ -85,12 +86,11 @@ class CG_calculations_hyd(GeomBase):
     def cg_aft(self):
         oew_and_payload = (self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
                 self.mass_oew + self.mass_payload)
-        oew_and_paylod_and_fuel = (
-                                          self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (
-                                          self.mass_fuel + self.mass_oew + self.mass_payload)
+        oew_and_payload_and_fuel = (self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew + self.x_payload
+                                    * self.mass_payload) / (self.mass_fuel + self.mass_oew + self.mass_payload)
         oew_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (
                 self.mass_fuel + self.mass_oew)
-        max_cg_hyd = max(oew_and_fuel, oew_and_paylod_and_fuel, oew_and_payload)
+        max_cg_hyd = max(oew_and_fuel, oew_and_payload_and_fuel, oew_and_payload)
 
         if max_cg_hyd > self.max_cg_fuel:
             msg = "The most after center of gravity location for the hydrogen aircraft is less stable than " \
@@ -99,7 +99,7 @@ class CG_calculations_hyd(GeomBase):
                   "     - Further investigation of stability required"
             warnings.warn(msg)
 
-        elif (max_cg_hyd-self.cg_forward) >= (self.max_cg_fuel - self.min_cg_fuel):
+        elif (max_cg_hyd - self.cg_forward) >= (self.max_cg_fuel - self.min_cg_fuel):
             msg = "The center of gravity range of the hydrogen aircraft is larger than the center of gravity range" \
                   "of the kerosene aircraft. Aircraft might be unstable" \
                   "Suggested options:" \
