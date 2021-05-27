@@ -104,6 +104,7 @@ class Drag(GeomBase):
     gg_length = Input(FanEngine().length_gas_generator)
     gg_diam = Input(FanEngine().diameter_gas_generator)
     gg_diam_exit = Input(FanEngine().exit_diameter_gas_generator)
+    n_engines = Input(In.N_engines)
     q_nacelle = Input(1.3)
     q_fuselage = Input(1)
     q_emp = Input(1.04)
@@ -195,7 +196,8 @@ class Drag(GeomBase):
 
     @Attribute
     def wet_area_total(self):
-        return self.wet_area_fus + self.wet_area_ht + self.wet_area_vt + self.wet_area_nacelle
+        return self.wet_area_fus + self.wet_area_ht + self.wet_area_vt + self.n_engines*self.wet_area_nacelle
+
 
     @Attribute
     def skin_friction(self):
@@ -214,6 +216,7 @@ class Drag(GeomBase):
     @Attribute
     def form_factor_fus(self):
         return 1 + 60 / (self.fus_len / self.fus_diam) ** 3 + (self.fus_len / self.fus_diam) / 400
+
 
     @Attribute
     def form_factor_nacelle(self):

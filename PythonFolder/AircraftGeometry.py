@@ -337,7 +337,7 @@ class AircraftGeometry(Base):
                               span_vertical=self.vertical_tail.span_vertical_tail,
                               root_chord_vertical_tail=self.vertical_tail.root_chord_vertical_tail,
                               tail_config=self.tail_config,
-                              sweep_vertical = self.vertical_tail.sweep_leading_edge_vertical)
+                              sweep_vertical=self.vertical_tail.sweep_leading_edge_vertical)
 
     @Part
     def prop_system(self):
@@ -395,7 +395,10 @@ class AircraftGeometry(Base):
                     mac=self.main_wing.mean_aerodynamic_chord,
                     altitude=self.altitude_cruise,
                     mach=self.mach_cruise,
-                    cl=self.main_wing.lift_coefficient)
+                    cl=self.main_wing.lift_coefficient,
+                    n_engines=self.n_engines)
+
+
 
     @Attribute
     def energy(self):
@@ -424,6 +427,43 @@ class AircraftGeometry(Base):
                      diameter_tank_final=self.energy.diameter_tank_final,
                      number_of_tanks=self.energy.number_of_tanks,
                      length_tank=self.energy.length_tank)
+
+    @Attribute
+    def new_profile(self):
+        return NewFuselageProfile(fuselage_diameter=self.fuselage.diameter_fuselage_outer,
+                                  y_pos=self.tanks.y_pos,
+                                  z_pos=self.tanks.z_pos,
+                                  diameter_tank_final=self.tanks.diameter_tank_final)
+
+    @Attribute
+    def drag_new(self):
+        return Drag(lift_coefficient=self.q3d.cldes,
+                    drag_coefficient=self.q3d.cddes,
+                    density=self.q3d.air_density,
+                    velocity=self.q3d.air_speed,
+                    surface=self.main_wing.area_wing,
+                    fus_diam=self.new_profile.fus_diam_new,
+                    ht_surface=self.horizontal_tail.surface_horizontal_tail,
+                    ht_sweep=self.horizontal_tail.sweep_cuarter_chord_horizontal_tail,
+                    vt_surface=self.vertical_tail.surface_vertical_tail,
+                    vt_sweep=self.vertical_tail.sweep_cuarter_chord_vertical_tail,
+                    len_nacelle=self.turbofan.nacelle_length,
+                    cowling_length=self.turbofan.fan_length,
+                    cowling_length_1=self.turbofan.loc_max_diameter,
+                    cowling_diam=self.turbofan.max_diameter,
+                    cowling_fan=self.turbofan.inlet_diameter,
+                    cowling_ef=self.turbofan.exit_diameter,
+                    gg_length=self.turbofan.length_gas_generator,
+                    gg_diam=self.turbofan.diameter_gas_generator,
+                    gg_diam_exit=self.turbofan.exit_diameter_gas_generator,
+                    span=self.main_wing.span,
+                    root_chord=self.main_wing.chord_root,
+                    tip_chord=self.main_wing.chord_tip,
+                    mac=self.main_wing.mean_aerodynamic_chord,
+                    altitude=self.altitude_cruise,
+                    mach=self.mach_cruise,
+                    cl=self.main_wing.lift_coefficient,
+                    n_engines=self.n_engines)
 
     @Part
     def cg_range_hyd(self):

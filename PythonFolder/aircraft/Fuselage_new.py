@@ -103,6 +103,30 @@ class NewFuselageProfile(GeomBase):
     def z_upper(self):
         return np.sin(self.angle_2) * self.fuselage_diameter / 2
 
+    @Attribute
+    def fuselage_angle(self):
+        return np.pi - 2 * self.angle_2
+
+    @Attribute
+    def tank_angle(self):
+        return np.pi/2 + self.angle_2
+
+    @Attribute
+    def profile_length_fuselage(self):
+        return np.pi*self.fuselage_diameter * self.fuselage_angle/(2*np.pi)
+
+    @Attribute
+    def profile_length_tank(self):
+        return np.pi * self.diameter_tank_final * 1.1 * self.tank_angle /(2*np.pi)
+
+    @Attribute
+    def circum_new_fuselage(self):
+        return self.profile_length_fuselage + 2*self.profile_length_tank+2*self.y_pos+2*self.straight_length_outer
+
+    @Attribute
+    def fus_diam_new(self):
+        return self.circum_new_fuselage/np.pi
+
     @Part
     def line_1(self):
         return LineSegment(start=Point(self.x_pos, self.y_lower, self.z_lower),
