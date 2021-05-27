@@ -535,9 +535,8 @@ class AircraftGeometry(Base):
         return self.weight_to * self.mass_fuel
 
     @Attribute
-    def new_MTOW(self):
-        return (self.weight_to - self.fuel_mass) + (self.cg_range_hyd.g_i * self.cg_range_hyd.vol_needed *
-                                                  self.cg_range_hyd.vol_to_kg_hyd)
+    def new_mtow(self):
+        return self.weight_to - self.fuel_mass + (self.energy.vol_needed * 1000 * self.cg_range_hyd.vol_to_kg_hyd*9.81)
 
     @Attribute
     def new_fuselage_1(self):

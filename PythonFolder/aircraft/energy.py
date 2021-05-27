@@ -269,15 +269,20 @@ class Drag(GeomBase):
         b = c + d
         x = a*b
         return 1/x
+
     @Attribute
     def induced_drag(self):
         drag_coeff = self.cl**2/(pi*self.surface*self.oswald)
         return drag_coeff
 
+    # @Attribute
+    # def drag_tot(self):
+    #     return (self.drag_coefficient_total + self.wave_drag_coefficient_change + self.induced_drag) * \
+    #            self.dynamic_pressure * self.surface
+
     @Attribute
     def drag_tot(self):
-        return (self.drag_coefficient_total + self.wave_drag_coefficient_change + self.induced_drag) * \
-               self.dynamic_pressure * self.surface
+        return self.drag_coefficient_total * self.dynamic_pressure * self.surface
 
 
 # calculates energy needed through drag  and transfers it to required volume of tanks
@@ -352,117 +357,17 @@ class Energy1(GeomBase):
     def diameter_tank_final(self):
         return self.diameter_tank[self.number_of_tanks - 1]
 
-    # @Part
-    # def cylinder(self):
-    #     return Cylinder(radius=self.diameter_tank_final / 2,
-    #                     height=self.length_tank,
-    #                     centered=True,
-    #                     position=translate(
-    #                         rotate(self.position, "y", np.deg2rad(90)),
-    #                         "z", self.length_tank / 2 + self.diameter_tank_final / 2),
-    #                     mesh_deflection=0.0001,
-    #                     hidden=True)
-    #
-    # @Part
-    # def sphere1(self):
-    #     return Sphere(radius=self.diameter_tank_final / 2,
-    #                   position=translate(self.position,
-    #                                      "x", self.diameter_tank_final / 2),
-    #                   hidden=True)
-    #
-    # @Part
-    # def sphere2(self):
-    #     return Sphere(radius=self.diameter_tank_final / 2,
-    #                   position=translate(self.position,
-    #                                      "x", self.length_tank + self.diameter_tank_final / 2),
-    #                   hidden=True)
-    #
-    # @Part
-    # def tank1(self):
-    #     return FusedSolid(shape_in=self.cylinder,
-    #                       tool=self.sphere1,
-    #                       hidden=True)
-    #
-    # @Part
-    # def tank(self):
-    #     return FusedSolid(shape_in=self.tank1,
-    #                       tool=self.sphere2,
-    #                       hidden=False,
-    #                       color="Orange")
 
 
 class Energy2(GeomBase):
 
     diameter_tank_final = Input(Energy1().diameter_tank_final)
     length_tank = Input(Energy1().length_tank)
-    #
-    #
-    # range = Input(Tanks().range)
-    # efficiency = Input(Tanks().efficiency)
-    # energy_density = Input(Tanks().energy_density)
-    # n_tanks = Input([1, 2, 3, 4])
-    # drag = Input(Drag().drag_tot)
-    # fus_diam = Input(Fuselage().diameter_fuselage_inner)
-    # length_fuselage = Input(Fuselage().length_fuselage)
-    # length_cockpit = Input(Fuselage().length_cockpit)
-    # length_tailcone = Input(Fuselage().length_tailcone)
-    # position_floor_lower = Input(Fuselage().position_floor_lower)
+
 
     popup_gui = Input(False)
 
-    # @Attribute
-    # def work(self):
-    #     return self.drag * self.range * 1000
-    #
-    # @Attribute
-    # def energy_req(self):
-    #     return self.work / self.efficiency
-    #
-    # @Attribute
-    # def vol_needed(self):
-    #     return self.energy_req / (self.energy_density * 10 ** 6)
-    #
-    # @Attribute
-    # def length_tank(self):
-    #     return (self.length_fuselage - self.length_cockpit - self.length_tailcone) * 0.95
-    #
-    # @Attribute
-    # def diameter_tank(self):
-    #     diameter = []
-    #     for i in range(0, len(self.n_tanks)):
-    #         coeff = [1, 0.75 * self.length_tank, -0.75 * self.vol_needed / self.n_tanks[i] * 1 / np.pi]
-    #         roots = np.roots(coeff)
-    #         roots1 = roots[0]
-    #         roots2 = roots[1]
-    #         # print (roots1)
-    #         # print (roots2)
-    #         if roots1 > 0:
-    #             radius = roots1
-    #         else:
-    #             radius = roots2
-    #         diameter.append(radius * 2)
-    #
-    #     return diameter
-    #
-    # @Attribute
-    # def number_of_tanks(self):
-    #     max_distance = []
-    #     for i in range(0, len(self.n_tanks)):
-    #         z_pos = self.position_floor_lower - 1.1 * self.diameter_tank[i] / 2
-    #         y_pos = (1.1 * self.diameter_tank[i] * (self.n_tanks[i] - 1)) / 2
-    #         tot_pos = np.sqrt(z_pos ** 2 + y_pos ** 2)
-    #         max_distance.append(tot_pos)
-    #     max_dist = min(max_distance)
-    #     for i in range(0, len(self.n_tanks)):
-    #         if max_dist == max_distance[i]:
-    #             n_tanks = i
-    #         else:
-    #             n_tanks = 2
-    #     return n_tanks
-    #
-    # @Attribute
-    # def diameter_tank_final(self):
-    #     return self.diameter_tank[self.number_of_tanks - 1]
+
 
     @Part
     def cylinder(self):

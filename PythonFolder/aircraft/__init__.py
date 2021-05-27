@@ -14,8 +14,8 @@ from .energy import Drag
 from .energy import Energy1
 from .energy import Energy2
 from .energy import Tanks
-from .Fuselage_new import NewFuselage1
-from .Fuselage_new import NewFuselageProfile
-from .Fuselage_new import NewFuselage2
+from .fuselage_new import NewFuselage1
+from .fuselage_new import NewFuselageProfile
+from .fuselage_new import NewFuselage2
 from .cg_calculations_hyd import CGCalculationsHyd
 from .lifting_surface import LiftingSurface
