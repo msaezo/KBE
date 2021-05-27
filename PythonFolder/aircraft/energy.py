@@ -269,6 +269,7 @@ class Drag(GeomBase):
         b = c + d
         x = a*b
         return 1/x
+
     @Attribute
     def induced_drag(self):
         drag_coeff = self.cl**2/(pi*self.surface*self.oswald)
@@ -276,7 +277,7 @@ class Drag(GeomBase):
 
     @Attribute
     def drag_tot(self):
-        return (self.drag_coefficient_total + self.wave_drag_coefficient_change + self.induced_drag) * \
+        return (self.drag_coefficient_total) * \
                self.dynamic_pressure * self.surface
 
 

@@ -536,7 +536,7 @@ class AircraftGeometry(Base):
 
     @Attribute
     def new_MTOW(self):
-        return (self.weight_to - self.fuel_mass) + (self.cg_range_hyd.g_i * self.cg_range_hyd.vol_needed *
+        return (self.weight_to - self.fuel_mass) + (self.cg_range_hyd.g_i * self.cg_range_hyd.vol_needed * 1000 *
                                                   self.cg_range_hyd.vol_to_kg_hyd)
 
     @Attribute
