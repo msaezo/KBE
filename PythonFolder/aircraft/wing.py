@@ -88,6 +88,10 @@ class Wing(GeomBase):
         return self.mach_cruise + 0.03
 
     @Attribute
+    def mach_critical(self):
+        return self.mach_drag_divergence - 0.18
+
+    @Attribute
     def sweep_quarter_chord(self):
         if self.mach_cruise < 0.7:
             sweep = np.rad2deg(np.arccos(1))

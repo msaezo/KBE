@@ -395,7 +395,11 @@ class AircraftGeometry(Base):
                     mac=self.main_wing.mean_aerodynamic_chord,
                     altitude=self.altitude_cruise,
                     mach=self.mach_cruise,
+                    mach_critical=self.main_wing.mach_critical,
                     cl=self.main_wing.lift_coefficient,
+                    taper_ratio=self.main_wing.taper_ratio,
+                    aspect_ratio=self.main_wing.aspect_ratio,
+                    sweep=self.main_wing.sweep_quarter_chord,
                     n_engines=self.n_engines)
 
 
@@ -462,7 +466,11 @@ class AircraftGeometry(Base):
                     mac=self.main_wing.mean_aerodynamic_chord,
                     altitude=self.altitude_cruise,
                     mach=self.mach_cruise,
+                    mach_critical=self.main_wing.mach_critical,
                     cl=self.main_wing.lift_coefficient,
+                    taper_ratio=self.main_wing.taper_ratio,
+                    aspect_ratio=self.main_wing.aspect_ratio,
+                    sweep=self.main_wing.sweep_quarter_chord,
                     n_engines=self.n_engines)
 
     @Attribute
@@ -484,6 +492,14 @@ class AircraftGeometry(Base):
     @Attribute
     def cd_fuselage_new_count_increase(self):
         return (self.drag_new.drag_coeff_fus - self.drag.drag_coeff_fus)*10000
+
+    @Attribute
+    def wave_drag_increase(self):
+        return self.drag_new.wave_drag_coefficient_change
+
+    @Attribute
+    def induced_drag_coefficient(self):
+        return self.drag_new.induced_drag
 
     @Attribute
     def cd_old(self):

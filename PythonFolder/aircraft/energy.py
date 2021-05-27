@@ -123,7 +123,11 @@ class Drag(GeomBase):
 
     altitude = Input(Wing().altitude_cruise)  # m
     mach = Input(Wing().mach_cruise)  # make it in accordance with the flight speed and altitude
+    mach_critical = Input(Wing().mach_critical)
     cl = Input(Wing().lift_coefficient)  # if Cl is used do not use angle of attack
+    taper_ratio = Input(Wing().taper_ratio)
+    aspect_ratio = Input(Wing().aspect_ratio)
+    sweep = Input(Wing().sweep_quarter_chord)
 
     popup_gui = Input(False)
 
@@ -252,8 +256,28 @@ class Drag(GeomBase):
                + self.drag_coeff_nacelle
 
     @Attribute
+    def wave_drag_coefficient_change(self):
+        drag_coeff_change = 0.1498 * (self.mach/self.mach_critical - 1)**3.2
+        return drag_coeff_change
+
+    @Attribute
+    def oswald(self):
+        a = (1+0.12*self.mach**6)
+        f = 0.005*(1+1.15*(self.taper_ratio-0.6)**2)
+        c = 1 + (0.142+f*self.aspect_ratio*(10*self.thick_to_chord)**0.33)/(cos(self.sweep))**2
+        d = (0.1*(3*self.n_engines + 1))/(4+self.aspect_ratio)**0.8
+        b = c + d
+        x = a*b
+        return 1/x
+    @Attribute
+    def induced_drag(self):
+        drag_coeff = self.cl**2/(pi*self.surface*self.oswald)
+        return drag_coeff
+
+    @Attribute
     def drag_tot(self):
-        return self.drag_coefficient_total * self.dynamic_pressure * self.surface
+        return (self.drag_coefficient_total + self.wave_drag_coefficient_change + self.induced_drag) * \
+               self.dynamic_pressure * self.surface
 
 
 # calculates energy needed through drag  and transfers it to required volume of tanks
