@@ -465,6 +465,30 @@ class AircraftGeometry(Base):
                     cl=self.main_wing.lift_coefficient,
                     n_engines=self.n_engines)
 
+    @Attribute
+    def drag_value_old(self):
+        return self.drag.drag_tot
+
+    @Attribute
+    def drag_value_new(self):
+        return self.drag_new.drag_tot
+
+    @Attribute
+    def cd_fuselage_old(self):
+        return self.drag.drag_coeff_fus
+
+    @Attribute
+    def cd_fuselage_new(self):
+        return self.drag_new.drag_coeff_fus
+
+    @Attribute
+    def cd_old(self):
+        return self.drag.drag_coefficient_total
+
+    @Attribute
+    def cd_new(self):
+        return self.drag_new.drag_coefficient_total
+
     @Part
     def cg_range_hyd(self):
         return CGCalculationsHyd(mtow=self.weight_to,
