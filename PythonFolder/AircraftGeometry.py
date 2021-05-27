@@ -482,6 +482,10 @@ class AircraftGeometry(Base):
         return self.drag_new.drag_coeff_fus
 
     @Attribute
+    def cd_fuselage_new_count_increase(self):
+        return (self.drag_new.drag_coeff_fus - self.drag.drag_coeff_fus)*10000
+
+    @Attribute
     def cd_old(self):
         return self.drag.drag_coefficient_total
 
@@ -498,6 +502,7 @@ class AircraftGeometry(Base):
                                  vol_needed=self.energy.vol_needed,
                                  hyd_density=self.hyd_density,
                                  g_i=0.5,  # gravimetric index taken from report on flying V, cryogenic tank
+                                 vol_to_kg_hyd=8/120, #hydrogen conversion from L to kg
                                  mass_oew_fr=self.mass_oew,
                                  mass_payload_fr=self.mass_payload,
                                  max_cg_fuel=self.cg_calc.cg_aft,
@@ -509,6 +514,14 @@ class AircraftGeometry(Base):
         # Variable input for new fuselage depending on tank size
         # if tanks dont fit inside fuselage use new profiles that do fit
         # else reuse old profiles and recreate fuselage as is
+    @Attribute
+    def fuel_mass(self):
+        return self.weight_to * self.mass_fuel
+
+    @Attribute
+    def new_MTOW(self):
+        return (self.weight_to - self.fuel_mass) + (self.cg_range_hyd.g_i * self.cg_range_hyd.vol_needed *
+                                                  self.cg_range_hyd.vol_to_kg_hyd)
 
     @Attribute
     def new_fuselage_1(self):

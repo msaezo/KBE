@@ -20,6 +20,7 @@ class CGCalculationsHyd(GeomBase):
     vol_needed = Input(Energy1().vol_needed)
     hyd_density = Input(In.hyd_density)
     g_i = Input(0.5)  # gravimetric index taken from report on flying V, cryogenic tank
+    vol_to_kg_hyd = Input(8/120)
     mass_oew_fr = Input(In.OEW_mass_fraction)
     mass_payload_fr = Input(In.Payload_mass_fraction)
     max_cg_fuel = Input(CGCalculations().cg_aft)
