@@ -189,14 +189,14 @@ class NewFuselageProfile(GeomBase):
         return SplitEdge(built_from=self.circle_tank_1,
                          tool=[Point(self.x_pos, self.y_lower, self.z_lower),
                                Point(self.x_pos, self.y_pos, self.z_pos - self.diameter_tank_final / 2 * 1.1)],
-                         hidden=False)
+                         hidden=True)
 
     @Part
     def splitted_tank_2(self):
         return SplitEdge(built_from=self.circle_tank_2,
                          tool=[Point(self.x_pos, -self.y_lower, self.z_lower),
                                Point(self.x_pos, -self.y_pos, self.z_pos - self.diameter_tank_final / 2 * 1.1)],
-                         hidden=False)
+                         hidden=True)
 
     @Part
     def composed_crv(self):

@@ -37,7 +37,7 @@ class Tanks(GeomBase):
     diameter_tank_final = Input(0.5)
     number_of_tanks = Input(5)
     length_tank = Input(10)
-
+    popup_gui = Input(True)
     @Attribute
     def y_pos(self):
         return (1.1 * self.diameter_tank_final * (self.number_of_tanks - 1)) / 2
@@ -129,7 +129,7 @@ class Drag(GeomBase):
     aspect_ratio = Input(Wing().aspect_ratio)
     sweep = Input(Wing().sweep_quarter_chord)
 
-    popup_gui = Input(False)
+    popup_gui = Input(True)
 
     @Attribute
     def temperature(self):
@@ -301,7 +301,7 @@ class Energy1(GeomBase):
     length_tailcone = Input(Fuselage().length_tailcone)
     position_floor_lower = Input(Fuselage().position_floor_lower)
 
-    popup_gui = Input(False)
+    popup_gui = Input(True)
 
     @Attribute
     def work(self):
@@ -365,7 +365,7 @@ class Energy2(GeomBase):
     length_tank = Input(Energy1().length_tank)
 
 
-    popup_gui = Input(False)
+    popup_gui = Input(True)
 
 
 

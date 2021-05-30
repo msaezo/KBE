@@ -262,6 +262,26 @@ class Fuselage(GeomBase):
             k_cabin1 = 1.17
         return k_cabin1
 
+    @Attribute
+    def n_rows_front(self):
+        return int(np.floor((self.length_nosecone - self.length_cockpit) / (0.8 * self.k_cabin)))
+
+    @Attribute
+    def n_rows_middle(self):
+        return int(np.floor((self.length_fuselage - self.length_nosecone - self.length_tailcone)
+                                             / (0.9 * self.k_cabin)))
+
+    @Attribute
+    def n_rows_rear(self):
+        return int((self.n_pax - self.seats_abreast * int(np.floor((self.length_fuselage
+                                                                                     - self.length_nosecone
+                                                                                     - self.length_tailcone)
+                                                                                    / (0.9 * self.k_cabin)))
+                                     - (self.seats_abreast - 2) * int(np.floor((self.length_nosecone
+                                                                                - self.length_cockpit)
+                                                                               / (0.8 * self.k_cabin))))
+                                    / (self.seats_abreast - 2))
+
     # Place seats in front part (less seats abreast as fuselage is slimming down)
     # Uses seat row class
     @Part
@@ -272,7 +292,7 @@ class Fuselage(GeomBase):
                        n_aisles=self.n_aisles,
                        height_shoulder=self.height_shoulder,
                        seats_abreast=self.seats_abreast - 2,
-                       quantify=int(np.floor((self.length_nosecone - self.length_cockpit) / (0.8 * self.k_cabin))),
+                       quantify=self.n_rows_front,
                        position=translate(self.position,
                                           'x', self.length_cockpit + child.index * 0.8 * self.k_cabin),
                        hidden=False)
@@ -287,8 +307,7 @@ class Fuselage(GeomBase):
                        seats_abreast=self.seats_abreast,
                        n_aisles=self.n_aisles,
                        height_shoulder=self.height_shoulder,
-                       quantify=int(np.floor((self.length_fuselage - self.length_nosecone - self.length_tailcone)
-                                             / (0.9 * self.k_cabin))),
+                       quantify=self.n_rows_middle,
                        position=translate(self.position,
                                           'x', self.length_nosecone + child.index * 0.9 * self.k_cabin),
                        hidden=False)
@@ -303,14 +322,7 @@ class Fuselage(GeomBase):
                        n_aisles=self.n_aisles,
                        height_shoulder=self.height_shoulder,
                        seats_abreast=self.seats_abreast - 2,
-                       quantify=int((self.n_pax - self.seats_abreast * int(np.floor((self.length_fuselage
-                                                                                     - self.length_nosecone
-                                                                                     - self.length_tailcone)
-                                                                                    / (0.9 * self.k_cabin)))
-                                     - (self.seats_abreast - 2) * int(np.floor((self.length_nosecone
-                                                                                - self.length_cockpit)
-                                                                               / (0.8 * self.k_cabin))))
-                                    / (self.seats_abreast - 2)),
+                       quantify=self.n_rows_rear,
                        position=translate(self.position,
                                           'x',
                                           self.length_fuselage-self.length_tailcone + child.index * 0.8 * self.k_cabin),

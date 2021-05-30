@@ -28,7 +28,7 @@ class CGCalculationsHyd(GeomBase):
     x_le_mac = Input(Wing().x_le_mac)
     mean_aerodynamic_chord = Input(Wing().mean_aerodynamic_chord)
     length_fuselage = Input(Fuselage().length_fuselage)
-
+    popup_gui = Input(True)
     @Attribute
     def mtom(self):
         return self.mtow / 9.81
@@ -80,7 +80,8 @@ class CGCalculationsHyd(GeomBase):
                   "Suggested options:" \
                   "     - Further investigation of stability required"
             warnings.warn(msg)
-
+            if self.popup_gui:  # invoke pop-up dialogue box using Tk"""
+                generate_warning("Warning: Value changed", msg)
         return min_cg_hyd
 
     @Attribute

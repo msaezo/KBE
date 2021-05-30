@@ -199,40 +199,6 @@ class AircraftGeometry(Base):
         finish = 'Look in terminal for warnings'
         return finish
 
-    # Some attributes to easily check in parapy GUI
-
-    # @Attribute
-    # def volume_needed(self):
-    #     return Energy().vol_needed
-    #
-    # @Attribute
-    # def cl_in(self):
-    #     return Wing().lift_coefficient
-    #
-    # @Attribute
-    # def cl_out(self):
-    #     return Q3D().cldes
-    #
-    # @Attribute
-    # def cd_out(self):
-    #     return Q3D().cddes
-    #
-    # @Attribute
-    # def alpha(self):
-    #     return Q3D().alpha
-    #
-    # @Attribute
-    # def reynolds(self):
-    #     return Q3D().reynolds
-    #
-    # @Attribute
-    # def cd_total(self):
-    #     return Drag().drag_coefficient_total
-    #
-    # @Attribute
-    # def drag_total(self):
-    #     return Drag().drag
-
     @Attribute
     def cg_calc(self):
         return CGCalculations(payload_cg_loc=self.Payload_cg_loc,
@@ -402,8 +368,6 @@ class AircraftGeometry(Base):
                     sweep=self.main_wing.sweep_quarter_chord,
                     n_engines=self.n_engines)
 
-
-
     @Attribute
     def energy(self):
         return Energy1(range=self.range,
@@ -419,18 +383,18 @@ class AircraftGeometry(Base):
     @Part
     def tanks(self):
         return Tanks(  # range=self.range,
-                     # efficiency=self.efficiency,
-                     # energy_density=self.energy_density,
-                     # fus_diam=self.fuselage.diameter_fuselage_outer,
-                     # length_fuselage=self.fuselage.length_fuselage,
-                     length_cockpit=self.fuselage.length_cockpit,
-                     # length_tailcone=self.fuselage.length_tailcone,
-                     position_floor_lower=self.fuselage.position_floor_lower,
-                     diameter_fuselage_inner=self.fuselage.diameter_fuselage_inner,
-                     # drag=self.drag.drag_tot,
-                     diameter_tank_final=self.energy.diameter_tank_final,
-                     number_of_tanks=self.energy.number_of_tanks,
-                     length_tank=self.energy.length_tank)
+            # efficiency=self.efficiency,
+            # energy_density=self.energy_density,
+            # fus_diam=self.fuselage.diameter_fuselage_outer,
+            # length_fuselage=self.fuselage.length_fuselage,
+            length_cockpit=self.fuselage.length_cockpit,
+            # length_tailcone=self.fuselage.length_tailcone,
+            position_floor_lower=self.fuselage.position_floor_lower,
+            diameter_fuselage_inner=self.fuselage.diameter_fuselage_inner,
+            # drag=self.drag.drag_tot,
+            diameter_tank_final=self.energy.diameter_tank_final,
+            number_of_tanks=self.energy.number_of_tanks,
+            length_tank=self.energy.length_tank)
 
     @Attribute
     def new_profile(self):
@@ -491,7 +455,7 @@ class AircraftGeometry(Base):
 
     @Attribute
     def cd_fuselage_new_count_increase(self):
-        return (self.drag_new.drag_coeff_fus - self.drag.drag_coeff_fus)*10000
+        return (self.drag_new.drag_coeff_fus - self.drag.drag_coeff_fus) * 10000
 
     @Attribute
     def wave_drag_increase(self):
@@ -518,7 +482,7 @@ class AircraftGeometry(Base):
                                  vol_needed=self.energy.vol_needed,
                                  hyd_density=self.hyd_density,
                                  g_i=0.5,  # gravimetric index taken from report on flying V, cryogenic tank
-                                 vol_to_kg_hyd=8/120, #hydrogen conversion from L to kg
+                                 vol_to_kg_hyd=8 / 120,  # hydrogen conversion from L to kg
                                  mass_oew_fr=self.mass_oew,
                                  mass_payload_fr=self.mass_payload,
                                  max_cg_fuel=self.cg_calc.cg_aft,
@@ -530,13 +494,15 @@ class AircraftGeometry(Base):
         # Variable input for new fuselage depending on tank size
         # if tanks dont fit inside fuselage use new profiles that do fit
         # else reuse old profiles and recreate fuselage as is
+
     @Attribute
     def fuel_mass(self):
         return self.weight_to * self.mass_fuel
 
     @Attribute
     def new_mtow(self):
-        return self.weight_to - self.fuel_mass + (self.energy.vol_needed * 1000 * self.cg_range_hyd.vol_to_kg_hyd*9.81)
+        return self.weight_to - self.fuel_mass + (
+                self.energy.vol_needed * 1000 * self.cg_range_hyd.vol_to_kg_hyd * 9.81)
 
     @Attribute
     def new_fuselage_1(self):
@@ -590,109 +556,85 @@ class AircraftGeometry(Base):
 
     @Attribute
     def tanks_step(self):
-        if self.energy.number_of_tanks == 1:
-            tanks_stp = [self.tanks.tank[0].tank]
-        elif self.energy.number_of_tanks == 2:
-            tanks_stp = [self.tanks.tank[0].tank,
-                         self.tanks.tank[1].tank]
-        elif self.energy.number_of_tanks == 3:
-            tanks_stp = [self.tanks.tank[0].tank,
-                         self.tanks.tank[1].tank,
-                         self.tanks.tank[2].tank]
-        elif self.energy.number_of_tanks == 4:
-            tanks_stp = [self.tanks.tank[0].tank,
-                         self.tanks.tank[1].tank,
-                         self.tanks.tank[2].tank,
-                         self.tanks.tank[3].tank]
-        else:
-            tanks_stp = [self.tanks.tank[0].tank,
-                         self.tanks.tank[1].tank]
+        tanks_stp = []
+        for i in range(0, int(self.energy.number_of_tanks)):
+            tanks_stp = tanks_stp + [self.tanks.tank[i].tank]
         return tanks_stp
 
     @Attribute
+    def seats_step(self):
+        seats_stp = []
+        for i in range(0, int(self.fuselage.n_rows_front)):
+            for j in range(0, int(self.fuselage.seats_abreast-2)):
+                seats_stp = seats_stp + [self.fuselage.seats_front[i].seat_row[j].seat]
+        for i in range(0, int(self.fuselage.n_rows_middle)):
+            for j in range(0, int(self.fuselage.seats_abreast)):
+                seats_stp = seats_stp + [self.fuselage.seats_middle[i].seat_row[j].seat]
+        for i in range(0, int(self.fuselage.n_rows_rear)):
+            for j in range(0, int(self.fuselage.seats_abreast-2)):
+                seats_stp = seats_stp + [self.fuselage.seats_rear[i].seat_row[j].seat]
+        return seats_stp
+
+    @Attribute
     def engines_step(self):
-        if self.prop_system.n_engines == 1:
-            engines_stp = [self.prop_system.propulsion_system[0].spinner,
-                           self.prop_system.propulsion_system[0].fan,
-                           self.prop_system.propulsion_system[0].core,
-                           self.prop_system.propulsion_system[0].nozzle,
-                           self.prop_system.propulsion_system[0].bypass]
-        elif self.prop_system.n_engines == 2:
-            engines_stp = [self.prop_system.propulsion_system[0].spinner,
-                           self.prop_system.propulsion_system[0].fan,
-                           self.prop_system.propulsion_system[0].core,
-                           self.prop_system.propulsion_system[0].nozzle,
-                           self.prop_system.propulsion_system[0].bypass,
-                           self.prop_system.propulsion_system[1].spinner,
-                           self.prop_system.propulsion_system[1].fan,
-                           self.prop_system.propulsion_system[1].core,
-                           self.prop_system.propulsion_system[1].nozzle,
-                           self.prop_system.propulsion_system[1].bypass]
-        elif self.prop_system.n_engines == 3:
-            engines_stp = [self.prop_system.propulsion_system[0].spinner,
-                           self.prop_system.propulsion_system[0].fan,
-                           self.prop_system.propulsion_system[0].core,
-                           self.prop_system.propulsion_system[0].nozzle,
-                           self.prop_system.propulsion_system[0].bypass,
-                           self.prop_system.propulsion_system[1].spinner,
-                           self.prop_system.propulsion_system[1].fan,
-                           self.prop_system.propulsion_system[1].core,
-                           self.prop_system.propulsion_system[1].nozzle,
-                           self.prop_system.propulsion_system[1].bypass,
-                           self.prop_system.propulsion_system[2].spinner,
-                           self.prop_system.propulsion_system[2].fan,
-                           self.prop_system.propulsion_system[2].core,
-                           self.prop_system.propulsion_system[2].nozzle,
-                           self.prop_system.propulsion_system[2].bypass]
-        elif self.prop_system.n_engines == 4:
-            engines_stp = [self.prop_system.propulsion_system[0].spinner,
-                           self.prop_system.propulsion_system[0].fan,
-                           self.prop_system.propulsion_system[0].core,
-                           self.prop_system.propulsion_system[0].nozzle,
-                           self.prop_system.propulsion_system[0].bypass,
-                           self.prop_system.propulsion_system[1].spinner,
-                           self.prop_system.propulsion_system[1].fan,
-                           self.prop_system.propulsion_system[1].core,
-                           self.prop_system.propulsion_system[1].nozzle,
-                           self.prop_system.propulsion_system[1].bypass,
-                           self.prop_system.propulsion_system[2].spinner,
-                           self.prop_system.propulsion_system[2].fan,
-                           self.prop_system.propulsion_system[2].core,
-                           self.prop_system.propulsion_system[2].nozzle,
-                           self.prop_system.propulsion_system[2].bypass,
-                           self.prop_system.propulsion_system[3].spinner,
-                           self.prop_system.propulsion_system[3].fan,
-                           self.prop_system.propulsion_system[3].core,
-                           self.prop_system.propulsion_system[3].nozzle,
-                           self.prop_system.propulsion_system[3].bypass]
+        engines_stp = []
+        for i in range(0, int(self.prop_system.n_engines)):
+            engines_stp = engines_stp + [self.prop_system.propulsion_system[i].spinner,
+                                         self.prop_system.propulsion_system[i].fan,
+                                         self.prop_system.propulsion_system[i].core,
+                                         self.prop_system.propulsion_system[i].nozzle,
+                                         self.prop_system.propulsion_system[i].bypass]
         return engines_stp
 
-    @Part
-    def step_writer_tanks(self):
-        return STEPWriter(default_directory=DIR,
-                          nodes=self.tanks_step)
+    @Attribute
+    def fuse_wing_empen_step(self):
+        fuse_wing_empenage = [self.fuselage.fuselage_subtracted,
+                              self.fuselage.floor_cut,
+                              self.fuselage.ceiling_cut,
+                              self.main_wing.right_wing_surface.right_wing_surface,
+                              self.main_wing.left_wing_surface.right_wing_surface,
+                              self.vertical_tail.vertical_tail.right_wing_surface,
+                              self.horizontal_tail.right_wing_surface_ht.right_wing_surface,
+                              self.horizontal_tail.left_wing_surface_ht.right_wing_surface,
+                              self.cg_range.cg_front,
+                              self.cg_range.cg_rear,
+                              self.cg_range_hyd.cg_front,
+                              self.cg_range_hyd.cg_rear,
+                              self.new_fuselage.fuselage_lofted_solid_outer]
+        return fuse_wing_empenage
+
+    @Attribute
+    def assem_step(self):
+        engines = self.engines_step
+        fuselage = self.fuse_wing_empen_step
+        tanks = self.tanks_step
+        seats = self.seats_step
+        return engines + fuselage + tanks + seats
+
+    # @Part
+    # def step_writer_seats(self):
+    #     return STEPWriter(default_directory=DIR,
+    #                       nodes=self.seats_step)
+    #
+    # @Part
+    # def step_writer_engines(self):
+    #     return STEPWriter(default_directory=DIR,
+    #                       nodes=self.engines_step)
+    #
+    # @Part
+    # def step_writer_fuselage_wing_empennage(self):
+    #     return STEPWriter(default_directory=DIR,
+    #                       nodes=self.fuse_wing_empen)
+    #
+    # @Part
+    # def step_writer_tanks(self):
+    #     return STEPWriter(default_directory=DIR,
+    #                       nodes=self.tanks_step)
 
     @Part
-    def step_writer_engines(self):
+    def step_writer_assem(self):
         return STEPWriter(default_directory=DIR,
-                          nodes=self.engines_step)
-
-    @Part
-    def step_writer_fuselage_wing_empennage(self):
-        return STEPWriter(default_directory=DIR,
-                          nodes=[self.fuselage.fuselage_subtracted,
-                                 self.fuselage.floor_cut,
-                                 self.fuselage.ceiling_cut,
-                                 self.main_wing.right_wing_surface,
-                                 self.main_wing.left_wing_surface,
-                                 self.vertical_tail.vertical_wing_surface,
-                                 self.horizontal_tail.right_wing_surface_ht,
-                                 self.horizontal_tail.left_wing_surface_ht,
-                                 self.cg_range.cg_front,
-                                 self.cg_range.cg_rear,
-                                 self.cg_range_hyd.cg_front,
-                                 self.cg_range_hyd.cg_rear,
-                                 self.newprofile.fuselage_lofted_solid_outer])
+                          nodes=self.assem_step)
 
     # Creating Output.txt file
 
