@@ -22,7 +22,7 @@ from aircraft import FanEngine
 from aircraft import NewFuselageProfile
 from parapy.exchange.step import STEPWriter
 
-import os
+import os, glob
 import xlrd
 import warnings
 from math import *
@@ -638,10 +638,6 @@ class AircraftGeometry(Base):
                           label='Aircraft_STEP',
                           nodes=self.assem_step,
                           filename="Aircraft_STEP.stp")
-    #
-    # def write_step(self):
-    #     self.step_writer_assem.write()
-
 
     # Creating Output.txt file
 
@@ -827,14 +823,30 @@ print()
 print('GUI exists and STEP file is written')
 print()
 
-f = open("Aircraft_STEP.stp", "rt")
-data = f.read()
-data = data.replace('SI_UNIT(.MILLI.,.METRE.)', 'SI_UNIT(.METRE.)')
-f.close()
-f = open("Aircraft_STEP.stp", "wt")
-f.write(data)
-f.close()
+# folder_path = '/STEP_files'
+# for filename in glob.glob(os.path.join(folder_path, '*.stp')):
+#   with open(filename, 'rt') as f:
+#       print(filename)
+#       data = f.read()
+#       data = data.replace('SI_UNIT(.MILLI.,.METRE.)', 'SI_UNIT(.METRE.)')
+#       f.close()
+#       f = open(filename, "wt")
+#       f.write(data)
+#       f.close()
+location = os.getcwd()
+for file in os.listdir(location):
+    if file.endswith(".stp"):
+        print(".stp file found:\t", file)
+        f = open(file, "rt")
+        data = f.read()
+        data = data.replace('SI_UNIT(.MILLI.,.METRE.)', 'SI_UNIT(.METRE.)')
+        f.close()
+        f = open(file, "wt")
+        f.write(data)
+        f.close()
+    else:
+        print("This was not a .stp file")
 
 print()
-print('STEP file is altered')
+print('The found .stp files have been altered to metres')
 print()
