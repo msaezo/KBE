@@ -1,6 +1,7 @@
 from parapy.core import *
 from parapy.geom import *
 
+
 from aircraft import Wing
 from aircraft import Fuselage
 from aircraft import VerticalTail
@@ -634,7 +635,13 @@ class AircraftGeometry(Base):
     @Part
     def step_writer_assem(self):
         return STEPWriter(default_directory=DIR,
-                          nodes=self.assem_step)
+                          label='Aircraft_STEP',
+                          nodes=self.assem_step,
+                          filename="Aircraft_STEP.stp")
+    #
+    # def write_step(self):
+    #     self.step_writer_assem.write()
+
 
     # Creating Output.txt file
 
@@ -814,4 +821,20 @@ if __name__ == '__main__':
     from parapy.gui import display
 
     obj1 = AircraftGeometry(label="totalgeometry")
+    # obj1.write_step()
     display(obj1)
+print()
+print('GUI exists and STEP file is written')
+print()
+
+f = open("Aircraft_STEP.stp", "rt")
+data = f.read()
+data = data.replace('SI_UNIT(.MILLI.,.METRE.)', 'SI_UNIT(.METRE.)')
+f.close()
+f = open("Aircraft_STEP.stp", "wt")
+f.write(data)
+f.close()
+
+print()
+print('STEP file is altered')
+print()
