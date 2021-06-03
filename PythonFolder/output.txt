@@ -1,85 +1,177 @@
 Outputs Fuselage class 
 
-seats_abreast = 7.0
-n_aisles width = 2
-n_rows = 26.0
-length_cabin = 34.52142857142857
-diameter_fuselage_inner = 4.680000000000001
-diameter_fuselage_outer = 4.9746
-length_tailcone = 17.411099999999998
-length_nosecone = 9.9492
-length_tail = 7.95936
-length_fuselage = 46.480788571428576
-thickness_fuselage = 0.14729999999999954
-position_floor_upper = -0.7
-position_floor_lower = -0.95
-section_radius_outer = [0.024873, 0.24872999999999998, 2.23857, 2.4873, 2.4873, 2.4873, 2.4873, 2.4873, 1.9898399999999998, 0.24872999999999998, 0.024873]
-section_radius_inner = (0.01, 0.10143000000000044, 2.0912700000000006, 2.3400000000000003, 2.3400000000000003, 2.3400000000000003, 2.3400000000000003, 2.3400000000000003, 1.8425400000000003, 0.10143000000000044, 0.01)
-section_length_outer = (0, 0.001, 0.08605705976466098, 0.21404972475264125, 0.3168905389852004, 0.4197313532177595, 0.5225721674503186, 0.6254129816828778, 0.8287602201978869, 0.996, 1)
-section_length_inner = (0.0005, 0.001, 0.08605705976466098, 0.21404972475264125, 0.3168905389852004, 0.4197313532177595, 0.5225721674503186, 0.6254129816828778, 0.8287602201978869, 0.996, 0.999)
-x_fuselage_cg = 20.95130281847476
+seats_abreast = 7.0[-] 
+n_aisles = 2[-] 
+n_rows = 26.0[-] 
+length_cabin = 33.24285714285715[m] 
+diameter_fuselage_inner = 4.680000000000001[m] 
+diameter_fuselage_outer = 4.9746[m] 
+length_tailcone = 17.411099999999998[m] 
+length_nosecone = 9.9492[m] 
+length_tail = 7.95936[m] 
+length_fuselage = 45.20221714285715[m]  
+thickness_fuselage = 0.14729999999999954[m]  
+position_floor_upper = -0.7[m]  
+position_floor_lower = -0.95[m]  
+section_radius_outer = [0.024873, 0.24872999999999998, 2.23857, 2.4873, 2.4873, 2.4873, 2.4873, 2.4873, 1.9898399999999998, 0.24872999999999998, 0.024873][m]  
+section_radius_inner = (0.01, 0.10143000000000044, 2.0912700000000006, 2.3400000000000003, 2.3400000000000003, 2.3400000000000003, 2.3400000000000003, 2.3400000000000003, 1.8425400000000003, 0.10143000000000044, 0.01)[m]  
+section_length_outer = (0, 0.001, 0.08849123456396828, 0.22010424773095827, 0.3187825774159245, 0.4174609071008906, 0.5161392367858569, 0.6148175664708231, 0.8239166018152333, 0.996, 1)[m]  
+section_length_inner = (0.0005, 0.001, 0.08849123456396828, 0.22010424773095827, 0.3187825774159245, 0.4174609071008906, 0.5161392367858569, 0.6148175664708231, 0.8239166018152333, 0.996, 0.999)[m]  
+x_fuselage_cg = 20.374984343716438[m]  
 
-Outputs Seat_row class 
+Outputs SeatRow class 
 
-seat_spacing = [0, 0.5, 1.55, 2.05, 2.55, 3.6, 4.1]
-row_width = 4.1
+seat_spacing = [0, 0.5, 1.55, 2.05, 2.55, 3.6, 4.1][m]  
+row_width = 4.1[m]  
 
 Outputs Horizontal_tail class 
 
-x_tail_horizontal = 39.50867028571429
-cg_arm_horizontal = 18.744740520713
-surface_horizontal_tail = 25.676188487151663
-span_horizontal_tail = 10.134335397479534
-root_chord_horizontal_tail = 3.1669798117123538
-tip_chord_horizontal_tail = 1.9001878870274123
-sweep_leading_edge_horizontal_tail = 28.87542784479033
-sweep_cuarter_chord_horizontal_tail = 26.05725685267437
-sweep_mid_chord_horizontal_tail = 23.096804758223865
-ht_x_shift = 39.50867028571429
-ht_z_shift = 1.98984
-mach_drag_divergence = 0.85
-thickness_to_chord = 0.1185252446493154
+x_tail_horizontal = 38.20109952466785[m]  
+cg_arm_horizontal = 18.013488234424884[m]  
+surface_horizontal_tail = 26.718505849011237[m^2]  
+span_horizontal_tail = 10.337989330428085[m]  
+root_chord_horizontal_tail = 3.230621665758777[m]  
+tip_chord_horizontal_tail = 1.9383729994552663[m]  
+sweep_leading_edge_horizontal_tail = 28.87542784479033[deg] 
+sweep_cuarter_chord_horizontal_tail = 26.05725685267437[deg] 
+sweep_mid_chord_horizontal_tail = 23.096804758223865[deg] 
+ht_x_shift = 38.20109952466785[m]  
+ht_z_shift = 1.98984[m]  
+mach_drag_divergence = 0.85[-] 
+thickness_to_chord = 0.1185252446493154[-] 
 
 Outputs Vertical_tail class 
 
-x_tail_vertical = 37.184630857142864
-cg_arm_vertical = 16.420701092141574
-surface_vertical_tail = 20.11735285712015
-span_vertical_tail = 5.493271273629241
-root_chord_vertical_tail = 4.882907798781547
-tip_chord_vertical_tail = 2.4414538993907735
-vt_x_shift = 37.184630857142864
-vt_z_shift = 2.2385699999999997
-sweep_mid_chord_vertical_tail = 29.054604099077146
-sweep_cuarter_chord_vertical_tail = 37.8749836510982
-mach_drag_divergence = 0.85
-thickness_to_chord = 0.12470385463485992
+x_tail_vertical = 37.24285714285715[m]  
+cg_arm_vertical = 17.055245852614178[m]  
+surface_vertical_tail = 19.36888162660385[m^2]  
+span_vertical_tail = 5.3901133976852265[m]  
+root_chord_vertical_tail = 4.791211909053535[m]  
+tip_chord_vertical_tail = 2.3956059545267676[m]  
+vt_x_shift = 37.24285714285715[m]  
+vt_z_shift = 2.2385699999999997[m]  
+sweep_mid_chord_vertical_tail = 29.054604099077146[deg] 
+sweep_cuarter_chord_vertical_tail = 37.8749836510982[deg] 
+mach_drag_divergence = 0.85[-] 
+thickness_to_chord = 0.12470385463485992[-] 
 
 Outputs Wing class 
 
-area_wing = 121.99999999999999
-temperature = 232.75
-pressure_static = 29055.11437460802
-sound_speed = 305.8086820219465
-air_speed = 250.7631192579961
-airDensity = 0.43496168556694903
-dynamic_pressure = 13675.661233840501
-mach_drag_divergence = 0.85
-sweep_quarter_chord = 34.41150866976944
-span = 33.846417831138346
-taper_ratio = 0.27988117462678985
-chord_root = 5.632581230769911
-chord_tip = 1.5764534510486923
-sweep_leading_edge = 36.68349342951247
-sweep_mid_chord = 32.00908150254794
-mean_aerodynamic_chord = 3.984877386591956
-y_mean_aerodynamic_chord = 6.87464446396866
-lift_coefficient = 0.4345155077797394
-dihedral = 1.558849133023056
-x_wing_cg = 0.8892568483763101
-x_le_mac = 19.878681687346997
-wing_x_shift = 14.757559873707068
-wing_z_shift = -1.98984
+area_wing = 121.99999999999999[m^2]  
+temperature = 232.75[K] 
+pressure_static = 29055.11437460802[Pa] 
+sound_speed = 305.8086820219465[m/s] 
+air_speed = 250.7631192579961[m/s] 
+airDensity = 0.43496168556694903[kg/m^3] 
+dynamic_pressure = 13675.661233840501[Pa] 
+mach_drag_divergence = 0.85[-] 
+sweep_quarter_chord = 34.41150866976944[deg] 
+span = 33.846417831138346[m] 
+taper_ratio = 0.27988117462678985[-] 
+chord_root = 5.632581230769911[m]  
+chord_tip = 1.5764534510486923[m]  
+sweep_leading_edge = 36.68349342951247[deg] 
+mean_aerodynamic_chord = 3.984877386591956[m]  
+y_mean_aerodynamic_chord = 6.87464446396866[m]  
+lift_coefficient = 0.4345155077797394[-] 
+dihedral = 1.558849133023056[deg] 
+x_wing_cg = 0.8892568483763101[m]  
+x_le_mac = 19.302363212588677[m]  
+wing_x_shift = 14.181241398948748[m]  
+wing_z_shift = -1.98984[m]  
 
 Outputs Tanks class 
 
+y_pos = 1.1[m]  
+z_pos = -1.225[m]  
+tank_max_dim = 1.8963975826026958[m]  
+
+Outputs Drag class 
+
+wet_area_fus = 664.4090165188285[m^2] 
+wet_area_ht = 45.31458591992307[m^2]  
+wet_area_vt = 36.95582614356015[m^2]  
+wet_area_nacelle = 23.017478995161163[m^2]  
+wet_area_total = 792.714386572634[m^2]  
+skin_friction = 0.00028989575900734924[-] 
+form_factor_ht = 2.3937797059619035[-] 
+form_factor_vt = 2.3086309102810043[-] 
+form_factor_fus = 1.1026900880163526[-] 
+form_factor_nacelle = 1.1327533117183208[-] 
+drag_coeff_fus = 0.0017408887530273262[-] 
+drag_coeff_ht = 0.0002680634280682263[-] 
+drag_coeff_vt = 0.0002108398953758449[-] 
+drag_coeff_nacelle = 8.054127115387297e-05[-] 
+drag_coeff_wing = 0.015767950664858883[-] 
+drag_coefficient_total = 0.018068284012484153[-] 
+drag = 30145.67921024904[-] 
+
+Outputs Energy class 
+
+work = 271311112892.24136[J] 
+energy_req = 1085244451568.9655[J] 
+vol_needed = 135.65555644612067[m^3] 
+length_tank = 22.601561285714293[m] 
+diameter_tank = [3.466559351744357, 1.8135020720154578, 1.2291123611469925, 0.9297567412296138][m] 
+number_of_tanks = 2[-] 
+diameter_tank_final = 1.8135020720154578[m] 
+
+Outputs Q3D class 
+
+cldes = 0.43452[-] 
+cddes = 0.015767950664858883[-] 
+alpha = 4.10569[deg] 
+
+Outputs CG_calculations class 
+
+x_oew = 20.298582559236667[m] 
+x_payload = 15.820776000000002[m] 
+x_fuel = 19.900094820577472[m] 
+cg_forward = 18.656720154183223[m] 
+cg_aft = 20.18761129024297[m] 
+
+Outputs CGCalculations_hyd class 
+
+mtom = 73900.0[kg] 
+mass_oew = 42123.0[kg-] 
+mass_payload = 24387.0[kg] 
+x_fuel = 15.300780642857147[m] 
+tank_cg_loc = 15.300780642857147[m] 
+mass_fuel = 9631.544507674567[kg] 
+mass_tank = 9631.544507674567[kg] 
+x_oew = 19.368489326728117[m] 
+x_payload = 15.820776000000002[m] 
+cg_forward = 17.717663841841787[m] 
+cg_aft = 18.61148687205193[m] 
+
+Outputs Propulsion_System class 
+
+y_pos = [-5.92312312044921, 5.92312312044921][m] 
+z_pos = [-2.9286495193268536, -2.9286495193268536][m] 
+x_pos = [18.09354739906101, 18.09354739906101][m] 
+
+Outputs Fan_engine class 
+
+massflow = 460.6036597615138[kg/s] 
+ratio_inlet_to_spinner = 0.1887716602874296[-] 
+inlet_diameter = 1.7631933498083152[m] 
+nacelle_length = 5.13374781927364[m] 
+fan_length = 2.56687390963682[m] 
+loc_max_diameter = 0.4783281572999748[m] 
+max_diameter = 1.9472057843865245[m] 
+exit_diameter = 1.7849386356876473[m] 
+length_gas_generator = 2.56687390963682[m] 
+diameter_gas_generator = 1.2283177942139367[m] 
+exit_diameter_gas_generator = 0.6755747868176653[m] 
+
+Outputs New_Fuselage_Profile class 
+
+delta_radius = 1.4898738603914978[m] 
+straight_length_midpoints = 1.6463975826026958[m] 
+straight_length_outer = 0.7006431903059759[m] 
+angle_1 = 112.89125471311422[rad] 
+angle_2 = -0.3995277646565132[rad] 
+y_lower = 2.018873632927791[m] 
+y_upper = 2.2914121621861434[m] 
+z_lower = -1.6129821525333365[m] 
+z_upper = -0.9675182649363384[m] 
