@@ -32,45 +32,25 @@ class Q3D(GeomBase):
     altitude = Input(Wing().altitude_cruise)  # m
     mach = Input(Wing().mach_cruise)  # make it in accordance with the flight speed and altitude
     cl = Input(Wing().lift_coefficient)  # if Cl is used do not use angle of attack
+    temperature = Input(Wing().temperature)
+    pressure = Input(Wing().pressure_static)
+    sound_speed = Input(Wing().sound_speed)
+    air_speed = Input(Wing().air_speed)
+    air_density = Input(Wing().air_density)
 
-    @Attribute
-    def temperature(self):
-        if self.altitude < 11001:
-            temp = self.t_zero + self.altitude * self.deltaT
-        else:
-            temp = self.t_zero + 11000 * self.deltaT
-        return temp
-
-    @Attribute
-    def pressure(self):
-        if self.altitude < 11001:
-            press = self.p_zero * np.e ** ((-9.81665 / (287 * self.temperature)) * self.altitude)
-        else:
-            press = 22632 * (self.temperature / 216.65) ** (-9.81665 / (self.altitude * 287))
-        return press
-
-    @Attribute
-    def sound_speed(self):
-        return np.sqrt(1.4 * 287 * self.temperature)
-
-    @Attribute
-    def air_speed(self):
-        return self.mach * self.sound_speed
-
-    @Attribute
-    def air_density(self):
-        return self.pressure / (287 * self.temperature)
-
+    # find the dynamic viscosity
     @Attribute
     def viscosity_dyn(self):
         return self.viscosity_dyn_zero * (
                     (self.temperature / self.t_zero_vs) ** (3 / 2) * (self.t_zero_vs + self.s_vis) / \
                     (self.temperature + self.s_vis))  # Sutherland's' Law
 
+    # find the reynolds number
     @Attribute
     def reynolds(self):
         return self.air_density * self.air_speed * self.MAC / self.viscosity_dyn
 
+    # run q3d by using a matlab engine and parsing all the inputs
     @Attribute
     def q_three_d(self):
 
@@ -83,8 +63,8 @@ class Q3D(GeomBase):
         twist_tip = float(self.twist_tip)
         dihedral = float(self.dihedral)
         sweep = float(self.sweep)
-        airspeed = float(self.air_speed)
-        airdensity = float(self.air_density)
+        air_speed = float(self.air_speed)
+        air_density = float(self.air_density)
         altitude = float(self.altitude)
         reynolds = float(self.reynolds)
         mach = float(self.mach)
@@ -94,18 +74,20 @@ class Q3D(GeomBase):
         # eng = matlab.engine.start_matlab()
         # run Q3D function
         [cldes, cddes, alpha] = eng.Q3Drunner(span, root_chord, tip_chord, twist_chord, twist_tip, dihedral, sweep,
-                                              airspeed,
-                                              airdensity, altitude, reynolds, mach, aoa, cl, nargout=3)
+                                              air_speed,
+                                              air_density, altitude, reynolds, mach, aoa, cl, nargout=3)
         eng.quit()
         res = [cldes, cddes, alpha]
         # print(res)
         return res
 
+    # parse cl and cd to attributes in python
     @Attribute
     def cldes(self):
         cldes = self.q_three_d[0]
         return cldes
 
+    # print a warning when cd is nan
     @Attribute
     def cddes(self):
         cddes = self.q_three_d[1]

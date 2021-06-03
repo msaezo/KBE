@@ -8,7 +8,7 @@ from aircraft.fuselage import Fuselage
 from aircraft.wing import Wing
 
 
-# Kerosene Based CG
+# Kerosene Based CG calculations
 class CGCalculations(GeomBase):
     payload_cg_loc = Input(In.Payload_cg_loc)
     fuel_cg_loc = Input(In.Fuel_cg_loc)
@@ -19,47 +19,46 @@ class CGCalculations(GeomBase):
     x_le_mac = Input(Wing().x_le_mac)
     length_fuselage = Input(Fuselage().length_fuselage)
 
+    # estimate the oew cg location
     @Attribute
     def x_oew(self):
         return self.x_le_mac + 0.25 * self.mean_aerodynamic_chord
 
+    # estimate the payload cg location
     @Attribute
     def x_payload(self):
         return self.payload_cg_loc * self.length_fuselage
 
+    # estimate the fuel cg location
     @Attribute
     def x_fuel(self):
         return self.x_le_mac + self.fuel_cg_loc * self.mean_aerodynamic_chord
 
+    # calculate all possible combinations of OEW, payload and fuel
+    @Attribute
+    def oew_and_payload(self):
+        return (self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / (self.mass_oew + self.mass_payload)
+
+    @Attribute
+    def oew_and_payload_and_fuel(self):
+        return (self.x_fuel * self.mass_fuel + self.x_oew * self.mass_oew + self.x_payload * self.mass_payload) / \
+               (self.mass_fuel + self.mass_oew + self.mass_payload)
+
+    @Attribute
+    def oew_and_fuel(self):
+        return (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (self.mass_fuel + self.mass_oew)
+
+    # the minimum of the aforementioned combinations is the most forward possible cg
     @Attribute
     def cg_forward(self):
-        oew_and_payload = (self.x_oew * self.mass_oew
-                           + self.x_payload * self.mass_payload) \
-                          / (self.mass_oew + self.mass_payload)
+        return min(self.oew_and_fuel, self.oew_and_payload_and_fuel, self.oew_and_payload)
 
-        oew_and_payload_and_fuel = (self.x_fuel * self.mass_fuel
-                                    + self.x_oew * self.mass_oew
-                                    + self.x_payload * self.mass_payload) \
-                                  / (self.mass_fuel + self.mass_oew + self.mass_payload)
-
-        oew_and_fuel = (self.x_oew * self.mass_oew
-                        + self.x_fuel * self.mass_fuel) \
-                       / (self.mass_fuel + self.mass_oew)
-
-        return min(oew_and_fuel, oew_and_payload_and_fuel, oew_and_payload)
-
+    # the maximum of the aforementioned combinations is the most aft possible cg
     @Attribute
     def cg_aft(self):
-        oew_and_payload = (self.x_oew * self.mass_oew
-                           + self.x_payload * self.mass_payload) \
-                          / (self.mass_oew + self.mass_payload)
-        oew_and_payload_and_fuel = (self.x_fuel * self.mass_fuel
-                                    + self.x_oew * self.mass_oew
-                                    + self.x_payload * self.mass_payload) \
-                                   / (self.mass_fuel + self.mass_oew + self.mass_payload)
-        oew_and_fuel = (self.x_oew * self.mass_oew + self.x_fuel * self.mass_fuel) / (self.mass_fuel + self.mass_oew)
-        return max(oew_and_fuel, oew_and_payload_and_fuel, oew_and_payload)
+        return max(self.oew_and_fuel, self.oew_and_payload_and_fuel, self.oew_and_payload)
 
+    # create a visual representation of the front and aft cg locations in blue for the kerosene based aircraft
     @Part
     def cg_front(self):
         return LineSegment(start=Point(self.cg_forward, -4, 0),

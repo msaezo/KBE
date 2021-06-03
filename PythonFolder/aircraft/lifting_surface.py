@@ -29,6 +29,7 @@ class LiftingSurface(GeomBase):
     rotate = Input(0)
     twist = Input(0)
 
+    # create the root and tip airfoils, scale and position them accordinglyusing the Airfoil class
     @Part
     def root_airfoil(self):  # root airfoil will receive self.position as default
         return Airfoil(airfoil_name=self.airfoil_root,

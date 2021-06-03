@@ -1,6 +1,4 @@
 from parapy.core import *
-from parapy.geom import *
-
 
 from aircraft import Wing
 from aircraft import Fuselage
@@ -13,16 +11,14 @@ from aircraft import PropulsionSystem
 from aircraft import Q3D
 from aircraft import Drag
 from aircraft import Energy1
-from aircraft import Energy2
 from aircraft import Tanks
 from aircraft import NewFuselage1
 from aircraft import NewFuselage2
-from aircraft import SeatRow
 from aircraft import FanEngine
 from aircraft import NewFuselageProfile
 from parapy.exchange.step import STEPWriter
 
-import os, glob
+import os
 import xlrd
 import warnings
 from math import *
@@ -31,9 +27,12 @@ DIR = os.path.dirname(__file__)
 
 
 class AircraftGeometry(Base):
-    # This is where we open the input file and parse the values to variables with the same name
 
-    workbook = xlrd.open_workbook('aircraft\KBE_Input.xls')
+    # This is where we open the input file and parse the values to variables with the same name
+    # Name is the name of the variable and Value is simply the value assigned tyo it in the spreadsheet
+    # For-loops  for each block in the excel sheet
+
+    workbook = xlrd.open_workbook('aircraft/KBE_Input.xls')
     worksheet = workbook.sheet_by_name('Input')
 
     # Fuselage parameters
@@ -47,13 +46,11 @@ class AircraftGeometry(Base):
         Name = worksheet.cell(i, 1).value
         Value = worksheet.cell(i, 2).value
         exec(Name + "=Value")
-
     # Engine parameters
     for i in range(25, 30):
         Name = worksheet.cell(i, 1).value
         Value = worksheet.cell(i, 2).value
         exec(Name + "=Value")
-
     # CG parameters
     for i in range(32, 41):
         Name = worksheet.cell(i, 1).value
@@ -63,28 +60,18 @@ class AircraftGeometry(Base):
         Name = worksheet.cell(i, 1).value
         Value = worksheet.cell(i, 2).value
         exec(Name + "=Value")
-
-    # Landing gear parameters
-    for i in range(52, 55):
-        Name = worksheet.cell(i, 1).value
-        Value = worksheet.cell(i, 2).value
-        exec(Name + "=Value")
-
     # Empenage parameters
-    for i in range(57, 66):
+    for i in range(52, 61):
         Name = worksheet.cell(i, 1).value
         Value = worksheet.cell(i, 2).value
         exec(Name + "=Value")
-
     # Flight parameters
-    for i in range(68, 73):
+    for i in range(63, 68):
         Name = worksheet.cell(i, 1).value
         Value = worksheet.cell(i, 2).value
         exec(Name + "=Value")
 
-    # Inputting the variables to parapy with the proper naming convention
-
-    # imported parameters from input file
+    # Here   we reassign the variable imported from excel to a new name that is PEP8 proof
     n_pax = Input(Number_of_passengers)
     width_aisle = Input(Width_aisle)
     width_seat = Input(Width_seat)
@@ -147,18 +134,20 @@ class AircraftGeometry(Base):
     hyd_density = Input(hyd_density)
     skinfric_coeff = Input(eq_skinfriction_coefficient)
 
-    # Declaring input warnings if it is out of recommended bounds
-
+    # Declaring input warnings if it is out of the recommended bounds
     @Attribute
     def warnings_inputs(self):
-
-        if self.mach_cruise < 0.75 or self.mach_cruise > 0.92:
+        # Mach is recommended to be between 0.7 and 0.92 as that related most to common airliner or transport operation
+        # Important as supersonic behaviour is not specifically well modelled in Q3D
+        # and too low mach has large impact on design
+        if self.mach_cruise < 0.7 or self.mach_cruise > 0.92:
             msg = "The mach number on the Input File might be outside of bounds for typical transport aviation." \
                   "Suggested options:" \
                   "     - Change mach_cruise between the bounds" \
-                  "     - 0.75 and 0.92"
+                  "     - 0.70 and 0.92"
             warnings.warn(msg)
 
+        # empirical relation to warn if MTOW and number of pax diverge too much to make sense
         pax_average = 0.0012 * self.weight_to / 9.81 + 86.01
         if self.n_pax <= pax_average * 0.75 or self.n_pax >= pax_average * 1.25:
             msg = "The number of passengers on the Input File might be outside of bounds for the selected MTOW " \
@@ -167,6 +156,7 @@ class AircraftGeometry(Base):
                   "     - n_pax = 0.0012 * MTOW [kg] + 86.01"
             warnings.warn(msg)
 
+        # empirical relation to warn if the wing loading and MTOW diverge too much compared to existing aircraft
         wing_loading_average = 0.0005 * self.weight_to / 9.81 + 547.52
         if self.wing_loading <= wing_loading_average * 0.77 or self.wing_loading >= wing_loading_average * 1.23:
             msg = "The wing loading on the Input File might be outside of bounds for the selected MTOW " \
@@ -175,6 +165,7 @@ class AircraftGeometry(Base):
                   "     - wing_loading = 0.0005 * MTOW [kg] + 547.52"
             warnings.warn(msg)
 
+        # Warning if the aspect ratio diverges too much compared to common airliner configurations
         if self.aspect_ratio < 7.73 or self.aspect_ratio > 9.44:
             msg = "The aspect ratio on the Input File might be outside of bounds for the typical transportation" \
                   "aircraft. Suggested options:" \
@@ -182,14 +173,7 @@ class AircraftGeometry(Base):
                   "     - 7.73 to 9.44"
             warnings.warn(msg)
 
-        span = sqrt(self.aspect_ratio * self.weight_to / 9.81 / self.wing_loading)
-        if span >= 80 or span <= 22:
-            msg = "The wing span resulting from the Input File might be outside of bounds for the typical " \
-                  "transportation aircraft. Suggested options:" \
-                  "     - Change the aspect ratio between the bounds" \
-                  "     - Change the wing loading"
-            warnings.warn(msg)
-
+        # empirical relation to warn if the aircraft range and MTOW diverge too much compared to existing aircraft
         range_average = 0.0323 * self.weight_to / 9.81 + 2819.4
         if self.range < range_average * 0.60 or self.range > range_average * 1.40:
             msg = "The range on the Input File might be outside of bounds for the selected MTOW " \
@@ -200,6 +184,7 @@ class AircraftGeometry(Base):
         finish = 'Look in terminal for warnings'
         return finish
 
+    # Calcuates the cg range of the fossil fuel aircraft
     @Attribute
     def cg_calc(self):
         return CGCalculations(payload_cg_loc=self.Payload_cg_loc,
@@ -208,6 +193,8 @@ class AircraftGeometry(Base):
                               mass_payload=self.Payload_mass_fraction,
                               mass_fuel=self.Fuel_mass_fraction)
 
+    # Calculates the attributes of one turbofan engine
+    # Required as the dimensions are required for the placement of the the entire propulsion system
     @Attribute
     def turbofan(self):
         return FanEngine(thrust_to=self.thrust_to,
@@ -216,8 +203,7 @@ class AircraftGeometry(Base):
                          turbine_inlet_temp=self.turbine_inlet_temp,
                          phi=self.phi)
 
-    # Creating the parts for the GUI
-
+    # Creating the fuselage part from the Fuselage class
     @Part
     def fuselage(self):
         return Fuselage(n_pax=self.n_pax,
@@ -241,6 +227,7 @@ class AircraftGeometry(Base):
                         empennage_cg_loc=self.empennage_cg_loc,
                         fixed_equipment_cg_loc=self.fixed_equipment_cg_loc)
 
+    # creating the main wing part from the Wing class
     @Part
     def main_wing(self):
         return Wing(mach_cruise=self.mach_cruise,
@@ -260,6 +247,7 @@ class AircraftGeometry(Base):
                     x_fuselage_cg=self.fuselage.x_fuselage_cg,
                     diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer)
 
+    # creating a visual representation of the petrol based cg range using the CGCalculations class
     @Part
     def cg_range(self):
         return CGCalculations(payload_cg_loc=self.payload_cg_loc,
@@ -271,6 +259,7 @@ class AircraftGeometry(Base):
                               x_le_mac=self.main_wing.x_le_mac,
                               length_fuselage=self.fuselage.length_fuselage)
 
+    # Creating the vertical tail part from the VerticalTail class
     @Part
     def vertical_tail(self):
         return VerticalTail(volume_vt=self.volume_VT,
@@ -286,6 +275,7 @@ class AircraftGeometry(Base):
                             cg_aft=self.cg_range.cg_aft,
                             diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer)
 
+    # Creating the horizontal tail part from the HorizontalTail class, requires VT input for positioning
     @Part
     def horizontal_tail(self):
         return HorizontalTail(volume_ht=self.volume_HT,
@@ -306,6 +296,7 @@ class AircraftGeometry(Base):
                               tail_config=self.tail_config,
                               sweep_vertical=self.vertical_tail.sweep_leading_edge_vertical)
 
+    # Creating the entire propulsion system using the PropulsionSystem class that places several TurboFan instances
     @Part
     def prop_system(self):
         return PropulsionSystem(thrust_to=self.thrust_to,
@@ -322,6 +313,7 @@ class AircraftGeometry(Base):
                                 sweep_leading_edge=self.main_wing.sweep_leading_edge,
                                 max_diameter=self.turbofan.max_diameter)
 
+    # Running Q3D to eventually use the wing drag
     @Attribute
     def q3d(self):
         return Q3D(span=self.main_wing.span,
@@ -333,8 +325,15 @@ class AircraftGeometry(Base):
                    sweep=self.main_wing.sweep_leading_edge,
                    altitude=self.main_wing.altitude_cruise,
                    mach=self.main_wing.mach_cruise,
-                   cl=self.main_wing.lift_coefficient)
+                   cl=self.main_wing.lift_coefficient,
+                   temperature=self.main_wing.temperature,
+                   pressure=self.main_wing.pressure_static,
+                   sound_speed=self.main_wing.sound_speed,
+                   air_speed=self.main_wing.air_speed,
+                   air_density=self.main_wing.air_density)
 
+    # Calculating the total drag using the class Drag which combines the wing drag as calculated above
+    # and the drag of fuselage, nacelles and empennage
     @Attribute
     def drag(self):
         return Drag(lift_coefficient=self.q3d.cldes,
@@ -369,6 +368,7 @@ class AircraftGeometry(Base):
                     sweep=self.main_wing.sweep_quarter_chord,
                     n_engines=self.n_engines)
 
+    # calculates the energy required for the flight and estimates the required tank size
     @Attribute
     def energy(self):
         return Energy1(range=self.range,
@@ -381,22 +381,17 @@ class AircraftGeometry(Base):
                        position_floor_lower=self.fuselage.position_floor_lower,
                        drag=self.drag.drag_tot)
 
+    # creates the part tanks using the Tanks class which creates and places as many instances of a tank as required
     @Part
     def tanks(self):
-        return Tanks(  # range=self.range,
-            # efficiency=self.efficiency,
-            # energy_density=self.energy_density,
-            # fus_diam=self.fuselage.diameter_fuselage_outer,
-            # length_fuselage=self.fuselage.length_fuselage,
-            length_cockpit=self.fuselage.length_cockpit,
-            # length_tailcone=self.fuselage.length_tailcone,
-            position_floor_lower=self.fuselage.position_floor_lower,
-            diameter_fuselage_inner=self.fuselage.diameter_fuselage_inner,
-            # drag=self.drag.drag_tot,
-            diameter_tank_final=self.energy.diameter_tank_final,
-            number_of_tanks=self.energy.number_of_tanks,
-            length_tank=self.energy.length_tank)
+        return Tanks(length_cockpit=self.fuselage.length_cockpit,
+                     position_floor_lower=self.fuselage.position_floor_lower,
+                     diameter_fuselage_inner=self.fuselage.diameter_fuselage_inner,
+                     diameter_tank_final=self.energy.diameter_tank_final,
+                     number_of_tanks=self.energy.number_of_tanks,
+                     length_tank=self.energy.length_tank)
 
+    # calculaes the dimensions and profile of a new fuselage to fit around the positioned tanks
     @Attribute
     def new_profile(self):
         return NewFuselageProfile(fuselage_diameter=self.fuselage.diameter_fuselage_outer,
@@ -404,6 +399,7 @@ class AircraftGeometry(Base):
                                   z_pos=self.tanks.z_pos,
                                   diameter_tank_final=self.tanks.diameter_tank_final)
 
+    # creates a new attribute which is another instance of the class Drag but now with an updated fuselage profile
     @Attribute
     def drag_new(self):
         return Drag(lift_coefficient=self.q3d.cldes,
@@ -438,42 +434,54 @@ class AircraftGeometry(Base):
                     sweep=self.main_wing.sweep_quarter_chord,
                     n_engines=self.n_engines)
 
+    # A couple of outputs of the two drag calculations such that they can be easily compared in the GUI
+    # This is the total drag value of the fossil fuel plane
     @Attribute
     def drag_value_old(self):
         return self.drag.drag_tot
 
+    # Total drag value of the LH2 plane
     @Attribute
     def drag_value_new(self):
         return self.drag_new.drag_tot
 
+    # Drag coefficient of the old fuselage
     @Attribute
     def cd_fuselage_old(self):
         return self.drag.drag_coeff_fus
 
+    # Drag coefficient of the newfuselage
     @Attribute
     def cd_fuselage_new(self):
         return self.drag_new.drag_coeff_fus
 
+    # Increase in drag counts between the new and old design
     @Attribute
     def cd_fuselage_new_count_increase(self):
         return (self.drag_new.drag_coeff_fus - self.drag.drag_coeff_fus) * 10000
 
+    # increase in the wave drag due to the new design
     @Attribute
     def wave_drag_increase(self):
         return self.drag_new.wave_drag_coefficient_change
 
+    # The induced drag coefficient
     @Attribute
     def induced_drag_coefficient(self):
         return self.drag_new.induced_drag
 
+    # Total drag coefficient of the old fuselage
     @Attribute
     def cd_old(self):
         return self.drag.drag_coefficient_total
 
+    # Total drag coefficient of the new fuselage
     @Attribute
     def cd_new(self):
         return self.drag_new.drag_coefficient_total
 
+
+    # Creates a visual representation of the new cg range
     @Part
     def cg_range_hyd(self):
         return CGCalculationsHyd(mtow=self.weight_to,
@@ -492,19 +500,18 @@ class AircraftGeometry(Base):
                                  mean_aerodynamic_chord=self.main_wing.mean_aerodynamic_chord,
                                  length_fuselage=self.fuselage.length_fuselage)
 
-        # Variable input for new fuselage depending on tank size
-        # if tanks dont fit inside fuselage use new profiles that do fit
-        # else reuse old profiles and recreate fuselage as is
-
+    # Calculates the original fuel mass
     @Attribute
     def fuel_mass(self):
         return self.weight_to * self.mass_fuel
 
+    # Calculates the new MTOW by substracting the old fuel mass and adding the LH2+tanks mass
     @Attribute
     def new_mtow(self):
         return self.weight_to - self.fuel_mass + (
                 self.energy.vol_needed * 1000 * self.cg_range_hyd.vol_to_kg_hyd * 9.81)
 
+    # Creates a set of fuselage profiles for each section along its length depending on the tank size
     @Attribute
     def new_fuselage_1(self):
         return NewFuselage1(diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer,
@@ -514,6 +521,7 @@ class AircraftGeometry(Base):
                             y_pos=self.tanks.y_pos,
                             z_pos=self.tanks.z_pos)
 
+    # Modifies the input for creating the new fuselage depending on if the tanks fit in the old fuselage or not
     @Attribute
     def new_fuselage_input(self):
         if self.tanks.tank_max_dim > self.fuselage.diameter_fuselage_inner / 2:
@@ -542,10 +550,12 @@ class AircraftGeometry(Base):
                    self.fuselage.outer_profile_set[10]]
         return aaa
 
+    # Physically creates the new fuselage as a part
     @Part
     def new_fuselage(self):
         return NewFuselage2(input_profile_set=self.new_fuselage_input)
 
+    # Physically shows the new fuselage profiles (not important but adds for visualisation in the GUI)
     @Part
     def new_fuselage_profiles(self):
         return NewFuselage1(diameter_fuselage_outer=self.fuselage.diameter_fuselage_outer,
@@ -555,6 +565,7 @@ class AircraftGeometry(Base):
                             y_pos=self.tanks.y_pos,
                             z_pos=self.tanks.z_pos)
 
+    # Generates a list of tree elements relating to the tanks that we want to convert to STEP files
     @Attribute
     def tanks_step(self):
         tanks_stp = []
@@ -562,20 +573,22 @@ class AircraftGeometry(Base):
             tanks_stp = tanks_stp + [self.tanks.tank[i].tank]
         return tanks_stp
 
+    # Generates a list of tree elements relating to the seats and seat rows that we want to convert to STEP files
     @Attribute
     def seats_step(self):
         seats_stp = []
         for i in range(0, int(self.fuselage.n_rows_front)):
-            for j in range(0, int(self.fuselage.seats_abreast-2)):
+            for j in range(0, int(self.fuselage.seats_abreast - 2)):
                 seats_stp = seats_stp + [self.fuselage.seats_front[i].seat_row[j].seat]
         for i in range(0, int(self.fuselage.n_rows_middle)):
             for j in range(0, int(self.fuselage.seats_abreast)):
                 seats_stp = seats_stp + [self.fuselage.seats_middle[i].seat_row[j].seat]
         for i in range(0, int(self.fuselage.n_rows_rear)):
-            for j in range(0, int(self.fuselage.seats_abreast-2)):
+            for j in range(0, int(self.fuselage.seats_abreast - 2)):
                 seats_stp = seats_stp + [self.fuselage.seats_rear[i].seat_row[j].seat]
         return seats_stp
 
+    # Generates a list of tree elements relating to the engines that we want to convert to STEP files
     @Attribute
     def engines_step(self):
         engines_stp = []
@@ -587,6 +600,7 @@ class AircraftGeometry(Base):
                                          self.prop_system.propulsion_system[i].bypass]
         return engines_stp
 
+    # Generates a list of tree elements relating to the fuselage that we want to convert to STEP files
     @Attribute
     def fuse_wing_empen_step(self):
         fuse_wing_empenage = [self.fuselage.fuselage_subtracted,
@@ -604,6 +618,7 @@ class AircraftGeometry(Base):
                               self.new_fuselage.fuselage_lofted_solid_outer]
         return fuse_wing_empenage
 
+    # Generates a total list of tree elements that we want to convert to STEP files
     @Attribute
     def assem_step(self):
         engines = self.engines_step
@@ -632,6 +647,7 @@ class AircraftGeometry(Base):
     #     return STEPWriter(default_directory=DIR,
     #                       nodes=self.tanks_step)
 
+    # Generates a step files writer of the final product
     @Part
     def step_writer_assem(self):
         return STEPWriter(default_directory=DIR,
@@ -812,27 +828,29 @@ class AircraftGeometry(Base):
     # f.write("z_upper = " + str(New_Fuselage_Profile().z_upper) + "\n")
     # f.close()
 
-
+# Creates the GUI
 if __name__ == '__main__':
     from parapy.gui import display
 
     obj1 = AircraftGeometry(label="totalgeometry")
-    # obj1.write_step()
     display(obj1)
-print()
-print('GUI exists and STEP file is written')
-print()
 
-# folder_path = '/STEP_files'
-# for filename in glob.glob(os.path.join(folder_path, '*.stp')):
-#   with open(filename, 'rt') as f:
-#       print(filename)
-#       data = f.read()
-#       data = data.replace('SI_UNIT(.MILLI.,.METRE.)', 'SI_UNIT(.METRE.)')
-#       f.close()
-#       f = open(filename, "wt")
-#       f.write(data)
-#       f.close()
+
+# Modifies all the STEP files in the working directory to be sized in metres rather than millimeters.
+# Required because our code works with SI units and metre as a standard whereas parapy assumes every
+# dimension to be in mm which is the standard in most CAD software packages
+
+# and no, the optional input 'UNIT' for the STEPWriter does not change anything,
+# it only converts the 'standard' unit of the .stp file but not the actual size.
+# So rather it would convert a length of 1000mm to 1m rather than to 1000m, that is why this operation is needed
+# It only comes into action after closing the GUI as the user can have created multiple .stp files whilst using it
+
+# Works by the following procedure:
+# 1) finding all files that end with .stp,
+# 2) storing all their content in variable 'data'
+# 3) replacing every mention of mm to m in the variable 'data'
+# 4) overwriting the original file by parsing 'data' back into it
+# Also creates print statements to indicate how many step files were found and corrected
 location = os.getcwd()
 for file in os.listdir(location):
     if file.endswith(".stp"):

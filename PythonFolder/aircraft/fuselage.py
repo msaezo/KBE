@@ -33,12 +33,15 @@ class Fuselage(GeomBase):
     # z-shift of each fuselage section
     fuselage_sections_z = Input([-0.3, -0.3, -0.08, 0, 0, 0, 0, 0, 0.2, 0.62, 0.65])
 
+    # calculate how many seats abreast we can have with a maximum of 9 (otherwise the seat dstribution wont work),
+    # numbers are rounded up
     @Attribute
     def seats_abreast(self):
         seats = 0.45 * np.sqrt(self.n_pax)
         seatsmax = 9
         return min(np.ceil(seats), seatsmax)
 
+    # depending on the number of seats abreast find the number of aisles
     @Attribute
     def n_aisles(self):
         if self.seats_abreast < 7:
@@ -47,28 +50,33 @@ class Fuselage(GeomBase):
             n_aisle = 2
         return n_aisle
 
+    # estimate how many rows we will need to accomodate all passengers
     @Attribute
     def n_rows(self):
         return np.ceil(self.n_pax / self.seats_abreast)
 
+    # find the length of the cabin based on the amount of pax and a fitting factor to account wor walking room etc
     @Attribute
     def length_cabin(self):
         if self.n_aisles == 1:
             k_cabin = 1.2
         elif self.n_aisles == 2:
-            k_cabin = 1.35
+            k_cabin = 1.3
         return self.n_pax / self.seats_abreast * k_cabin
 
+    # calculate the minimum diameter of the inner fuselage so it can accomodate all seats and armrests and aisles
     @Attribute
     def diameter_fuselage_inner(self):
         return self.seats_abreast * self.width_seat \
                + (self.seats_abreast + self.n_aisles + 1) * self.width_armrest \
                + self.n_aisles * self.width_aisle + 2 * self.clearance_seat
 
+    # create an outer diameter
     @Attribute
     def diameter_fuselage_outer(self):
         return 1.045 * self.diameter_fuselage_inner + 0.084
 
+    # use the fuselage fractions to find the nose, tail, nosecone and tailcone lengths
     @Attribute
     def length_tailcone(self):
         return self.length_tailcone_over_diam * self.diameter_fuselage_outer
@@ -89,10 +97,12 @@ class Fuselage(GeomBase):
     def thickness_fuselage(self):
         return (self.diameter_fuselage_outer - self.diameter_fuselage_inner) / 2
 
+    # position the floor upper side
     @Attribute
     def position_floor_upper(self):
         return - self.height_shoulder
 
+    # position the floor lower side
     @Attribute
     def position_floor_lower(self):
         return self.position_floor_upper - self.height_floor
@@ -152,10 +162,6 @@ class Fuselage(GeomBase):
         sec_9 = 0.996
         sec_10 = 0.999
         return sec_0, sec_1, sec_2, sec_3, sec_4, sec_5, sec_6, sec_7, sec_8, sec_9, sec_10
-
-    # @Attribute
-    # def profiles(self):
-    #     return self.profile_set  # collect the elements of the sequence profile_set
 
     # Find cg of fuselage group
     @Attribute
@@ -263,15 +269,18 @@ class Fuselage(GeomBase):
             k_cabin1 = 1.17
         return k_cabin1
 
+    # calculate how many rows we can fit in the nosecone
     @Attribute
     def n_rows_front(self):
         return int(np.floor((self.length_nosecone - self.length_cockpit) / (0.8 * self.k_cabin)))
 
+    # calculate how many rows we can fit in the cylindrical part of the fuselage
     @Attribute
     def n_rows_middle(self):
         return int(np.floor((self.length_fuselage - self.length_nosecone - self.length_tailcone)
                             / (0.9 * self.k_cabin)))
 
+    # calculate how many rows we can fit in the tailcone
     @Attribute
     def n_rows_rear(self):
         return int((self.n_pax - self.seats_abreast * int(np.floor((self.length_fuselage
@@ -336,6 +345,7 @@ class Seat(GeomBase):
     n_aisles = Input(Fuselage().n_aisles)
     width_seat = Input(Fuselage().width_seat)
 
+    # the length that each pax occupies
     @Attribute
     def k_cabin(self):
         if self.n_aisles == 1:
@@ -344,6 +354,7 @@ class Seat(GeomBase):
             k_cabin1 = 1.17
         return k_cabin1
 
+    # estimate the length of the feetroom
     @Attribute
     def l_feet(self):
         if self.n_aisles == 1:
@@ -352,6 +363,7 @@ class Seat(GeomBase):
             l_feet1 = 0.57
         return l_feet1
 
+    # estimate the depth that the seat takes up except the backsupport of the seat
     @Attribute
     def l_seat(self):
         if self.n_aisles == 1:
@@ -360,11 +372,13 @@ class Seat(GeomBase):
             l_seat1 = 1.07
         return l_seat1
 
+    # create some fillets to make it look nice
     @Attribute
     def fillets(self):
         e1 = self.seatbox.top_face.edges
         return e1
 
+    # create a box to cut away some volume at the bottom of the seat
     @Part
     def leg1(self):
         return Box(length=self.width_seat / 3,
@@ -391,6 +405,7 @@ class Seat(GeomBase):
                    hidden=True
                    )
 
+    # create a box that has the entire volume of a seat plus legroom
     @Part
     def seatbox(self):
         return Box(length=self.width_seat,
@@ -403,6 +418,7 @@ class Seat(GeomBase):
                    hidden=True
                    )
 
+    # create a box with the volume of the legroom
     @Part
     def feetspace(self):
         return Box(length=self.width_seat,
@@ -415,6 +431,7 @@ class Seat(GeomBase):
                    hidden=True
                    )
 
+    # create a box that cuts away the part where the person sits
     @Part
     def seatspace(self):
         return Box(length=self.width_seat,
@@ -426,11 +443,13 @@ class Seat(GeomBase):
                                       "x", self.l_seat / 2),
                    hidden=True)
 
+    # apply the fillets to the top
     @Part
     def seat_filleted(self):
         return FilletedSolid(self.seatbox, radius=0.2, edge_table=self.fillets,
                              hidden=True)
 
+    # subtract the feetspace, leg 1 and 2 and the seatspace from the filleted seat to create a seat-looking shape
     @Part
     def seat(self):
         return SubtractedSolid(shape_in=self.seat_filleted,
@@ -513,7 +532,7 @@ class SeatRow(GeomBase):
                         8 * self.width_seat + 10 * self.width_armrest + 2 * self.width_aisle])
         return spacing
 
-    # dependen ton the number of seats and ailses determine the total with of a row (centre of seat to centre of seat)
+    # dependent on the number of seats and aisles determine the total with of a row (centre of seat to centre of seat)
     @Attribute
     def row_width(self):
         if self.seats_abreast == 2:

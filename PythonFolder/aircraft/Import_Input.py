@@ -35,20 +35,14 @@ for i in range(42, 50):
     Value = worksheet.cell(i, 2).value
     exec(Name + "=Value")
 
-# Landing gear parameters
-for i in range(52, 55):
-    Name = worksheet.cell(i, 1).value
-    Value = worksheet.cell(i, 2).value
-    exec(Name + "=Value")
-
 # Empennage parameters
-for i in range(57, 66):
+for i in range(52, 61):
     Name = worksheet.cell(i, 1).value
     Value = worksheet.cell(i, 2).value
     exec(Name + "=Value")
 
 # Flight parameters
-for i in range(68, 73):
+for i in range(63, 68):
     Name = worksheet.cell(i, 1).value
     Value = worksheet.cell(i, 2).value
     exec(Name + "=Value")

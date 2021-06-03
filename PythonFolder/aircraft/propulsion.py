@@ -25,6 +25,7 @@ class PropulsionSystem(GeomBase):
     sweep_leading_edge = Input(Wing().sweep_leading_edge)
     max_diameter = Input(2)
 
+    # creates a list of y positions depending pn how many engines are needed
     @Attribute
     def y_pos(self):
         if self.n_engines == 1:
@@ -43,6 +44,7 @@ class PropulsionSystem(GeomBase):
             y_distr = [-pos2, -pos1, pos1, pos2]
         return y_distr
 
+    # creates a list of all z positions dependent on how many engines are needed
     @Attribute
     def z_pos(self):
         if self.n_engines == 1:
@@ -65,6 +67,7 @@ class PropulsionSystem(GeomBase):
             z_distr = [pos2, pos1, pos1, pos2]
         return z_distr
 
+    # creates a list of all x positions dependent on how many engines are needed
     @Attribute
     def x_pos(self):
         if self.n_engines == 1:
@@ -83,6 +86,7 @@ class PropulsionSystem(GeomBase):
             x_distr = [pos2, pos1, pos1, pos2]
         return x_distr
 
+    # creates multiple instances of FanEngine and places them where needed
     @Part
     def propulsion_system(self):
         return FanEngine(thrust_to=self.thrust_to,
@@ -111,11 +115,14 @@ class FanEngine(GeomBase):
     sound_speed = Input(343)
     rho_0 = Input(1.225)
 
+    # a lot of half-emperical relations to estimate some engine sizing parameters, relations and
+    # sizing procedure stem from ADSEE1
     @Attribute
     def massflow(self):
         gg = self.turbine_inlet_temp / 600 - 1.25
         return (self.thrust_to * 10 ** 6) / (self.n_engines * self.sound_speed) * (1 + self.bypass_ratio) / (
             np.sqrt(5 * self.eta_n * gg * (1 + self.eta_tf * self.bypass_ratio)))
+
 
     @Attribute
     def ratio_inlet_to_spinner(self):
@@ -173,6 +180,8 @@ class FanEngine(GeomBase):
     def exit_diameter_gas_generator(self):
         return 0.55 * self.diameter_gas_generator
 
+    # create the physical parts of the engine
+    # create the spinner as a cone
     @Part
     def spinner(self):
         return Cone(radius1=0.05,
@@ -181,6 +190,7 @@ class FanEngine(GeomBase):
                     position=rotate(self.position, "y", np.deg2rad(90)),
                     color="yellow")
 
+    # create the fan as a disc
     @Part
     def fan(self):
         return Cylinder(radius=self.inlet_diameter / 2,
@@ -188,6 +198,7 @@ class FanEngine(GeomBase):
                         position=translate(rotate(self.position, "y", np.deg2rad(90)), "z", 0.5),
                         color="orange")
 
+    # create the core as a cylinder
     @Part
     def core(self):
         return Cylinder(radius=self.diameter_gas_generator / 2,
@@ -196,6 +207,7 @@ class FanEngine(GeomBase):
                                            "z", self.inlet_diameter * 0.05 + 0.5),
                         color="orange")
 
+    # create the nozzle as a cone
     @Part
     def nozzle(self):
         return Cone(radius1=self.diameter_gas_generator / 2,
@@ -205,6 +217,7 @@ class FanEngine(GeomBase):
                                        "z", self.fan_length),
                     color="orange")
 
+    # create the cowling as two cones (diverging and converging)
     @Part
     def bypass_cowling_1(self):
         return Cone(radius1=(self.inlet_diameter + 0.2) / 2,
@@ -222,12 +235,14 @@ class FanEngine(GeomBase):
                                        "z", self.loc_max_diameter),
                     hidden=True)
 
+    # fuse the bypass cones together
     @Part
     def fused_bypass_outer(self):
         return FusedSolid(shape_in=self.bypass_cowling_1, tool=self.bypass_cowling_2,
                           color="Orange",
                           hidden=True)
 
+    # crete two cones, slightly smaller to cut-out the bypass  cowling
     @Part
     def bypass_cowling_cut_1(self):
         return Cone(radius1=self.inlet_diameter / 2,
@@ -245,6 +260,7 @@ class FanEngine(GeomBase):
                                        "z", self.loc_max_diameter),
                     hidden=True)
 
+    # fuse the parts to cut away
     @Part
     def fused_bypass_inner(self):
         return FusedSolid(shape_in=self.bypass_cowling_cut_1,
@@ -252,6 +268,7 @@ class FanEngine(GeomBase):
                           color="Orange",
                           hidden=True)
 
+    # subtract the full bypass cowling with the inner part to create a thinner hollowed out cone
     @Part
     def bypass(self):
         return SubtractedSolid(shape_in=self.fused_bypass_outer,
@@ -263,5 +280,5 @@ class FanEngine(GeomBase):
 if __name__ == '__main__':
     from parapy.gui import display
 
-    obj1 = Propulsion_System(label="Prop")
+    obj1 = PropulsionSystem(label="Prop")
     display(obj1)

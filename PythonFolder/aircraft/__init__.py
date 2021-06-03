@@ -19,5 +19,3 @@ from .fuselage_new import NewFuselageProfile
 from .fuselage_new import NewFuselage2
 from .cg_calculations_hyd import CGCalculationsHyd
 from .lifting_surface import LiftingSurface
-
-

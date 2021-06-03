@@ -1,4 +1,4 @@
-function [CLdes,CDdes, alpha] = Q3Drunner(span,root_chord,tip_chord,twist_chord,twist_tip,dihedral,sweep,airSpeed,airDensity,altitude,Reynolds,Mach,AoA,Cl)
+function [CLdes,CDdes, alpha] = Q3Drunner(span,root_chord,tip_chord,twist_chord,twist_tip,dihedral,sweep,air_speed,air_density,altitude,reynolds,mach,aoa,cl)
 
 
 % Wing planform geometry 
@@ -22,13 +22,13 @@ AC.Wing.eta = [0;1];  % Spanwise location of the airfoil sections
 AC.Visc  = 1;              % 0 for inviscidand 1 for viscous analysis
 
 % Flight Conditions
-AC.Aero.V     = airSpeed;            % flight speed (m/s)
-AC.Aero.rho   = airDensity;         % air density  (kg/m3)
+AC.Aero.V     = air_speed;            % flight speed (m/s)
+AC.Aero.rho   = air_density;         % air density  (kg/m3)
 AC.Aero.alt   = altitude;             % flight altitude (m)
-AC.Aero.Re    = Reynolds;        % reynolds number (bqased on mean aerodynamic chord)
-AC.Aero.M     = Mach;           % flight Mach number 
-AC.Aero.CL    = Cl;         % lift coefficient -comment this line to run the code for given alpha%
-%AC.Aero.Alpha = AoA;             % angle of attack - comment this line to run the code for given cl ient - comment this line to run the code for given alpha%
+AC.Aero.Re    = reynolds;        % reynolds number (bqased on mean aerodynamic chord)
+AC.Aero.M     = mach;           % flight Mach number
+AC.Aero.CL    = cl;         % lift coefficient -comment this line to run the code for given alpha%
+%AC.Aero.Alpha = aoa;             % angle of attack - comment this line to run the code for given cl ient - comment this line to run the code for given alpha%
 
 %% 
 % tic

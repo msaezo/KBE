@@ -29,10 +29,13 @@ class CGCalculationsHyd(GeomBase):
     mean_aerodynamic_chord = Input(Wing().mean_aerodynamic_chord)
     length_fuselage = Input(Fuselage().length_fuselage)
     popup_gui = Input(True)
+
+    # calculate actual max take off mass
     @Attribute
     def mtom(self):
         return self.mtow / 9.81
 
+    # find physical quantities of mass fractions rather than percentages
     @Attribute
     def mass_oew(self):
         return self.mtom * self.mass_oew_fr
@@ -41,6 +44,7 @@ class CGCalculationsHyd(GeomBase):
     def mass_payload(self):
         return self.mtom * self.mass_payload_fr
 
+    # find cog of hydrogen tanks
     @Attribute
     def x_fuel(self):
         return self.tank_length / 2 + self.tank_front_loc
@@ -49,6 +53,7 @@ class CGCalculationsHyd(GeomBase):
     def tank_cg_loc(self):
         return self.x_fuel
 
+    # estimate hydrogen tank and fuel mass
     @Attribute
     def mass_fuel(self):
         return self.vol_needed * self.hyd_density
@@ -57,15 +62,18 @@ class CGCalculationsHyd(GeomBase):
     def mass_tank(self):
         return (self.mass_fuel - self.g_i * self.mass_fuel) / self.g_i
 
+    # add contribution of hydrogen tank to oew cg location
     @Attribute  # Are we missing in this function the weight of the fuselage? or it is included?
     def x_oew(self):  # HERE I ADD THE CENTER OF GRAVITY CONTRIBUTION OF THE TANK WEIGHT
         return ((self.x_le_mac + 0.25 * self.mean_aerodynamic_chord) * self.mass_oew + self.mass_tank
                 * self.tank_cg_loc) / (self.mass_oew + self.mass_tank)
 
+    # payload cg location
     @Attribute
     def x_payload(self):
         return self.payload_cg_loc * self.length_fuselage
 
+    # try all possible configurations and cg locations and select the most forward and most aft as cg limits
     @Attribute
     def cg_forward(self):
         oew_and_payload = (self.x_oew * self.mass_oew
@@ -110,6 +118,7 @@ class CGCalculationsHyd(GeomBase):
 
         return max_cg_hyd
 
+    # creates visual representations of the hydrogen cg locations in green lines
     @Part
     def cg_front(self):
         return LineSegment(start=Point(self.cg_forward, -4, 0),
